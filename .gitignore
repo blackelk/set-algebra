@@ -1,6 +1,10 @@
 *.pyc
 *.pyo
 __pycache__
+*.egg*
+
+*.swp
+
 venv*
 trash
 
