@@ -1,15 +1,15 @@
-class uiset:
+class UISet:
     """
     Uncountable Infinite Set
     
     The subset and equality comparisons do not generalize to a total ordering function.
-    For example, any two nonempty disjoint uisets are not equal and are not subsets of each other,
+    For example, any two nonempty disjoint UISets are not equal and are not subsets of each other,
     so all of the following return False: a<b, a==b, or a>b.
 
     Note, the non-operator versions of union(), intersection(), difference(), and symmetric_difference(), issubset(), and issuperset() methods will accept any iterable as an argument.
-    In contrast, their operator based counterparts require their arguments to be uisets.
+    In contrast, their operator based counterparts require their arguments to be UISets.
 
-    Note, the elem argument to the __contains__(), remove(), and discard() methods may be an uiset.
+    Note, the elem argument to the __contains__(), remove(), and discard() methods may be an UISet.
     """
 
     def __init__(self, elements):
@@ -21,170 +21,170 @@ class uiset:
     def __contains__(self, x):
         """
         x in self
-        Test x for membership in uiset.
+        Test x for membership in UISet.
         """
     
     def __invert__(self):
         """
         ~self
-        Return a new uiset with elements that self does not contain.
-        Double inversion (~~self) returns uiset that is equal to self.
+        Return a new UISet with elements that self does not contain.
+        Double inversion (~~self) returns UISet that is equal to self.
         """
 
     # TODO: maybe slicing?
 
     def isdisjoint(self, other):
         """
-        Return True if uiset has no elements in common with other.
-        Uisets are disjoint if and only if their intersection is the empty uiset.
+        Return True if UISet has no elements in common with other.
+        Uisets are disjoint if and only if their intersection is the empty UISet.
         """
 
     def __eq__(self, other):
         """
         self == other
-        Test whether uiset contains all the elements of other and vice versa.
+        Test whether UISet contains all the elements of other and vice versa.
         """
 
     def __ne__(self, other):
         """
         self != other
-        Test whether uiset contains at least one element that other does not contain or vice versa.
+        Test whether UISet contains at least one element that other does not contain or vice versa.
         """
 
     def __gt__(self, other):
         """
         self > other
-        Test whether the uiset is a proper superset of other.
+        Test whether the UISet is a proper superset of other.
         """
 
     def __ge__(self, other):
         """
         self >= other
-        Test whether every element in other is in the uiset.
+        Test whether every element in other is in the UISet.
         """
 
     def issuperset(self, other):
-        """Test whether every element in other is in the uiset."""
+        """Test whether every element in other is in the UISet."""
         # same as __ge__
 
     def __le__(self, other):
         """
         self <= other
-        Test whether every element in the uiset is in other.
+        Test whether every element in the UISet is in other.
         """
 
     def issubset(self, other):
-        """Test whether every element in the uiset is in other."""
+        """Test whether every element in the UISet is in other."""
         # same as __le__
 
     def __lt__(self, other):
         """
         self < other
-        Test whether the uiset is a proper subset of other.
+        Test whether the UISet is a proper subset of other.
         """
 
     def __or__(self, other):
         """
         self | other
-        Return a new uiset with elements from the uiset and other.
+        Return a new UISet with elements from the UISet and other.
         """
 
     def union(self, *others):
-        """Return a new uiset with elements from the uiset and all others."""
+        """Return a new UISet with elements from the UISet and all others."""
         # same as __or__
 
     def __and__(self, other):
         """
         self & other
-        Return a new uiset with elements common to the uiset and other.
+        Return a new UISet with elements common to the UISet and other.
         """
 
     def intersection(self, *others):
-        """Return a new uiset with elements common to the uiset and all others."""
+        """Return a new UISet with elements common to the UISet and all others."""
         # same as __and__
 
     def __sub__(self, other):
         """
         self - other
-        Return a new uiset with elements in the uiset that are not in other.
+        Return a new UISet with elements in the UISet that are not in other.
         """
 
     def difference(self, *others):
         """
-        Return a new uiset with elements in the uiset that are not in the others.
+        Return a new UISet with elements in the UISet that are not in the others.
         """
         # same as __sub__
 
     def __xor__(self, other):
         """
         self ^ other
-        Return a new uiset with elements in either the uiset or other but not both."""
+        Return a new UISet with elements in either the UISet or other but not both."""
 
     def symmetric_difference(self, other):
         """
-        Return a new uiset with elements in either the uiset or other but not both."""
+        Return a new UISet with elements in either the UISet or other but not both."""
         # same as __xor__
 
     def __ior__(self, other):
         """
         self |= other
-        Update the uiset, adding elements from other.
+        Update the UISet, adding elements from other.
         """
 
     def update(self, *others):
         """
-        Update the uiset, adding elements from all others.
+        Update the UISet, adding elements from all others.
         """
         # same as __ior__
 
     def __iand__(self, other):
         """
         self &= other
-        Update the uiset, keeping only elements found in it and other.
+        Update the UISet, keeping only elements found in it and other.
         """
 
     def intersection_update(self, *others):
         """
-        Update the uiset, keeping only elements found in it and all others.
+        Update the UISet, keeping only elements found in it and all others.
         """
 
     def __isub__(self, other):
         """
         self -= other
-        Update the uiset, removing elements found in other.
+        Update the UISet, removing elements found in other.
         """
 
     def difference_update(self, *others):
         """
-        Update the uiset, removing elements found in others.
+        Update the UISet, removing elements found in others.
         """
 
     def __ixor__(self, other):
         """
         self ^= other
-        Update the uiset, keeping only elements found in either uiset, but not in both.
+        Update the UISet, keeping only elements found in either UISet, but not in both.
         """
     
     def symmetric_difference_update(self, other):
         """
-        Update the uiset, keeping only elements found in either uiset, but not in both.
+        Update the UISet, keeping only elements found in either UISet, but not in both.
         """
 
     def add(self, elem):
-        """Add element elem to the uiset."""
+        """Add element elem to the UISet."""
 
     def remove(self, elem):
-        """Remove element elem from the uiset.
-        Raises KeyError if elem is not contained in the uiset."""
+        """Remove element elem from the UISet.
+        Raises KeyError if elem is not contained in the UISet."""
 
     def discard(self, elem):
-        """Remove element elem from the uiset if it is present."""
+        """Remove element elem from the UISet if it is present."""
 
     def pop(self):
         """
-        Remove and return an arbitrary element from the uiset.
-        Raises KeyError if the uiset is empty."""
+        Remove and return an arbitrary element from the UISet.
+        Raises KeyError if the UISet is empty."""
 
     def clear(self):
-        """Remove all elements from the uiset."""
+        """Remove all elements from the UISet."""
 

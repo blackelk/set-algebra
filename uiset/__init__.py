@@ -19,3 +19,4 @@ __copyright__ = 'Copyright 2014 Constantine Parkhimovich'
 from uiset.infinity import Infinity, NegativeInfinity, is_finite, inf, neg_inf
 from uiset.endpoint import Endpoint
 from uiset.interval import Interval, is_scalar, unbounded
+from uiset.uiset import UISet
