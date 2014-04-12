@@ -12,8 +12,10 @@ class UISet:
     Note, the elem argument to the __contains__(), remove(), and discard() methods may be an UISet.
     """
 
-    def __init__(self, elements):
-        pass
+    def __init__(self, intervals):
+        self.intervals = []
+        for interval in intervals:
+            self.add(interval)
 
     def __repr__(self):
         pass
@@ -170,8 +172,20 @@ class UISet:
         Update the UISet, keeping only elements found in either UISet, but not in both.
         """
 
-    def add(self, elem):
-        """Add element elem to the UISet."""
+    def add(self, new):
+        """Merge existing intervals with a new one."""
+        for n, i in enumerate(self.intervals):
+            if i.b < new.a:
+                continue
+            if i.a > new.b:
+                self.intervals.insert(n, new)
+                return
+            if i.a > new.a:
+                i.a = new.a
+            if new.b > i.b:
+                i.b = new.b
+            return
+        self.intervals.append(new)
 
     def remove(self, elem):
         """Remove element elem from the UISet.
