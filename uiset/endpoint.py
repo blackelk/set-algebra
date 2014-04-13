@@ -77,6 +77,13 @@ class Endpoint:
     Endpoints support bitwise inversion:
     ~Endpoint('[7') -> Endpoint('7)')
 
+    To give an idea how Endpoint can be compared to other Endpoint or scalar,
+    the figure below demonstrates some Endpoints located on the real axis:
+           (0                   1)  1]  (1                   2)
+                                   [1
+        0                           1                            2
+    ------------------------------------------------------------------------->
+
     See tests/test_endpoint.py for details.
     """
 
@@ -125,6 +132,17 @@ class Endpoint:
         return repr_format % params
 
     def __eq__(self, other):
+        """
+        self == other
+        When comparing two Endpoints,
+            test whether all 3 slots (value, excluded, open) are equal.
+        When other is not Endpoint test whether Endpoint value is equal to other,
+            and if Endpoint is not excluded:
+        >>> Endpoint('[1') == 1
+        True
+        >>> Endpoint('(1') == 1
+        False
+        """
         if isinstance(other, Endpoint):
             return self.value == other.value\
                and self.excluded == other.excluded\
@@ -133,9 +151,11 @@ class Endpoint:
             return not self.excluded and self.value == other
 
     def __ne__(self, other):
+        """ self != other """
         return not self == other
 
     def __gt__(self, other):
+        """ self > other """
         if isinstance(other, Endpoint):
             if self.value == other.value:
                 return self._cmp(other) == 1
@@ -148,6 +168,7 @@ class Endpoint:
                 return self.value > other
 
     def __ge__(self, other):
+        """ self >= other """
         if isinstance(other, Endpoint):
             if self.value == other.value:
                 return self._cmp(other) != -1
@@ -160,6 +181,7 @@ class Endpoint:
                 return self.value > other
 
     def __lt__(self, other):
+        """ self < other """
         if isinstance(other, Endpoint):
             if self.value == other.value:
                 return self._cmp(other) == -1
@@ -172,6 +194,7 @@ class Endpoint:
                 return self.value < other
 
     def __le__(self, other):
+        """ self <= other """
         if isinstance(other, Endpoint):
             if self.value == other.value:
                 return self._cmp(other) != 1
@@ -184,7 +207,7 @@ class Endpoint:
                 return self.value < other
 
     def _cmp(self, other):
-        """Compare two Endpoints."""
+        """Compare two Endpoints with equal values."""
         if self.open:
             if other.open:
                 if not self.excluded and not other.excluded:
@@ -217,6 +240,10 @@ class Endpoint:
                     return 0
 
     def __invert__(self):
-        inverted = Endpoint(None, self.value, not self.excluded, not self.open)
-        return inverted
+        """
+        Return Endpoint with same value but opposite excluded and open attributes.
+        >>> ~Endpoint('[1')
+        Endpoint('1)')
+        """
+        return Endpoint(None, self.value, not self.excluded, not self.open)
 
