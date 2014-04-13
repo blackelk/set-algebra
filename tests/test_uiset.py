@@ -45,6 +45,15 @@ def test_uiset_init():
     assert s.intervals == [Interval('(0, 1)'), Interval('(1, 2)')]
 
 
+def test_uiset_bool():
+
+    s = UISet()
+    assert bool(s) is False
+
+    s.add(Interval('[1, 2]'))
+    assert bool(s) is True
+
+
 def test_uiset_add():
 
     s = UISet()

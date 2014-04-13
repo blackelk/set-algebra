@@ -15,6 +15,8 @@ class UISet:
     In contrast, their operator based counterparts require their arguments to be UISets.
 
     Note, the elem argument to the __contains__(), remove(), and discard() methods may be an UISet.
+
+    In boolean context UISet is True if it is not empty and False if it is empty.
     """
 
     def __init__(self, intervals=None):
@@ -26,6 +28,9 @@ class UISet:
 
     def __repr__(self):
         pass
+
+    def __bool__(self):
+        return len(self.intervals) > 0
 
     def __contains__(self, x):
         """
