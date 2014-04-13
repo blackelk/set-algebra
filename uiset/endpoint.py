@@ -217,6 +217,6 @@ class Endpoint:
                     return 0
 
     def __invert__(self):
-        inverted = Endpoint(self.value, not self.excluded, not self.open)
+        inverted = Endpoint(None, self.value, not self.excluded, not self.open)
         return inverted
 

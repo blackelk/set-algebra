@@ -75,6 +75,15 @@ def test_endpoint_repr():
     assert repr(Endpoint(None, '', True, True)) == "Endpoint(None, '', True, True)"
 
 
+def test_endpoint_invert():
+
+    assert ~Endpoint('[1') == Endpoint('1)')
+    assert ~Endpoint('(1') == Endpoint('1]')
+    assert ~Endpoint('1]') == Endpoint('(1')
+    assert ~Endpoint('1)') == Endpoint('[1')
+    assert ~~Endpoint('[2') == Endpoint('[2')
+
+
 def test_endpoint_notation():
 
     assert Endpoint('[1').notation == '[1'
