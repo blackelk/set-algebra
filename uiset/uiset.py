@@ -32,11 +32,10 @@ class UISet:
     def __bool__(self):
         return len(self.intervals) > 0
 
-    def __contains__(self, x):
+    def search(self, x):
         """
-        x in self
-        Test x for membership in UISet.
-        Binary search is used.
+        Return UISet`s Interval that contains x, or None if none found.
+        Implements Binary search.
         """
         lo = 0
         hi = len(self.intervals)
@@ -48,8 +47,15 @@ class UISet:
             elif mid_interval.a > x:
                 hi = mid
             else:
-                return True
-        return False
+                return mid_interval
+        return None
+
+    def __contains__(self, x):
+        """
+        x in self
+        Test x for membership in UISet.
+        """
+        return self.search(x) is not None
     
     def __invert__(self):
         """

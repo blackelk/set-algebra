@@ -9,15 +9,23 @@ def test_uiset_init():
     s = UISet([])
     assert s.intervals == []
 
+    s = UISet([unbounded])
+    assert s.intervals[0] == unbounded
+    assert s.intervals[0] is not unbounded
+
     i1 = Interval('[1, 4]')
     i2 = Interval('[7, 9]')
     s = UISet([i1, i2])
     assert s.intervals == [Interval('[1, 4]'), Interval('[7, 9]')]
+    assert s.intervals[0] is not i1
+    assert s.intervals[1] is not i2
 
     i1 = Interval('[7, 9]')
     i2 = Interval('[1, 4]')
     s = UISet([i1, i2])
     assert s.intervals == [Interval('[1, 4]'), Interval('[7, 9]')]
+    assert s.intervals[0] is not i1
+    assert s.intervals[1] is not i2
 
     i1 = Interval('[1, 9]')
     i2 = Interval('[3, 5]')
@@ -127,6 +135,22 @@ def test_uiset_inverse():
     assert i6 == Interval('(1, 2)')
     assert i7 == Interval('(-inf, 0)')
     assert i8 == Interval('[0, inf)')
+
+
+def test_uiset_search():
+
+    s = UISet()
+    assert s.search(1) is None
+    
+    s = UISet([unbounded])
+    assert s.search(1) == unbounded
+
+    i1 = Interval('[0, 1]')
+    i2 = Interval('(2, 3)')
+    s = UISet([i1, i2])
+    assert s.search(1) == i1
+    assert s.search(2) is None
+    assert s.search(2.5) == i2
 
 
 def test_uiset_contains():
