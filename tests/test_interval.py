@@ -95,6 +95,20 @@ def test_interval_in_interval():
     assert Interval('(1, 2)') in Interval('(1, 2)')
 
 
+def test_interval_copy():
+
+    a = Endpoint('[1')
+    b = Endpoint('2]')
+    i1 = Interval(None, a, b)
+    i2 = i1.copy()
+    assert i1 == i2
+    assert i1 is not i2
+    assert a == i2.a
+    assert a is not i2.a
+    assert b == i2.b
+    assert b is not i2.b
+
+
 def test_str_interval():
 
     a = Endpoint(value='p', excluded=False, open=True)

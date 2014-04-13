@@ -98,6 +98,10 @@ class Interval:
         else:
             return self.a <= other <= self.b
 
+    def copy(self):
+        """Return a shallow copy of an Interval"""
+        return Interval(a=self.a.copy(), b=self.b.copy())
+
 
 def is_scalar(obj):
     return not isinstance(obj, Interval)

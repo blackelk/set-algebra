@@ -247,3 +247,7 @@ class Endpoint:
         """
         return Endpoint(None, self.value, not self.excluded, not self.open)
 
+    def copy(self):
+        """Return a shallow copy of an Endpoint"""
+        return Endpoint(None, self.value, self.excluded, self.open)
+

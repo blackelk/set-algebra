@@ -396,3 +396,11 @@ def test_endpoint_le_endpoint():
     assert Endpoint('1)') <= Endpoint('2]')
     assert Endpoint('1)') <= Endpoint('2)')
 
+
+def test_endpoint_copy():
+
+    e1 = Endpoint('1]')
+    e2 = e1.copy()
+    assert e1 == e2
+    assert e1 is not e2
+
