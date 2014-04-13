@@ -36,7 +36,20 @@ class UISet:
         """
         x in self
         Test x for membership in UISet.
+        Binary search is used.
         """
+        lo = 0
+        hi = len(self.intervals)
+        while lo < hi:
+            mid = (lo+hi) // 2
+            mid_interval = self.intervals[mid]
+            if mid_interval.b < x:
+                lo = mid + 1
+            elif mid_interval.a > x:
+                hi = mid
+            else:
+                return True
+        return False
     
     def __invert__(self):
         """

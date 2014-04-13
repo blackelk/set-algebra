@@ -1,4 +1,4 @@
-from uiset import Interval, UISet
+from uiset import Interval, UISet, inf, unbounded
 
 
 def test_uiset_init():
@@ -45,15 +45,6 @@ def test_uiset_init():
     assert s.intervals == [Interval('(0, 1)'), Interval('(1, 2)')]
 
 
-def test_uiset_bool():
-
-    s = UISet()
-    assert bool(s) is False
-
-    s.add(Interval('[1, 2]'))
-    assert bool(s) is True
-
-
 def test_uiset_add():
 
     s = UISet()
@@ -75,6 +66,15 @@ def test_uiset_add():
     assert i2 == Interval('(-inf, 0)')
     assert i3 == Interval('[-1, 0]')
     assert i4 == Interval('(0, 1)')
+
+
+def test_uiset_bool():
+
+    s = UISet()
+    assert bool(s) is False
+
+    s.add(Interval('[1, 2]'))
+    assert bool(s) is True
 
 
 def test_uiset_inverse():
@@ -127,4 +127,57 @@ def test_uiset_inverse():
     assert i6 == Interval('(1, 2)')
     assert i7 == Interval('(-inf, 0)')
     assert i8 == Interval('[0, inf)')
+
+
+def test_uiset_contains():
+
+    s = UISet()
+    assert 1 not in s
+
+    s = UISet([unbounded])
+    assert 1 in s
+
+    i1 = Interval('[1, 3]')
+    s = UISet([i1])
+    assert 0 not in s
+    assert 1 in s
+    assert 2 in s
+    assert 3 in s
+    assert 4 not in s
+
+    i2 = Interval('(5, 7)')
+    s.add(i2)
+    assert 0 not in s
+    assert 1 in s
+    assert 2 in s
+    assert 3 in s
+    assert 4 not in s
+    assert 5 not in s
+    assert 6 in s
+    assert 7 not in s
+
+    i3 = Interval('(7, inf)')
+    s.add(i3)
+    assert 0 not in s
+    assert 1 in s
+    assert 2 in s
+    assert 3 in s
+    assert 4 not in s
+    assert 5 not in s
+    assert 6 in s
+    assert 7 not in s
+    assert 100 in s
+    assert inf not in s
+
+    s = ~s
+    assert 0 in s
+    assert 1 not in s
+    assert 2 not in s
+    assert 3 not in s
+    assert 4 in s
+    assert 5 in s
+    assert 6 not in s
+    assert 7 in s
+    assert 100 not in s
+    assert inf not in s
 
