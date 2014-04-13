@@ -1,3 +1,8 @@
+from uiset.infinity import inf, neg_inf
+from uiset.endpoint import Endpoint
+from uiset.interval import Interval, unbounded
+
+
 class UISet:
     """
     Uncountable Infinite Set
@@ -33,7 +38,36 @@ class UISet:
         Double inversion (~~self) returns UISet that is equal to self.
         """
 
-    # TODO: maybe slicing?
+        new = UISet([])
+        if not self.intervals:
+            new.intervals.append(unbounded.copy())
+            return new
+        if self.intervals[0] == unbounded.copy():
+            return new
+        # Get plain list of endpoints from original UISet.
+        endpoints = []
+        for i in self.intervals:
+            endpoints += [i.a, i.b]
+        # Make sure the first endpoint is either -inf or inverted original one.
+        if endpoints[0].value == neg_inf:
+            del endpoints[0]
+            endpoints[0] = ~endpoints[0]
+        else:
+            endpoints.insert(0, Endpoint('(-inf'))
+        # Make sure the last endpoint is either inf or inverted original one.
+        if endpoints[-1].value == inf:
+            del endpoints[-1]
+            endpoints[-1] = ~endpoints[-1]
+        else:
+            endpoints.append(Endpoint('inf)'))
+        # Invert inner endpoints.
+        endpoints[1:-1] = [~e for e in endpoints[1:-1]]
+        # Construct new UISet`s intervals from endpoint pairs.
+        for a, b in zip(endpoints[::2], endpoints[1::2]):
+            i = Interval(a=a, b=b)
+            new.intervals.append(i)
+
+        return new
 
     def isdisjoint(self, other):
         """
