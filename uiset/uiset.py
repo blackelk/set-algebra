@@ -17,8 +17,10 @@ class UISet:
     Note, the elem argument to the __contains__(), remove(), and discard() methods may be an UISet.
     """
 
-    def __init__(self, intervals):
+    def __init__(self, intervals=None):
         self.intervals = []
+        if intervals is None:
+            return
         for interval in intervals:
             self.add(interval)
 
@@ -212,14 +214,14 @@ class UISet:
             if i.b < new.a:
                 continue
             if i.a > new.b:
-                self.intervals.insert(n, new)
+                self.intervals.insert(n, new.copy())
                 return
             if i.a > new.a:
-                i.a = new.a
+                i.a = new.a.copy()
             if new.b > i.b:
-                i.b = new.b
+                i.b = new.b.copy()
             return
-        self.intervals.append(new)
+        self.intervals.append(new.copy())
 
     def remove(self, elem):
         """Remove element elem from the UISet.
