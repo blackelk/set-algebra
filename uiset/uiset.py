@@ -236,9 +236,17 @@ class UISet:
         """Merge existing intervals with a new one."""
         for n, i in enumerate(self.intervals):
             if i.b < new.a:
+                if i.b == ~new.a:
+                    # (1, 2) + [2, 5] --> (1, 5];     (1, 2] + (2, 5] --> (1, 5]
+                    i.b = new.b.copy()
+                    return
                 continue
             if i.a > new.b:
-                self.intervals.insert(n, new.copy())
+                if i.a == ~new.b:
+                    # (3, 5) + [2, 3] --> [2, 5);     [3, 5) + [2, 3) --> [2, 5)
+                    i.a = new.a.copy()
+                else:
+                    self.intervals.insert(n, new.copy())
                 return
             if i.a > new.a:
                 i.a = new.a.copy()

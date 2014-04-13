@@ -59,21 +59,49 @@ def test_uiset_add():
     i1 = Interval('(-inf, 0)')
     s.add(i1)
     assert s.intervals == [i1]
+    
     i2 = Interval('(-inf, 0)')
     s.add(i2)
     assert s.intervals == [i1]
+    
     i3 = Interval('[-1, 0]')
     s.add(i3)
     assert s.intervals == [Interval('(-inf, 0]')]
+    
     i4 = Interval('(0, 1)')
     s.add(i4)
-    assert s.intervals == [Interval('(-inf, 0]'), i4]
+    assert s.intervals == [Interval('(-inf, 1)')]
+    
+    i5 = Interval('(1, 2)')
+    s.add(i5)
+    assert s.intervals == [Interval('(-inf, 1)'), Interval('(1, 2)')]
+
+    s = UISet([i4])
+    s.add(i3)
+    assert s.intervals == [Interval('[-1, 1)')]
+
+    i6 = Interval('[0, 1)')
+    i7 = Interval('[-1, 0)')
+    s = UISet([i6])
+    s.add(i7)
+    assert s.intervals == [Interval('[-1, 1)')]
+
+    i8 = Interval('(0, 1)')
+    i9 = Interval('(-1, 0)')
+    s = UISet([i8])
+    s.add(i9)
+    assert s.intervals == [Interval('(-1, 0)'), Interval('(0, 1)')]
 
     # Make sure original intervals has not changed.
     assert i1 == Interval('(-inf, 0)')
     assert i2 == Interval('(-inf, 0)')
     assert i3 == Interval('[-1, 0]')
     assert i4 == Interval('(0, 1)')
+    assert i5 == Interval('(1, 2)')
+    assert i6 == Interval('[0, 1)')
+    assert i7 == Interval('[-1, 0)')
+    assert i8 == Interval('(0, 1)')
+    assert i9 == Interval('(-1, 0)')
 
 
 def test_uiset_bool():
