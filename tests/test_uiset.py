@@ -179,6 +179,7 @@ def test_uiset_search():
     assert s.search(1) == i1
     assert s.search(2) is None
     assert s.search(2.5) == i2
+    assert s.search(2.5, enumerated=True) == (1, i2)
 
 
 def test_uiset_contains():
@@ -232,4 +233,20 @@ def test_uiset_contains():
     assert 7 in s
     assert 100 not in s
     assert inf not in s
+
+
+def test_uiset_discard():
+
+    s = UISet()
+    i = Interval('[0, 2]')
+    s.add(i)
+    s.discard(0)
+    assert s.intervals == [Interval('(0, 2]')]
+    s.discard(2)
+    assert s.intervals == [Interval('(0, 2)')]
+    s.discard(1)
+    s.discard(-1)
+    assert s.intervals == [Interval('(0, 1)'), Interval('(1, 2)')]
+
+    assert i == Interval('[0, 2]')
 

@@ -32,10 +32,13 @@ class UISet:
     def __bool__(self):
         return len(self.intervals) > 0
 
-    def search(self, x):
+    def search(self, x, enumerated=False):
         """
         Return UISet`s Interval that contains x, or None if none found.
         Implements Binary search.
+        If enumerated is True, return tuple of:
+            index of interval containing x,
+            interval itself.
         """
         lo = 0
         hi = len(self.intervals)
@@ -47,7 +50,7 @@ class UISet:
             elif mid_interval.a > x:
                 hi = mid
             else:
-                return mid_interval
+                return enumerated and (mid, mid_interval) or mid_interval
         return None
 
     def __contains__(self, x):
@@ -257,10 +260,28 @@ class UISet:
 
     def remove(self, elem):
         """Remove element elem from the UISet.
-        Raises KeyError if elem is not contained in the UISet."""
+        Raises LookupError if elem is not contained in the UISet."""
 
     def discard(self, elem):
-        """Remove element elem from the UISet if it is present."""
+        """Remove element elem from the UISet if it is present.
+        Dependently on values, none of intervals will change,
+            or one of endpoints will be excluded,
+            or one of intervals will be splitted into two intervals.
+        """
+        res = self.search(elem, True)
+        if not res:
+            return
+
+        n, interval = res
+        if interval.a == elem:
+            interval.a.excluded = True
+        elif interval.b == elem:
+            interval.b.excluded = True
+        else:
+            # Split interval by elem.
+            i1 = Interval(a=interval.a, b=Endpoint(None, elem, True, False))
+            i2 = Interval(a=Endpoint(None, elem, True, True), b=interval.b)
+            self.intervals[n:n+1] = [i1, i2]
 
     def pop(self):
         """
