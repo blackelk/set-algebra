@@ -290,4 +290,5 @@ class UISet:
 
     def clear(self):
         """Remove all elements from the UISet."""
+        self.intervals = []
 

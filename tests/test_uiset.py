@@ -250,3 +250,12 @@ def test_uiset_discard():
 
     assert i == Interval('[0, 2]')
 
+
+def test_uiset_clear():
+
+    i1 = Interval('[0, 1]')
+    i2 = Interval('[2, 3]')
+    s = UISet([i1, i2])
+    s.clear()
+    assert s.intervals == []
+
