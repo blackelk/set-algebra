@@ -53,6 +53,16 @@ def test_uiset_init():
     assert s.intervals == [Interval('(0, 1)'), Interval('(1, 2)')]
 
 
+def test_uiset_notation():
+
+    s = UISet()
+    assert s.notation == ''
+    s.add(Interval('(-inf, 0)'))
+    assert s.notation == '(-inf, 0)'
+    s.add(Interval('[1, 2]'))
+    assert s.notation == '(-inf, 0), [1, 2]'
+
+
 def test_uiset_add():
 
     s = UISet()
@@ -237,9 +247,8 @@ def test_uiset_contains():
 
 def test_uiset_discard():
 
-    s = UISet()
-    i = Interval('[0, 2]')
-    s.add(i)
+    i1 = Interval('[0, 2]')
+    s = UISet([i1])
     s.discard(0)
     assert s.intervals == [Interval('(0, 2]')]
     s.discard(2)
@@ -247,8 +256,13 @@ def test_uiset_discard():
     s.discard(1)
     s.discard(-1)
     assert s.intervals == [Interval('(0, 1)'), Interval('(1, 2)')]
+    i2 = Interval('[2, inf)')
+    s.add(i2)
+    s.discard(inf)
+    assert s.intervals == [Interval('(0, 1)'), Interval('(1, inf)')]
 
-    assert i == Interval('[0, 2]')
+    assert i1 == Interval('[0, 2]')
+    assert i2 == Interval('[2, inf)')
 
 
 def test_uiset_clear():

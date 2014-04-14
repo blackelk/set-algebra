@@ -29,6 +29,10 @@ class UISet:
     def __repr__(self):
         pass
 
+    @property
+    def notation(self):
+        return ', '.join(i.notation for i in self.intervals)
+
     def __bool__(self):
         return len(self.intervals) > 0
 

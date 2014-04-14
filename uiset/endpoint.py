@@ -114,12 +114,12 @@ class Endpoint:
 
     @property
     def notation(self):
-        _format = '%s%s'
         if self.open:
             _format = self.excluded and '(%s' or '[%s'
         else:
             _format = self.excluded and '%s)' or '%s]'
-        return _format % self.value
+        value_str = self.value == neg_inf and '-inf' or str(self.value)
+        return _format % value_str
 
     def __repr__(self):
         classname = self.__class__.__name__

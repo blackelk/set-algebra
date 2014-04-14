@@ -70,7 +70,7 @@ def test_endopint_parses_value():
 def test_endpoint_repr():
 
     assert repr(Endpoint('[5')) == "Endpoint('[5')"
-    assert repr(Endpoint('(-inf')) == "Endpoint('(neg_inf')"
+    assert repr(Endpoint('(-inf')) == "Endpoint('(-inf')"
     assert repr(Endpoint('inf)')) == "Endpoint('inf)')"
     assert repr(Endpoint(None, 3, True, False)) == "Endpoint('3)')"
     assert repr(Endpoint(None, '', True, True)) == "Endpoint(None, '', True, True)"
