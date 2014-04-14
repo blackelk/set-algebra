@@ -69,11 +69,23 @@ def test_endopint_parses_value():
 
 def test_endpoint_repr():
 
-    assert repr(Endpoint('[5')) == "Endpoint('[5')"
-    assert repr(Endpoint('(-inf')) == "Endpoint('(-inf')"
-    assert repr(Endpoint('inf)')) == "Endpoint('inf)')"
-    assert repr(Endpoint(None, 3, True, False)) == "Endpoint('3)')"
-    assert repr(Endpoint(None, '', True, True)) == "Endpoint(None, '', True, True)"
+    e1 = Endpoint('[5')
+    e2 = Endpoint('(-inf')
+    e3 = Endpoint('inf)')
+    e4 = Endpoint(None, 3, True, False)
+    e5 = Endpoint(None, 'A', True, True)
+
+    assert repr(e1) == "Endpoint('[5')"
+    assert repr(e2) == "Endpoint('(-inf')"
+    assert repr(e3) == "Endpoint('inf)')"
+    assert repr(e4) == "Endpoint('3)')"
+    assert repr(e5) == "Endpoint(None, 'A', True, True)"
+
+    assert eval(repr(e1)) == e1
+    assert eval(repr(e2)) == e2
+    assert eval(repr(e3)) == e3
+    assert eval(repr(e4)) == e4
+    assert eval(repr(e5)) == e5
 
 
 def test_endpoint_invert():

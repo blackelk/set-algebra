@@ -85,14 +85,17 @@ class Interval:
         return '%s, %s' % (self.a.notation, self.b.notation)
 
     def __repr__(self):
-        return "%s('%s')" % (self.__class__.__name__, self.notation)
+        classname = self.__class__.__name__
+        if isinstance(self.a.value, Endpoint.PARSABLE_TYPES):
+            return "%s('%s')" % (classname, self.notation)
+        else:
+            return "%s(None, %s, %s)" % (classname, self.a, self.b)
 
     def __eq__(self, other):
         return isinstance(other, Interval)\
            and self.a == other.a and self.b == other.b
 
     def __contains__(self, other):
-
         if isinstance(other, Interval):
             return self.a <= other.a and other.b <= self.b
         else:

@@ -53,6 +53,15 @@ def test_uiset_init():
     assert s.intervals == [Interval('(0, 1)'), Interval('(1, 2)')]
 
 
+def test_uiset_repr():
+
+    s = UISet()
+    assert repr(s) == 'UISet([])'
+
+    s = UISet([Interval('[1, 2.5)'), Interval('(2.5, 4]'), Interval('[7, 9]')])
+    assert eval(repr(s)).intervals == s.intervals
+
+
 def test_uiset_notation():
 
     s = UISet()

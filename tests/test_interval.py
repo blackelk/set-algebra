@@ -3,6 +3,35 @@ import pytest
 from uiset import Endpoint, Interval
 
 
+def test_interval_repr():
+
+    i1 = Interval('[1, 2]')
+    i2 = Interval('[1, 2)')
+    i3 = Interval('(1, 2]')
+    i4 = Interval('(1, 2)')
+    i5 = Interval('(-inf, 2)')
+    i6 = Interval('(1, inf)')
+    a = Endpoint(None, 'A', False, True)
+    b = Endpoint(None, 'Z', False, False)
+    i7 = Interval(None, a=a, b=b)
+
+    assert repr(i1) == "Interval('[1, 2]')"
+    assert repr(i2) == "Interval('[1, 2)')"
+    assert repr(i3) == "Interval('(1, 2]')"
+    assert repr(i4) == "Interval('(1, 2)')"
+    assert repr(i5) == "Interval('(-inf, 2)')"
+    assert repr(i6) == "Interval('(1, inf)')"
+    assert repr(i7) == "Interval(None, Endpoint(None, 'A', False, True), Endpoint(None, 'Z', False, False))"
+
+    assert eval(repr(i1)) == i1
+    assert eval(repr(i2)) == i2
+    assert eval(repr(i3)) == i3
+    assert eval(repr(i4)) == i4
+    assert eval(repr(i5)) == i5
+    assert eval(repr(i6)) == i6
+    assert eval(repr(i7)) == i7
+
+
 def test_interval_init_raises():
 
     with pytest.raises(ValueError):

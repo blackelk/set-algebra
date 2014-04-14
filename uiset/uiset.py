@@ -27,7 +27,7 @@ class UISet:
             self.add(interval)
 
     def __repr__(self):
-        pass
+        return '%s(%s)' % (self.__class__.__name__, self.intervals)
 
     @property
     def notation(self):
