@@ -41,7 +41,7 @@ def parse_endpoint_notation(notation):
     value_str = value_str.strip()
     if value_str.isdigit() or (value_str[0] == '-' and value_str[1:].isdigit()):
         value = int(value_str)
-    elif value_str == '-inf':
+    elif value_str in ('-inf', 'neg_inf'):
         value = neg_inf
     elif value_str == 'inf':
         value = inf

@@ -63,6 +63,7 @@ def test_endopint_parses_value():
     assert Endpoint('[4.5e-6').value == 4.5e-6
     assert Endpoint('[4.5e6').value == 4.5e6
     assert Endpoint('(-inf').value == float('-inf')
+    assert Endpoint('(neg_inf').value == float('-inf')
     assert Endpoint('inf)').value == float('inf')
 
 
