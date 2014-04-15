@@ -1,3 +1,4 @@
+import pytest
 from uiset import Interval, UISet, inf, unbounded
 
 
@@ -51,6 +52,40 @@ def test_uiset_init():
     i2 = Interval('(1, 2)')
     s = UISet([i1, i2])
     assert s.intervals == [Interval('(0, 1)'), Interval('(1, 2)')]
+
+
+def test_uiset_init_from_notation():
+
+    s = UISet('[1, 2]')
+    assert s.intervals == [Interval('[1, 2]')]
+
+    s = UISet('[1, 2], (4, 5)')
+    assert s.intervals == [Interval('[1, 2]'), Interval('(4, 5)')]
+
+    s = UISet('[1, 2], [5, inf)')
+    assert s.intervals == [Interval('[1, 2]'), Interval('[5, inf)')]
+
+
+def test_uiset_init_from_notation_raises():
+
+    with pytest.raises(ValueError):
+        s = UISet('')
+    with pytest.raises(ValueError):
+        UISet('1')
+    with pytest.raises(ValueError):
+        UISet(',')
+    with pytest.raises(ValueError):
+        UISet('[1')
+    with pytest.raises(ValueError):
+        UISet('[1,')
+    with pytest.raises(ValueError):
+        UISet('[1, [2')
+    with pytest.raises(ValueError):
+        UISet('[1, 3], [2, 4]')
+    with pytest.raises(ValueError):
+        UISet('[1, 2], (2, 3)')
+    with pytest.raises(ValueError):
+        UISet('[1, 2), [2, 3)')
 
 
 def test_uiset_repr():

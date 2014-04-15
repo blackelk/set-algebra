@@ -6,6 +6,12 @@ from uiset.interval import Interval, unbounded
 class UISet:
     """
     Uncountable Infinite Set
+
+    UISet can be instantiated from either:
+        - iterable of intervals: UISet([Interval('[1, 2]'), Interval('[5, inf)')])
+        - notation string: UISet('[1, 2], [5, inf)'). Note that in this case all
+            the intervals must be sorted in ascending order and must not intersect.
+        - nothing for empty UISet: UISet() 
     
     The subset and equality comparisons do not generalize to a total ordering function.
     For example, any two nonempty disjoint UISets are not equal and are not subsets of each other,
@@ -23,8 +29,24 @@ class UISet:
         self.intervals = []
         if intervals is None:
             return
-        for interval in intervals:
-            self.add(interval)
+        if isinstance(intervals, str):
+            # Initialize from notation.
+            classname = self.__class__.__name__
+            if ',' not in intervals:
+                raise ValueError('Invalid %s notation' % classname)
+            it = iter(intervals.split(','))
+            for a, b in zip(it, it):
+                interval = Interval(a=Endpoint(a), b=Endpoint(b))
+                if self.intervals:
+                    last = self.intervals[-1]
+                    if last.b > interval.a or last.b == ~interval.a:
+                        emsg = '%s notation must be acscending' % classname
+                        raise ValueError(emsg)
+                self.intervals.append(interval)
+        else:
+            # Initialize from iterable of intervals.
+            for interval in intervals:
+                self.add(interval)
 
     def __repr__(self):
         return '%s(%s)' % (self.__class__.__name__, self.intervals)
