@@ -234,6 +234,9 @@ def test_uiset_search():
     assert s.search(2) is None
     assert s.search(2.5) == i2
     assert s.search(2.5, enumerated=True) == (1, i2)
+    assert s.search(1, lo=1) is None
+    assert s.search(2.5, hi=1) is None
+    assert s.search(2.5, lo=1)
 
 
 def test_uiset_contains():

@@ -58,16 +58,23 @@ class UISet:
     def __bool__(self):
         return len(self.intervals) > 0
 
-    def search(self, x, enumerated=False):
+    def search(self, x, lo=0, hi=None, enumerated=False):
         """
         Return UISet`s Interval that contains scalar x, or None if none found.
+
         Implements Binary search.
-        If enumerated is True, return tuple of:
-            index of interval containing x,
-            interval itself.
+        
+        Optional args lo (default 0) and hi (default len(self.intervals)) bound the
+            slice of self.intervals to be searched.
+        
+        If optional arg enumerated is True, tuple of 2 items below will be returned:
+            - index of interval containing x,
+            - interval itself.
         """
-        lo = 0
-        hi = len(self.intervals)
+        if lo < 0:
+            raise ValueError('lo must be non-negative')
+        if hi is None:
+            hi = len(self.intervals)
         while lo < hi:
             mid = (lo+hi) // 2
             mid_interval = self.intervals[mid]
@@ -296,10 +303,9 @@ class UISet:
             or one of endpoints will be excluded,
             or one of intervals will be splitted into two intervals.
         """
-        res = self.search(elem, True)
+        res = self.search(elem, enumerated=True)
         if not res:
             return
-
         n, interval = res
         if interval.a == elem:
             interval.a.excluded = True
