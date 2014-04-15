@@ -320,3 +320,13 @@ class UISet:
         """Remove all intervals from the UISet."""
         self.intervals = []
 
+    def copy(self):
+        """
+        Return a copy of an UISet.
+        Intervals are recreated.
+        copy is safe as long as endpoint values are of immutable types.
+        """
+        new = UISet()
+        new.intervals = [i.copy() for i in self.intervals]
+        return new
+

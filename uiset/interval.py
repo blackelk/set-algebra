@@ -102,7 +102,11 @@ class Interval:
             return self.a <= other <= self.b
 
     def copy(self):
-        """Return a shallow copy of an Interval"""
+        """
+        Return a shallow copy of an Interval.
+        Endpoints are recreated.
+        copy is safe as long as endpoint values are of immutable types.
+        """
         return Interval(a=self.a.copy(), b=self.b.copy())
 
 

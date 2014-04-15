@@ -1,5 +1,5 @@
 import pytest
-from uiset import Interval, UISet, inf, unbounded
+from uiset import Endpoint, Interval, UISet, inf, unbounded
 
 
 def test_uiset_init():
@@ -331,4 +331,28 @@ def test_uiset_clear():
     s = UISet([i1, i2])
     s.clear()
     assert s.intervals == []
+
+
+def test_uiset_copy():
+
+    s1 = UISet()
+    s2 = s1.copy()
+    assert s1 == s2
+    assert s1 is not s2
+
+    i = Interval('[1, 2]')
+    s1 = UISet([i])
+    s2 = s1.copy()
+    assert s1 == s2
+    assert s2.intervals[0] is not i
+
+    l1 = [1, 2, 3]
+    l2 = [4, 5, 6]
+    a = Endpoint(None, l1, True, True)
+    b = Endpoint(None, l2, True, False)
+    i = Interval(None, a, b)
+    s1 = UISet([i])
+    s2 = s1.copy()
+    s2.intervals[0].a.value[2] = -1
+    assert i.a.value[2] == -1
 
