@@ -254,6 +254,21 @@ def test_uiset_contains():
     assert inf not in s
 
 
+def test_uiset_eq_and_ne():
+
+    s1 = UISet()
+    s2 = UISet()
+    assert s1 == s2
+    s1.add(Interval('[1, 2]'))
+    assert s1 != s2
+
+    s2 = UISet([Interval('[1, 2]')])
+    assert s1 == s2
+
+    s2.discard(2)
+    assert s1 != s2
+
+
 def test_uiset_discard():
 
     i1 = Interval('[0, 2]')

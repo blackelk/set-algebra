@@ -38,7 +38,7 @@ class UISet:
 
     def search(self, x, enumerated=False):
         """
-        Return UISet`s Interval that contains x, or None if none found.
+        Return UISet`s Interval that contains scalar x, or None if none found.
         Implements Binary search.
         If enumerated is True, return tuple of:
             index of interval containing x,
@@ -60,7 +60,7 @@ class UISet:
     def __contains__(self, x):
         """
         x in self
-        Test x for membership in UISet.
+        Test scalar x for membership in UISet.
         """
         return self.search(x) is not None
     
@@ -113,12 +113,14 @@ class UISet:
         self == other
         Test whether UISet contains all the elements of other and vice versa.
         """
+        return self.intervals == other.intervals
 
     def __ne__(self, other):
         """
         self != other
         Test whether UISet contains at least one element that other does not contain or vice versa.
         """
+        return self.intervals != other.intervals
 
     def __gt__(self, other):
         """
@@ -267,7 +269,7 @@ class UISet:
         Raises LookupError if elem is not contained in the UISet."""
 
     def discard(self, elem):
-        """Remove element elem from the UISet if it is present.
+        """Remove scalar element elem from the UISet if it is present.
         Dependently on values, none of intervals will change,
             or one of endpoints will be excluded,
             or one of intervals will be splitted into two intervals.
@@ -293,6 +295,6 @@ class UISet:
         Raises KeyError if the UISet is empty."""
 
     def clear(self):
-        """Remove all elements from the UISet."""
+        """Remove all intervals from the UISet."""
         self.intervals = []
 
