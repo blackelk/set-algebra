@@ -95,7 +95,7 @@ class Endpoint:
 
         if (notation is None) ^ any(k is not None for k in [value, excluded, open]):
             e = '%s() takes notation or 3 kwargs: value, excluded, and open'
-            raise TypeError(e % self.__class__.__name__)
+            raise TypeError(e % type(self).__name__)
 
         if notation is not None:
             value, excluded, open = parse_endpoint_notation(notation)
@@ -122,7 +122,7 @@ class Endpoint:
         return _format % value_str
 
     def __repr__(self):
-        classname = self.__class__.__name__
+        classname = type(self).__name__
         if isinstance(self.value, self.PARSABLE_TYPES):
             repr_format = "%s('%s')"
             params = (classname, self.notation)

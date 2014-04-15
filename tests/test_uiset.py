@@ -4,6 +4,16 @@ from uiset import Endpoint, Interval, UISet, inf, unbounded
 
 def test_uiset_init():
 
+    s1 = UISet()
+    s2 = UISet(s1)
+    assert s1 == s2
+    assert s1 is not s2
+
+    s1 = UISet([Interval('[1, 2]')])
+    s2 = UISet(s1)
+    assert s1 == s2
+    assert s1 is not s2
+
     s = UISet()
     assert s.intervals == []
 

@@ -11,6 +11,7 @@ class UISet:
         - iterable of intervals: UISet([Interval('[1, 2]'), Interval('[5, inf)')])
         - notation string: UISet('[1, 2], [5, inf)'). Note that in this case all
             the intervals must be sorted in ascending order and must not intersect.
+        - another UISet. Intervals will be copied.
         - nothing for empty UISet: UISet() 
     
     The subset and equality comparisons do not generalize to a total ordering function.
@@ -25,31 +26,37 @@ class UISet:
     In boolean context UISet is True if it is not empty and False if it is empty.
     """
 
-    def __init__(self, intervals=None):
-        self.intervals = []
-        if intervals is None:
+    def __init_from_notation(self, notation):
+
+        if ',' not in notation:
+            raise ValueError('Invalid %s notation' % type(self).__name__)
+        it = iter(notation.split(','))
+        for a, b in zip(it, it):
+            interval = Interval(a=Endpoint(a), b=Endpoint(b))
+            if self.intervals:
+                last = self.intervals[-1]
+                if last.b > interval.a or last.b == ~interval.a:
+                    emsg = '%s notation must be ascending' % type(self).__name__
+                    raise ValueError(emsg)
+            self.intervals.append(interval)
+
+    def __init__(self, arg=None):
+        
+        if isinstance(arg, type(self)):
+            self.intervals = [i.copy() for i in arg.intervals]
             return
-        if isinstance(intervals, str):
-            # Initialize from notation.
-            classname = self.__class__.__name__
-            if ',' not in intervals:
-                raise ValueError('Invalid %s notation' % classname)
-            it = iter(intervals.split(','))
-            for a, b in zip(it, it):
-                interval = Interval(a=Endpoint(a), b=Endpoint(b))
-                if self.intervals:
-                    last = self.intervals[-1]
-                    if last.b > interval.a or last.b == ~interval.a:
-                        emsg = '%s notation must be acscending' % classname
-                        raise ValueError(emsg)
-                self.intervals.append(interval)
+        self.intervals = []
+        if arg is None:
+            return
+        elif isinstance(arg, str):
+            self.__init_from_notation(arg)
         else:
             # Initialize from iterable of intervals.
-            for interval in intervals:
+            for interval in arg:
                 self.add(interval)
 
     def __repr__(self):
-        return '%s(%s)' % (self.__class__.__name__, self.intervals)
+        return '%s(%s)' % (type(self).__name__, self.intervals)
 
     @property
     def notation(self):
@@ -99,7 +106,6 @@ class UISet:
         Return a new UISet with elements that self does not contain.
         Double inversion (~~self) returns UISet that is equal to self.
         """
-
         new = UISet([])
         if not self.intervals:
             new.intervals.append(unbounded.copy())

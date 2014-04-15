@@ -62,7 +62,7 @@ class Interval:
 
         if (notation is None) ^ any(k is not None for k in [a, b]):
             emsg = '%s() takes notation or 2 kwargs: a and b'
-            raise TypeError(emsg % self.__class__.__name__)
+            raise TypeError(emsg % type(self).__name__)
         if notation is None:
             if not isinstance(a, Endpoint) or not isinstance(b, Endpoint):
                 raise TypeError('Kwargs a and b must be instances of Endpoint')
@@ -85,7 +85,7 @@ class Interval:
         return '%s, %s' % (self.a.notation, self.b.notation)
 
     def __repr__(self):
-        classname = self.__class__.__name__
+        classname = type(self).__name__
         if isinstance(self.a.value, Endpoint.PARSABLE_TYPES):
             return "%s('%s')" % (classname, self.notation)
         else:
