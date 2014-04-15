@@ -142,14 +142,14 @@ class UISet:
         self == other
         Test whether UISet contains all the elements of other and vice versa.
         """
-        return self.intervals == other.intervals
+        return isinstance(other, UISet) and self.intervals == other.intervals
 
     def __ne__(self, other):
         """
         self != other
         Test whether UISet contains at least one element that other does not contain or vice versa.
         """
-        return self.intervals != other.intervals
+        return not isinstance(other, UISet) or self.intervals != other.intervals
 
     def __gt__(self, other):
         """
@@ -162,6 +162,28 @@ class UISet:
         self >= other
         Test whether every element in other is in the UISet.
         """
+        if not isinstance(other, UISet):
+            raise TypeError('Can only compare to an UISet')
+        lo = 0
+        Y = iter(other.intervals)
+        try:
+            y = next(Y)
+            while True:
+                res = self.search(y.a, lo=lo, enumerated=True)
+                if not res:
+                    return False
+                lo, x = res
+                if y.b > x.b:
+                    return False
+                while True:
+                    y = next(Y)
+                    if y.a >= x.b or y.b == x.b:
+                        break
+                    if y.b < x.b:
+                        continue
+                    return False
+        except StopIteration:
+            return True
 
     def issuperset(self, other):
         """Test whether every element in other is in the UISet."""

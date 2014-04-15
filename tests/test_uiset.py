@@ -306,6 +306,9 @@ def test_uiset_eq_and_ne():
     s2.discard(2)
     assert s1 != s2
 
+    assert not s1 == 0
+    assert s1 != 0
+
 
 def test_uiset_discard():
 
@@ -358,4 +361,34 @@ def test_uiset_copy():
     s2 = s1.copy()
     s2.intervals[0].a.value[2] = -1
     assert i.a.value[2] == -1
+
+
+def test_uiset_ge():
+
+    assert UISet() >= UISet()
+    assert not UISet() >= UISet('[1, 2]')
+    assert UISet('(1, 6)') >= UISet()
+    assert UISet('(1, 6)') >= UISet('(2, 3)')
+    assert UISet('(1, 6)') >= UISet('(2, 3), (4, 5)')
+    assert UISet('(1, 6)') >= UISet('(1, 3), (4, 6)')
+    assert UISet('(1, 6)') >= UISet('(1, 6)')
+    assert not UISet('(1, 6)') >= UISet('(4, 6]')
+    assert not UISet('(1, 6)') >= UISet('(1, 6]')
+    assert not UISet('(1, 6)') >= UISet('[1, 6)')
+    assert not UISet('(1, 6)') >= UISet('[1, 6]')
+    assert not UISet('(1, 6)') >= UISet('[2, 7]')
+    assert UISet('(2, 4), (4, 6)') >= UISet('(2, 4), (4, 6)')
+    assert UISet('(2, 4), (4, 6)') >= UISet('(2, 3), (3, 4), (4, 6)')
+    assert not UISet('(2, 4), (4, 6)') >= UISet('(1, 3)')
+    assert not UISet('(2, 4), (4, 6)') >= UISet('(3, 5)')
+    assert not UISet('(2, 4), (4, 6)') >= UISet('(5, 7)')
+    assert UISet('[1, 2]') >= UISet('(1, 2)')
+    assert UISet('[1, 2]') >= UISet('[1, 2]')
+    assert UISet('[1, inf)') >= UISet('[1, 10]')
+    assert not UISet('[1, inf)') >= UISet('(0, 10]')
+
+    with pytest.raises(TypeError):
+        0 <= UISet()
+    with pytest.raises(TypeError):
+        UISet() >= -inf
 
