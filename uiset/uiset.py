@@ -3,6 +3,31 @@ from uiset.endpoint import Endpoint
 from uiset.interval import Interval, unbounded
 
 
+import functools
+def _assert_intervals_are_ascending(fn):
+    """
+    Debug decorator for UISet methods.
+    Makes sure every interval's start is greater than previous interval's end,
+    and every open endpoint of one interval is not a closed endpoint of the other.
+    """
+    @functools.wraps(fn)
+    def wrapper(self, *args, **kwargs):
+        res = fn(self, *args, **kwargs)
+        for i, interval in enumerate(self.intervals[:-1]):
+            end = interval.b
+            start = self.intervals[i+1].a
+            error = None
+            if end >= start:
+                error = '%s >= %s in UISet %s'
+            elif end.value == start.value and end.excluded != start.excluded:
+                error = 'no gap between %s and %s! in UISet %s'
+            if error:
+                params = (end.notation, start.notation, self.notation)
+                assert False, error % params
+        return res
+    return wrapper
+
+
 class UISet:
     """
     Uncountable Infinite Set
@@ -40,6 +65,7 @@ class UISet:
                     raise ValueError(emsg)
             self.intervals.append(interval)
 
+    @_assert_intervals_are_ascending
     def __init__(self, arg=None):
         
         if isinstance(arg, type(self)):
@@ -100,6 +126,7 @@ class UISet:
         """
         return self.search(x) is not None
     
+    @_assert_intervals_are_ascending
     def __invert__(self):
         """
         ~self
@@ -140,7 +167,7 @@ class UISet:
     def isdisjoint(self, other):
         """
         Return True if UISet has no elements in common with other.
-        Uisets are disjoint if and only if their intersection is the empty UISet.
+        UISets are disjoint if and only if their intersection is the empty UISet.
         """
 
     def __eq__(self, other):
@@ -298,6 +325,7 @@ class UISet:
         Update the UISet, keeping only elements found in either UISet, but not in both.
         """
 
+    @_assert_intervals_are_ascending
     def add(self, new):
         """Merge existing intervals with a new one."""
         for n, i in enumerate(self.intervals):
@@ -325,6 +353,7 @@ class UISet:
         """Remove element elem from the UISet.
         Raises LookupError if elem is not contained in the UISet."""
 
+    @_assert_intervals_are_ascending
     def discard(self, elem):
         """Remove scalar element elem from the UISet if it is present.
         Dependently on values, none of intervals will change,
