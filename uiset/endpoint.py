@@ -251,3 +251,17 @@ class Endpoint:
         """Return a shallow copy of an Endpoint"""
         return Endpoint(None, self.value, self.excluded, self.open)
 
+
+def are_bounding(e1, e2):
+    """
+    Return boolean indicating that 2 endpoints have no gap between them.
+    >>> are_bounding(Endpoint('1]'), Endpoint('(1'))
+    True
+    >>> are_bounding(Endpoint('[1'), Endpoint('1]'))
+    True
+    >>> are_bounding(Endpoint('1)'), Endpoint('(1'))
+    False
+    """
+    assert e1.open is not e2.open
+    return e1.value == e2.value and (not e1.excluded or not e2.excluded)
+

@@ -1,5 +1,5 @@
 from uiset.infinity import inf, neg_inf
-from uiset.endpoint import Endpoint
+from uiset.endpoint import Endpoint, are_bounding
 from uiset.interval import Interval, unbounded
 
 
@@ -325,29 +325,63 @@ class UISet:
         Update the UISet, keeping only elements found in either UISet, but not in both.
         """
 
+    def bisect_left(self, x, lo=0, hi=None):
+        """
+        Return index of the first interval having a >= x,
+        OR return -1 if such intervals does not exit.
+        """
+        if lo < 0:
+            raise ValueError('lo must be non-negative')
+        if hi is None:
+            hi = len(self.intervals)
+        while lo < hi:
+            mid = (lo+hi) // 2
+            if self.intervals[mid].a < x:
+                lo = mid + 1
+            else:
+                hi = mid
+        return lo == len(self.intervals) and -1 or lo
+
     @_assert_intervals_are_ascending
-    def add(self, new):
-        """Merge existing intervals with a new one."""
-        for n, i in enumerate(self.intervals):
-            if i.b < new.a:
-                if i.b == ~new.a:
-                    # (1, 2) + [2, 5] --> (1, 5];     (1, 2] + (2, 5] --> (1, 5]
-                    i.b = new.b.copy()
-                    return
-                continue
-            if i.a > new.b:
-                if i.a == ~new.b:
-                    # (3, 5) + [2, 3] --> [2, 5);     [3, 5) + [2, 3) --> [2, 5)
-                    i.a = new.a.copy()
-                else:
-                    self.intervals.insert(n, new.copy())
-                return
-            if i.a > new.a:
-                i.a = new.a.copy()
-            if new.b > i.b:
-                i.b = new.b.copy()
+    def add(self, x):
+        """Add interval x to existing intervals, merge them if needed."""
+        x = x.copy()
+        a, b = x.a, x.b
+        intervals = self.intervals
+        if not intervals:
+            intervals.append(x)
             return
-        self.intervals.append(new.copy())
+        na = self.bisect_left(x.a)
+        if na == -1:
+            prev = intervals[-1]
+            if x.a > prev.b:
+                if are_bounding(x.a, prev.b):
+                    prev.b = b
+                else:
+                    intervals.append(x)
+            else:
+                a = prev.a
+                b = max([prev.b, x.b])
+                interval = Interval(a=a, b=b)
+                intervals[-1] = interval
+            return
+        if na > 0:
+            prev = intervals[na-1]
+            if x.a < prev.b or are_bounding(x.a, prev.b):
+                a = prev.a
+                na -= 1
+        nb = self.bisect_left(x.b, na)
+        if nb != -1:
+            if are_bounding(intervals[nb].a, x.b):
+                nb += 1
+                b = intervals[nb-1].b
+            elif nb > na:
+                b = max([x.b, intervals[nb-1].b])
+        else:
+            b = max([x.b, intervals[-1].b])
+            nb = None
+        interval = Interval(a=a, b=b)
+        intervals[na:nb] = [interval]
 
     def remove(self, elem):
         """Remove element elem from the UISet.
