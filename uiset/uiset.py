@@ -236,6 +236,7 @@ class UISet:
         self <= other
         Test whether every element in the UISet is in other.
         """
+        return NotImplemented
 
     def issubset(self, other):
         """Test whether every element in the UISet is in other."""

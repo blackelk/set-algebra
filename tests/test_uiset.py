@@ -510,7 +510,36 @@ def test_uiset_ge():
     assert not UISet('[1, inf)') >= UISet('(0, 10]')
 
     with pytest.raises(TypeError):
-        0 <= UISet()
+        UISet() >= 0
     with pytest.raises(TypeError):
         UISet() >= -inf
+    inf >= UISet()
+
+
+def test_uiset_le():
+
+    assert UISet() <= UISet()
+    assert UISet() <= UISet('[1, 2]')
+    assert not UISet('(1, 6)') <= UISet()
+    assert not UISet('(1, 6)') <= UISet('(2, 3)')
+    assert not UISet('(1, 6)') <= UISet('(2, 3), (4, 5)')
+    assert not UISet('(1, 6)') <= UISet('(1, 3), (4, 6)')
+    assert UISet('(1, 6)') <= UISet('(1, 6)')
+    assert not UISet('(1, 6)') <= UISet('(4, 6]')
+    assert UISet('(1, 6)') <= UISet('(1, 6]')
+    assert UISet('(1, 6)') <= UISet('[1, 6)')
+    assert UISet('(1, 6)') <= UISet('[1, 6]')
+    assert not UISet('(1, 6)') <= UISet('[2, 7]')
+    assert UISet('(2, 4), (4, 6)') <= UISet('(2, 4), (4, 6)')
+    assert not UISet('(2, 4), (4, 6)') <= UISet('(2, 3), (3, 4), (4, 6)')
+    assert not UISet('(2, 4), (4, 6)') <= UISet('(1, 3)')
+    assert not UISet('(2, 4), (4, 6)') <= UISet('(3, 5)')
+    assert not UISet('(2, 4), (4, 6)') <= UISet('(5, 7)')
+    assert not UISet('[1, 2]') <= UISet('(1, 2)')
+    assert UISet('[1, 2]') <= UISet('[1, 2]')
+    assert not UISet('[1, inf)') <= UISet('[1, 10]')
+    assert not UISet('[1, inf)') <= UISet('(0, 10]')
+
+    with pytest.raises(TypeError):
+        0 <= UISet()
 
