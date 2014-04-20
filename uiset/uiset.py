@@ -122,10 +122,19 @@ class UISet:
     def __contains__(self, x):
         """
         x in self
-        Test scalar x for membership in UISet.
+        Test x for membership in UISet.
+        x can be either scalar or Interval.
+        Note that if x is interval, returning True does not mean that one of
+        intervals equals to x, because there can be an interval larger than x.
         """
-        return self.search(x) is not None
-    
+        if isinstance(x, Interval):
+            interval = self.search(x.a)
+            if interval is None:
+                return False
+            return x.b <= interval.b
+        else:
+            return bool(self.search(x))
+        
     @_assert_intervals_are_ascending
     def __invert__(self):
         """

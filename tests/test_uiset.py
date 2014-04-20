@@ -322,7 +322,7 @@ def test_uiset_search():
     assert s.search(2.5, lo=1)
 
 
-def test_uiset_contains():
+def test_uiset_contains_scalar():
 
     s = UISet()
     assert 1 not in s
@@ -373,6 +373,45 @@ def test_uiset_contains():
     assert 7 in s
     assert 100 not in s
     assert inf not in s
+
+
+def test_uiset_contains_interval():
+
+    s = UISet()
+    assert Interval('(1, 2)') not in s
+
+    s = UISet('(1, 4)')
+    assert Interval('(2, 3)') in s
+    assert Interval('[1, 4)') not in s
+    assert Interval('(1, 4]') not in s
+    assert Interval('[1, 4]') not in s
+    assert Interval('(0, 2)') not in s
+    assert Interval('(3, 5)') not in s
+    assert Interval('(0, 1)') not in s
+
+    s = UISet('[1, 4)')
+    assert Interval('(2, 3)') in s
+    assert Interval('[1, 4)') in s
+    assert Interval('(1, 4]') not in s
+    assert Interval('[1, 4]') not in s
+    assert Interval('(0, 2)') not in s
+    assert Interval('(3, 5)') not in s
+
+    s = UISet('(1, 4]')
+    assert Interval('(2, 3)') in s
+    assert Interval('[1, 4)') not in s
+    assert Interval('(1, 4]') in s
+    assert Interval('[1, 4]') not in s
+    assert Interval('(0, 2)') not in s
+    assert Interval('(3, 5)') not in s
+
+    s = UISet('[1, 4]')
+    assert Interval('(2, 3)') in s
+    assert Interval('[1, 4)') in s
+    assert Interval('(1, 4]') in s
+    assert Interval('[1, 4]') in s
+    assert Interval('(0, 2)') not in s
+    assert Interval('(3, 5)') not in s
 
 
 def test_uiset_eq_and_ne():
