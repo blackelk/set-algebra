@@ -4,6 +4,7 @@ uiset
 | How to have a set containing all numbers from 1 to 10 not including 10?
 | How to add interval from 20 to 30 to that set?
 | How to make sure this set is a subset of set of positive numbers?
+| How to invert that set?
 
 .. code:: python
 
@@ -18,6 +19,8 @@ uiset
     True
     >>> s <= UISet('(0, inf)')
     True
+    >>> (~s).notation
+    '(-inf, 1), [10, 20), (30, inf)'
 
 uiset provides classes representing math concepts:
 
@@ -26,7 +29,7 @@ uiset provides classes representing math concepts:
 - Interval
 - Uncountable Infinite Set
 
-Besides numbers, uiset can contain any objects that can be compared to each other - strings, datetimes, etc.
+Besides numbers, uiset supports all objects that can be compared to each other - strings, datetimes, etc.
 
 Infinity() is greater than any of these objects except float('inf') and float('nan').
 NegativeInfinity included as well.
