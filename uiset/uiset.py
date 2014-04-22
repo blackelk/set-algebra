@@ -229,18 +229,18 @@ class UISet:
 
     def issuperset(self, other):
         """Test whether every element in other is in the UISet."""
-        # same as __ge__
+        return self >= other
 
     def __le__(self, other):
         """
         self <= other
         Test whether every element in the UISet is in other.
         """
-        return NotImplemented
+        return NotImplemented # so that other.__ge__ will be called
 
     def issubset(self, other):
         """Test whether every element in the UISet is in other."""
-        # same as __le__
+        return self <= other
 
     def __lt__(self, other):
         """

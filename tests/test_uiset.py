@@ -543,3 +543,15 @@ def test_uiset_le():
     with pytest.raises(TypeError):
         0 <= UISet()
 
+
+def test_uiset_issuperset():
+
+    assert UISet('[1, 3]').issuperset(UISet('(1, 3)'))
+    assert not UISet().issuperset(UISet('(1, 3)'))
+
+
+def test_uiset_issubset():
+
+    assert not UISet('[1, 3]').issubset(UISet('(1, 3)'))
+    assert UISet().issubset(UISet('(1, 3)'))
+
