@@ -41,3 +41,27 @@ NegativeInfinity included as well.
 
 uiset fully supports Python3. Tested on python 2.7, 3.2, 3.3, 3.4.
 
+Not yet implemented features
+----------------------------
+uiset is under active development. Currently, the following UISet methods are not implemented:
+
+| isdisjoint
+| __gt__
+| __lt__
+| __or__
+| __ior__
+| union
+| update
+| __and__
+| __iand__
+| intersection
+| intersection_update
+| __sub__
+| __isub__
+| difference
+| difference_update
+| __xor__
+| __ixor__
+| symmetric_difference
+| symmetric_difference_update
+
