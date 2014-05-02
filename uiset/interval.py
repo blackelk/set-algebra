@@ -2,7 +2,7 @@ from uiset.endpoint import Endpoint
 from uiset.infinity import inf, neg_inf
 
 
-class Interval:
+class Interval(object):
     """
     Class representing interval on an axis.
     Contains two Endpoint instances - a and b.
@@ -22,7 +22,7 @@ class Interval:
 
     See tests/test_interval.py
 
-    >>> real = Interval('[-inf, inf]')
+    >>> real = Interval('(-inf, inf)')
     >>> 99999999 in real
     True
     >>> percentage = Interval('[0, 100]')
@@ -30,9 +30,9 @@ class Interval:
     True
     >>> 200 in percentage
     False
-    >>> negative = Interval('[-inf, 0)')
+    >>> negative = Interval('(-inf, 0)')
     >>> negative
-    Interval('[-inf, 0)')
+    Interval('(-inf, 0)')
     >>> 0 in negative
     False
     >>> -1 in negative
@@ -99,7 +99,7 @@ class Interval:
         if isinstance(other, Interval):
             return self.a <= other.a and other.b <= self.b
         else:
-            return self.a <= other <= self.b
+            return self.a <= other and self.b >= other
 
     def copy(self):
         """
@@ -110,6 +110,10 @@ class Interval:
         return Interval(a=self.a.copy(), b=self.b.copy())
 
 
+def is_interval(obj):
+    return isinstance(obj, Interval)
+
+
 def is_scalar(obj):
     return not isinstance(obj, Interval)
 
@@ -118,3 +122,4 @@ def is_scalar(obj):
 unbounded = Interval(
     a=Endpoint(value=neg_inf, excluded=True, open=True),
     b=Endpoint(value=inf, excluded=True, open=False))
+

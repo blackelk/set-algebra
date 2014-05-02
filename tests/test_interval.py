@@ -1,6 +1,12 @@
 import datetime
+import sys
 import pytest
+
 from uiset import Endpoint, Interval
+
+_ver = sys.version_info
+is_py2 = (_ver[0] == 2)
+is_py3 = (_ver[0] == 3)
 
 
 def test_interval_repr():
@@ -147,11 +153,15 @@ def test_str_interval():
     assert 'o' not in p
     assert 'p' in p
     assert 'p' * 1000 in p
+    assert 'pq' in p
     assert 'q' not in p
-    with pytest.raises(TypeError):
-        1 in p
-    with pytest.raises(TypeError):
-        Interval(a=p, b=Endpoint('3]'))
+    assert a in p
+    assert b in p
+    if is_py3:
+        with pytest.raises(TypeError):
+            1 in p
+        with pytest.raises(TypeError):
+            Endpoint('3]') in p
 
 
 def test_date_interval():

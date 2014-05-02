@@ -1,5 +1,5 @@
 import pytest
-from uiset import Endpoint, Interval
+from uiset import Endpoint, Interval, are_bounding
 
 
 def test_endpoint_init():
@@ -52,7 +52,7 @@ def test_endpoint_init_raises():
     with pytest.raises(ValueError): Endpoint('inf]')
 
 
-def test_endopint_parses_value():
+def test_endopint_init_from_notation():
 
     assert Endpoint('[1').value is 1
     v1 = Endpoint('[1.').value
@@ -416,4 +416,13 @@ def test_endpoint_copy():
     e2 = e1.copy()
     assert e1 == e2
     assert e1 is not e2
+
+
+def test_are_bounding():
+
+    assert not are_bounding(Endpoint('(1'), Endpoint('1)'))
+    assert are_bounding(Endpoint('(1'), Endpoint('1]'))
+    assert are_bounding(Endpoint('[1'), Endpoint('1)'))
+    assert are_bounding(Endpoint('[1'), Endpoint('1]'))
+    assert not are_bounding(Endpoint('[1'), Endpoint('2]'))
 
