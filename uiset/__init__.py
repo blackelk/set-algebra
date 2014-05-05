@@ -284,7 +284,9 @@ class UISet(object):
         self > other
         Test whether the UISet is a proper superset of other.
         """
-        raise NotImplementedError
+        if not isinstance(other, UISet):
+            raise TypeError('Can only compare to an UISet')
+        return self != other and self >= other
 
     def __ge__(self, other):
         """
@@ -294,23 +296,23 @@ class UISet(object):
         if not isinstance(other, UISet):
             raise TypeError('Can only compare to an UISet')
         lo = 0
-        Y = iter(other.pieces)
+        X = iter(other.pieces)
         try:
-            y = next(Y)
+            x = next(X)
             while True:
-                ya, yb = isinstance(y, Interval) and (y.a, y.b) or (y, y)
-                lo, x = self.search(ya, lo=lo)
-                if x is None:
-                    return False
                 xa, xb = isinstance(x, Interval) and (x.a, x.b) or (x, x)
-                if yb > xb:
+                lo, p = self.search(xa, lo=lo)
+                if p is None:
+                    return False
+                pa, pb = isinstance(p, Interval) and (p.a, p.b) or (p, p)
+                if xb > pb:
                     return False
                 while True:
-                    y = next(Y)
-                    ya, yb = isinstance(y, Interval) and (y.a, y.b) or (y, y)
-                    if ya >= xb or yb == xb:
+                    x = next(X)
+                    xa, xb = isinstance(x, Interval) and (x.a, x.b) or (x, x)
+                    if xa >= pb or xb == pb:
                         break
-                    if yb < xb:
+                    if xb < pb:
                         continue
                     return False
         except StopIteration:
@@ -326,6 +328,8 @@ class UISet(object):
         self <= other
         Test whether every element in the UISet is in other.
         """
+        if not isinstance(other, UISet):
+            raise TypeError('Can only compare to an UISet')
         return NotImplemented # so that other.__ge__ will be called
 
     def issubset(self, other):
@@ -337,7 +341,9 @@ class UISet(object):
         self < other
         Test whether the UISet is a proper subset of other.
         """
-        raise NotImplementedError
+        if not isinstance(other, UISet):
+            raise TypeError('Can only compare to an UISet')
+        return NotImplemented # so that other.__gt__ will be called
 
     def __or__(self, other):
         """

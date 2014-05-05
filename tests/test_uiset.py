@@ -675,7 +675,6 @@ def test_uiset_ge():
 
     with pytest.raises(TypeError):
         UISet() >= 0
-    with pytest.raises(TypeError):
         UISet() >= -inf
     inf >= UISet()
 
@@ -717,7 +716,7 @@ def test_uiset_le():
     assert not s <= UISet('(0, 10]')
 
     with pytest.raises(TypeError):
-        0 <= UISet()
+        UISet() <= 0
 
 
 def test_uiset_issuperset():
@@ -732,4 +731,66 @@ def test_uiset_issubset():
     assert not UISet('[1, 3]').issubset(UISet('(1, 3)'))
     assert UISet().issubset(UISet('{1}'))
     assert UISet().issubset(UISet('(1, 3)'))
+
+
+def test_uiset_gt():
+
+    assert not UISet() > UISet()
+    assert not UISet() > UISet('{1}')
+    assert UISet('{1}') > UISet()
+    assert not UISet('{1}') > UISet('{1}')
+    assert not UISet('{1}') > UISet('{2}')
+    s1 = UISet('(1, 2)')
+    s2 = UISet('[1, 2)')
+    s3 = UISet('(1, 2]')
+    s4 = UISet('[1, 2]')
+    assert not s1 > s1
+    assert not s1 > s2
+    assert not s1 > s3
+    assert not s1 > s4
+    assert s2 > s1
+    assert not s2 > s3
+    assert not s2 > s4
+    assert s3 > s1
+    assert not s3 > s2
+    assert not s3 > s4
+    assert s4 > s1
+    assert s4 > s2
+    assert s4 > s3
+    
+    s1 = UISet('(1, 2), {4}')
+    s2 = UISet('(1, 2)')
+    assert s1 > s2
+    assert not s2 > s1
+
+    s = UISet('(1, 4)')
+    assert s > UISet('{2}')
+    assert s > UISet('{2}, {3}')
+    assert not s > UISet('{0}')
+    assert not s > UISet('{1}')
+    assert not s > UISet('{4}')
+    assert not s > UISet('{5}')
+    assert s > UISet('(1, 3)')
+    assert s > UISet('(2, 3)')
+    assert s > UISet('(2, 4)')
+
+    s = UISet('(-inf, inf)')
+    assert s > UISet('[1, 2], (3, inf)')
+    assert not s > UISet('(-inf, inf)')
+
+    with pytest.raises(TypeError):
+        UISet('(1, 2)') > Interval('(1, 2)')
+        UISet('(1, 2)') > 0
+    
+
+def test_uiset_lt():
+
+    assert not UISet() < UISet()
+    assert UISet() < UISet('{3}')
+    assert UISet() < UISet('(1, 2)')
+    assert not UISet('{0}') < UISet('(1, 2)')
+    assert UISet('{1}') < UISet('{1}, {2}')
+
+    with pytest.raises(TypeError):
+        UISet() < 5
 

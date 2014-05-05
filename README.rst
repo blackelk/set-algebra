@@ -46,8 +46,6 @@ Not yet implemented features
 uiset is under active development. Currently, the following UISet methods are not implemented:
 
 | isdisjoint
-| __gt__
-| __lt__
 | __or__
 | __ior__
 | union
