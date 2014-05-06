@@ -725,12 +725,23 @@ def test_uiset_issuperset():
     assert UISet('[1, 3]').issuperset(UISet('{1}, {2}, {3}'))
     assert not UISet().issuperset(UISet('(1, 3)'))
 
+    assert UISet('[1, 3]').issuperset('(1, 2), {3}')
+    assert UISet('[1, 3]').issuperset([])
+    assert not UISet('[1, 3]').issuperset([0])
+
+    assert UISet.issuperset(UISet('(0, 8)'), [2, 3, Interval('[3, 5]'), 6])
+
 
 def test_uiset_issubset():
 
     assert not UISet('[1, 3]').issubset(UISet('(1, 3)'))
     assert UISet().issubset(UISet('{1}'))
     assert UISet().issubset(UISet('(1, 3)'))
+
+    assert UISet('{1}').issubset('(0, 2)')
+    assert not UISet('{1}, {2}').issubset([1, 3])
+
+    assert UISet.issubset(UISet('(-2, -1)'), [Interval('(-inf, 0)')])
 
 
 def test_uiset_gt():

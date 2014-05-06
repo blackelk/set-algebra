@@ -321,7 +321,10 @@ class UISet(object):
 
     def issuperset(self, other):
         """Test whether every element in other is in the UISet."""
-        return self >= other
+        if isinstance(other, UISet):
+            return self >= other
+        else:
+            return self >= UISet(other)
 
     def __le__(self, other):
         """
@@ -334,7 +337,10 @@ class UISet(object):
 
     def issubset(self, other):
         """Test whether every element in the UISet is in other."""
-        return self <= other
+        if isinstance(other, UISet):
+            return self <= other
+        else:
+            return self <= UISet(other)
 
     def __lt__(self, other):
         """
