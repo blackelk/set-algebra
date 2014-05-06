@@ -348,13 +348,43 @@ class UISet(object):
     def __or__(self, other):
         """
         self | other
-        Return a new UISet with elements from the UISet and other.
+        Return a new UISet with merged pieces from the UISets self and other.
         """
-        raise NotImplementedError
+        new = self.copy()
+        lo = 0
+        for x in other.pieces:
+            lo = new._add(x, lo)
+        return new
 
+    def __ior__(self, other):
+        """
+        self |= other
+        Update the UISet, adding pieces from other.
+        """
+        lo = 0
+        for x in other.pieces:
+            lo = self._add(x, lo)
+        return self
+        
     def union(self, *others):
-        """Return a new UISet with elements from the UISet and all others."""
-        raise NotImplementedError
+        """Return a new UISet with pieces from the UISet and all others."""
+        new = self.copy()
+        for other in others:
+            if isinstance(other, UISet):
+                lo = 0
+                for x in other.pieces:
+                    lo = new._add(x, lo)
+            else:
+                for x in other:
+                    new.add(x)
+        return new
+
+    def update(self, *others):
+        """Update the UISet, adding pieces from all others."""
+        for other in others:
+            lo = 0
+            for x in other.pieces:
+                lo = self._add(x, lo)
 
     def __and__(self, other):
         """
@@ -389,19 +419,6 @@ class UISet(object):
     def symmetric_difference(self, other):
         """
         Return a new UISet with elements in either the UISet or other but not both."""
-        raise NotImplementedError
-
-    def __ior__(self, other):
-        """
-        self |= other
-        Update the UISet, adding elements from other.
-        """
-        raise NotImplementedError
-
-    def update(self, *others):
-        """
-        Update the UISet, adding elements from all others.
-        """
         raise NotImplementedError
 
     def __iand__(self, other):
@@ -443,13 +460,13 @@ class UISet(object):
         """
         raise NotImplementedError
 
-    def _add_scalar(self, x):
+    def _add_scalar(self, x, lo=0):
 
         if not is_finite(x):
             raise ValueError('x must be finite')
-        idx, piece = self.search(x)
+        idx, piece = self.search(x, lo)
         if piece is not None:
-            return
+            return idx
         
         pieces = self.pieces
         pre = pieces[idx-1] if idx > 0 else None
@@ -466,19 +483,20 @@ class UISet(object):
                     # Adding b to (a, b)
                     b = Endpoint(value=x, excluded=False, open=False)
                     pieces[idx-1] = Interval(a=pre.a.copy(), b=b)
-                return
+                return idx
         if nex is not None and nex.a.value == x:
             # Adding a to (a, b)
             a = Endpoint(value=x, excluded=False, open=True)
             pieces[idx] = Interval(a=a, b=nex.b.copy())
-            return
+            return idx
         pieces.insert(idx, x)
+        
+        return idx + 1
             
-
-    def _add_interval(self, x):
+    def _add_interval(self, x, lo=0):
 
         pieces = self.pieces
-        idx1, piece1 = self.search(x.a)
+        idx1, piece1 = self.search(x.a, lo)
         idx2, piece2 = self.search(x.b, idx1)
 
         a = x.a.copy()
@@ -511,15 +529,22 @@ class UISet(object):
                 idx2 += 1
 
         pieces[idx1:idx2] = [Interval(a=a, b=b)]
+        return min([idx2, len(self.pieces)])
 
-
+    def _add(self, x, lo=0):
+        """
+        Add scalar or interval x to UISet, starting from piece at index lo.
+        return index of the first piece that does not intersect with x.
+        """
+        if isinstance(x, Interval):
+            return self._add_interval(x, lo)
+        else:
+            return self._add_scalar(x, lo)
+        
     @_assert_pieces_are_ascending
     def add(self, x):
         """Add scalar or interval x to UISet, merge some of them if needed."""
-        if isinstance(x, Interval):
-            self._add_interval(x)
-        else:
-            self._add_scalar(x)
+        self._add(x)
 
     def _remove_scalar(self, x):
 

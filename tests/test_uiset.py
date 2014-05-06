@@ -794,3 +794,121 @@ def test_uiset_lt():
     with pytest.raises(TypeError):
         UISet() < 5
 
+
+def test_uiset_or():
+
+    s1 = UISet()
+    s2 = UISet()
+    assert s1 | s2 == UISet()
+
+    s1 = UISet()
+    s2 = UISet('{3}')
+    assert s2 | s2 == s2
+    assert s1 | s2 == s2 | s1 == s2
+
+    s1 = UISet('(1, 2)')
+    s2 = UISet('[2, 3]')
+    assert s1 | s2 == s2 | s1 == UISet('(1, 3]')
+
+    s1 = UISet('(1, 2)')
+    s2 = UISet('{2}')
+    assert s1 | s2 == s2 | s1 == UISet('(1, 2]')
+
+    s1 = UISet('(1, 3), (3, 5), (5, 7)')
+    s2 = UISet('{3}, {5}')
+    assert s1 | s2 == s2 | s1 == UISet('(1, 7)')
+
+    s1 = UISet('(-inf, 0), {2}, [4, 6], (9, 12]')
+    s2 = UISet('(-inf, 0], (2, 3), {5}, (7, 8), {9}, (20, inf)')
+    expected = UISet('(-inf, 0], [2, 3), [4, 6], (7, 8), [9, 12], (20, inf)')
+    assert s1 | s2 == s2 | s1 == expected
+    assert s1 == UISet('(-inf, 0), {2}, [4, 6], (9, 12]')
+    assert s2 == UISet('(-inf, 0], (2, 3), {5}, (7, 8), {9}, (20, inf)')
+    
+
+def test_uiset_ior():
+
+    s1 = UISet()
+    s2 = UISet()
+    s1 |= s2
+    assert s1 == UISet()
+
+    s1 = UISet()
+    s2 = UISet('{3}')
+    s1 |= s2
+    s2 |= s1
+    assert s1 == s2 == UISet('{3}')
+
+    s1 = UISet('(1, 2)')
+    s2 = UISet('{1}')
+    s1 |= s2
+    s2 |= s1
+    assert s1 == s2 == UISet('[1, 2)')
+
+    s1 = UISet('(1, 2)')
+    s2 = UISet('(2, 3)')
+    s1 |= s2
+    s2 |= s1
+    assert s1 == s2 == UISet('(1, 2), (2, 3)')
+    s1 |= s1
+    assert s1 == UISet('(1, 2), (2, 3)')
+
+
+def test_uiset_union():
+
+    s1 = UISet()
+    s2 = UISet()
+    s3 = UISet()
+    assert s1.union(s2, s3) == UISet()
+
+    s1 = UISet('{1}')
+    s2 = UISet('{3}')
+    s3 = UISet('{2}')
+    assert s1.union(s2, s3) == UISet('{1}, {2}, {3}')
+    assert s1 == UISet('{1}')
+    assert s2 == UISet('{3}')
+    assert s3 == UISet('{2}')
+
+    s1 = UISet('(3, 4)')
+    s2 = UISet('[2, 3]')
+    s3 = UISet('[4, 5]')
+    assert s1.union(s2, s3) == s2.union(s1, s3) == s3.union(s1, s2) == UISet('[2, 5]')
+    assert s1.union(s1, s1, s3, s2, s3, s1, s2, s3) == UISet('[2, 5]')
+    assert UISet.union(s1) == s1
+    assert UISet.union(s1, s2, s3) == UISet('[2, 5]')
+    assert s1 == UISet('(3, 4)')
+    assert s2 == UISet('[2, 3]')
+    assert s3 == UISet('[4, 5]')
+
+    i1 = Interval('(-inf, 0)')
+    i2 = Interval('(-10, 2)')
+    s1 = UISet('(-inf, -5)')
+    s2 = UISet('{5}')
+    assert s1.union(s2, [i1, i2], [4, i1], []) == UISet('(-inf, 2), {4}, {5}')
+
+
+def test_uiset_update():
+
+    s1 = UISet()
+    s2 = UISet()
+    s3 = UISet()
+    s1.update(s2, s3)
+    assert s1 == UISet()
+
+    s1 = UISet('{1}')
+    s2 = UISet('{3}')
+    s3 = UISet('{2}')
+    s1.update(s2, s3)
+    assert s1 == UISet('{1}, {2}, {3}')
+    assert s2 == UISet('{3}')
+    assert s3 == UISet('{2}')
+
+    s1 = UISet('(3, 4)')
+    s2 = UISet('[2, 3]')
+    s3 = UISet('[4, 5]')
+    s1.update(s1, s2, s1, s3, s2, s3, s1, s2, s3)
+    assert s1 == UISet('[2, 5]')
+    assert s2 == UISet('[2, 3]')
+    assert s3 == UISet('[4, 5]')
+
+
