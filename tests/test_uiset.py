@@ -835,6 +835,9 @@ def test_uiset_or():
     assert s1 | s2 == s2 | s1 == expected
     assert s1 == UISet('(-inf, 0), {2}, [4, 6], (9, 12]')
     assert s2 == UISet('(-inf, 0], (2, 3), {5}, (7, 8), {9}, (20, inf)')
+
+    with pytest.raises(TypeError):
+        UISet() | 0
     
 
 def test_uiset_ior():
@@ -863,6 +866,9 @@ def test_uiset_ior():
     assert s1 == s2 == UISet('(1, 2), (2, 3)')
     s1 |= s1
     assert s1 == UISet('(1, 2), (2, 3)')
+
+    with pytest.raises(TypeError):
+        s1 |= 0
 
 
 def test_uiset_union():

@@ -356,6 +356,9 @@ class UISet(object):
         self | other
         Return a new UISet with merged pieces from the UISets self and other.
         """
+        if not isinstance(other, UISet):
+            emsg = "unsupported operand type for |: %s and %s"
+            raise TypeError(emsg % (type(self), type(other)))
         new = self.copy()
         lo = 0
         for x in other.pieces:
@@ -367,6 +370,9 @@ class UISet(object):
         self |= other
         Update the UISet, adding pieces from other.
         """
+        if not isinstance(other, UISet):
+            emsg = "unsupported operand type for |=: %s and %s"
+            raise TypeError(emsg % (type(self), type(other)))
         lo = 0
         for x in other.pieces:
             lo = self._add(x, lo)
