@@ -50,10 +50,6 @@ uiset is under active development. Currently, the following UISet methods are no
 | __iand__
 | intersection
 | intersection_update
-| __sub__
-| __isub__
-| difference
-| difference_update
 | __xor__
 | __ixor__
 | symmetric_difference

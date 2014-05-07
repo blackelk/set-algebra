@@ -923,3 +923,93 @@ def test_uiset_update():
     assert s3 == UISet('[4, 5]')
 
 
+def test_uiset_sub():
+
+    s0 = UISet()
+    s1 = UISet('{1}')
+    s2 = UISet('{1}, {2}')
+    s3 = UISet('[1, 2]')
+    assert s0 - s0 == s0
+    assert s1 - s0 == s1
+    assert s0 - s1 == s0
+    assert s2 - s1 == UISet('{2}')
+    assert s0 == UISet()
+    assert s1 == UISet('{1}')
+    assert s2 == UISet('{1}, {2}')
+    assert s3 == UISet('[1, 2]')
+    assert s3 - s1 == UISet('(1, 2]')
+    assert s3 - s2 == UISet('(1, 2)')
+    assert s3 - s3 == s0
+
+    s1 = UISet('(1, 4)')
+    s2 = UISet('{1}, {2}, {3}, {4}')
+    assert s1 - s2 == UISet('(1, 2), (2, 3), (3, 4)')
+    assert s2 - s1 == UISet('{1}, {4}')
+
+    s1 = UISet('(-inf, 0), {2}, [4, 6], [8, 20]')
+    s2 = UISet('{-3}, {2}, (4, 9), [10, 11], {15}, {20}')
+    assert s1 - s2 == UISet('(-inf, -3), (-3, 0), {4}, [9, 10), (11, 15), (15, 20)')
+    assert s2 - s1 == UISet('(6, 8)')
+    
+    with pytest.raises(TypeError):
+        UISet() - 0
+
+
+def test_uiset_isub():
+
+    s = UISet()
+    s -= s
+    assert s == UISet()
+
+    s = UISet('(-inf, inf)')
+    s -= UISet('{0}')
+    assert s == UISet('(-inf, 0), (0, inf)')
+    s -= UISet('{0}, {1}')
+    assert s == UISet('(-inf, 0), (0, 1), (1, inf)')
+    s -= UISet('(-inf, -2), (0, 1), (2, inf)')
+    assert s == UISet('[-2, 0), (1, 2]')
+    s -= UISet('{0}, {1}')
+    assert s == UISet('[-2, 0), (1, 2]')
+    s -= UISet('(-2, 2)')
+    assert s == UISet('{-2}, {2}')
+    s -= s.copy()
+    assert s == UISet()
+
+    with pytest.raises(TypeError):
+        s -= 5
+
+
+def test_uiset_difference():
+
+    s = UISet()
+    assert s.difference(s) == s
+
+    s = UISet('[1, 3], [4, 5], [6, 7], [8, 10]')
+    s = s.difference(UISet('(2, 9)'), UISet())
+    assert s == UISet('[1, 2], [9, 10]')
+    s = s.difference(UISet('{1}, {2}, {3}'), UISet('{4}'), UISet('{8}, {9}, {10}'))
+    assert s == UISet('(1, 2), (9, 10)')
+
+    s = UISet('(-inf, 0), {1}, {2}, [5, 9]')
+    s = s.difference([Interval('(-inf, 3)'), 4, Interval('(5, 6)')], UISet())
+    assert s == UISet('{5}, [6, 9]')
+
+    s = UISet('[1, 3], {4}, [5, 7], {8}, (10, inf)')
+    expected = UISet('[2, 3], {4}, (5, 6), (6, 7), (10, inf)')
+    assert s.difference([6], [8, 5, 7], UISet('(-inf, 2)')) == expected
+
+    assert UISet.difference(UISet('[1, 3]'), UISet('[2, 4]')) == UISet('[1, 2)')
+
+
+def test_uiset_difference_update():
+
+    s = UISet()
+    s.difference_update(s, s)
+    assert s == s
+
+    s = UISet('{1}, {2}, {3}, (4, 6), [8, 9]')
+    s.difference_update([Interval('[1, 4]'), 5], UISet('{2}, (8, 9)'))
+    assert s == UISet('(4, 5), (5, 6), {8}, {9}')
+    s.difference_update(~s)
+    assert s == UISet('(4, 5), (5, 6), {8}, {9}')
+

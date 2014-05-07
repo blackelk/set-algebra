@@ -84,7 +84,7 @@ class UISet(object):
     For example, any two nonempty disjoint UISets are not equal and are not subsets of each other,
     so all of the following return False: a<b, a==b, or a>b.
 
-    Note, the non-operator versions of union(), intersection(), difference(), and symmetric_difference(), issubset(), and issuperset() methods will accept any iterable as an argument.
+    Note, the non-operator versions of union(), intersection(), difference(), difference_update(), symmetric_difference(), issubset() and issuperset() methods will accept any iterable as an argument.
     In contrast, their operator based counterparts require their arguments to be UISets.
 
     In boolean context UISet is True if it is not empty and False if it is empty.
@@ -408,13 +408,55 @@ class UISet(object):
         self - other
         Return a new UISet with elements in the UISet that are not in other.
         """
-        raise NotImplementedError
+        if not isinstance(other, UISet):
+            emsg = "unsupported operand type for -: %s and %s"
+            raise TypeError(emsg % (type(self), type(other)))
+        new = self.copy()
+        lo = 0
+        for x in other.pieces:
+            lo = new._remove(x, lo)
+        return new
+
+    def __isub__(self, other):
+        """
+        self -= other
+        Update the UISet, removing elements found in other.
+        """
+        if not isinstance(other, UISet):
+            emsg = "unsupported operand type for -=: %s and %s"
+            raise TypeError(emsg % (type(self), type(other)))
+        lo = 0
+        for x in other.pieces:
+            lo = self._remove(x, lo)
+        return self
 
     def difference(self, *others):
         """
-        Return a new UISet with elements in the UISet that are not in the others.
+        Return a new UISet with pieces in the UISet that are not in the others.
         """
-        raise NotImplementedError
+        new = self.copy()
+        for other in others:
+            if isinstance(other, UISet):
+                lo = 0
+                for x in other.pieces:
+                    lo = new._remove(x, lo)
+            else:
+                for x in other:
+                    new.remove(x)
+        return new
+
+    def difference_update(self, *others):
+        """
+        Update the UISet, removing pieces found in others.
+        """
+        for other in others:
+            if isinstance(other, UISet):
+                lo = 0
+                for x in other.pieces:
+                    lo = self._remove(x, lo)
+            else:
+                for x in other:
+                    self.remove(x)
 
     def __xor__(self, other):
         """
@@ -437,19 +479,6 @@ class UISet(object):
     def intersection_update(self, *others):
         """
         Update the UISet, keeping only elements found in it and all others.
-        """
-        raise NotImplementedError
-
-    def __isub__(self, other):
-        """
-        self -= other
-        Update the UISet, removing elements found in other.
-        """
-        raise NotImplementedError
-
-    def difference_update(self, *others):
-        """
-        Update the UISet, removing elements found in others.
         """
         raise NotImplementedError
 
@@ -552,11 +581,11 @@ class UISet(object):
         """Add scalar or interval x to UISet, merge some of them if needed."""
         self._add(x)
 
-    def _remove_scalar(self, x):
+    def _remove_scalar(self, x, lo=0):
 
-        idx, piece = self.search(x)
+        idx, piece = self.search(x, lo)
         if piece is None:
-            return
+            return idx
         
         if isinstance(piece, Interval):
             if piece.a.value == x:
@@ -573,11 +602,12 @@ class UISet(object):
         else:
             self.pieces[idx:idx+1] = []
 
+        return idx
 
-    def _remove_interval(self, x):
+    def _remove_interval(self, x, lo=0):
 
         pieces = self.pieces
-        idx1, piece1 = self.search(x.a)
+        idx1, piece1 = self.search(x.a, lo)
         idx2, piece2 = self.search(x.b, idx1)
 
         if piece1 is piece2 and piece1 is not None: # so they are both are Intervals
@@ -593,7 +623,7 @@ class UISet(object):
             else:
                 new_pieces.append(Interval(a=~x.b, b=piece2.b))
             pieces[idx1:idx1+1] = new_pieces
-            return
+            return idx1
 
         if piece1 is not None:
             if isinstance(piece1, Interval):
@@ -618,14 +648,22 @@ class UISet(object):
                 idx2 += 1
 
         pieces[idx1:idx2] = []
+        return max([idx2-1, 0])
+
+    def _remove(self, x, lo=0):
+        """
+        Remove scalar or interval x from UISet, starting from piece at index lo.
+        return index of the first piece that does not intersect with x.
+        """
+        if isinstance(x, Interval):
+            return self._remove_interval(x, lo)
+        else:
+            return self._remove_scalar(x, lo)
 
     @_assert_pieces_are_ascending
     def remove(self, x):
         """Remove scalar or interval x from the UISet."""
-        if isinstance(x, Interval):
-            self._remove_interval(x)
-        else:
-            self._remove_scalar(x)
+        self._remove(x)
 
     def clear(self):
         """Remove all pieces from the UISet."""
