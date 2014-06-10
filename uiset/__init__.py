@@ -616,7 +616,7 @@ class UISet(object):
         idx1, piece1 = self.search(x.a, lo)
         idx2, piece2 = self.search(x.b, idx1)
 
-        if piece1 is piece2 and piece1 is not None: # so they are both are Intervals
+        if piece1 is piece2 and piece1 is not None: # same interval
             new_pieces = []
             if x.a.value == piece1.a.value:
                 if x.a.excluded and not piece1.a.excluded:
@@ -654,7 +654,8 @@ class UISet(object):
                 idx2 += 1
 
         pieces[idx1:idx2] = []
-        return max([idx2-1, 0])
+
+        return idx1
 
     def _remove(self, x, lo=0):
         """
