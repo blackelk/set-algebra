@@ -84,7 +84,7 @@ class UISet(object):
     For example, any two nonempty disjoint UISets are not equal and are not subsets of each other,
     so all of the following return False: a<b, a==b, or a>b.
 
-    Note, the non-operator versions of union(), intersection(), difference(), difference_update(), symmetric_difference(), issubset() and issuperset() methods will accept any iterable as an argument.
+    Note, the non-operator versions of union(), intersection(), difference(), difference_update(), symmetric_difference(), issubset() and issuperset() methods will accept iterable of scalars and/or intervals as an argument.
     In contrast, their operator based counterparts require their arguments to be UISets.
 
     In boolean context UISet is True if it is not empty and False if it is empty.
@@ -411,6 +411,14 @@ class UISet(object):
         """Return a new UISet that is an intersection of UISet`s and all other`s pieces."""
         raise NotImplementedError
 
+    @staticmethod
+    def __sub(A, B):
+        """Subtract UISet B from UISet A"""
+        lo = 0
+        for x in B.pieces:
+            lo = A._remove(x, lo)
+        return A
+
     def __sub__(self, other):
         """
         self - other
@@ -420,10 +428,7 @@ class UISet(object):
             emsg = "unsupported operand type for -: %s and %s"
             raise TypeError(emsg % (type(self), type(other)))
         new = self.copy()
-        lo = 0
-        for x in other.pieces:
-            lo = new._remove(x, lo)
-        return new
+        return UISet.__sub(new, other)
 
     @_assert_pieces_are_ascending
     def __isub__(self, other):
@@ -434,19 +439,14 @@ class UISet(object):
         if not isinstance(other, UISet):
             emsg = "unsupported operand type for -=: %s and %s"
             raise TypeError(emsg % (type(self), type(other)))
-        lo = 0
-        for x in other.pieces:
-            lo = self._remove(x, lo)
-        return self
+        return UISet.__sub(self, other)
 
     def difference(self, *others):
         """Return a new UISet with pieces in the UISet that are not in the others."""
         new = self.copy()
         for other in others:
             if isinstance(other, UISet):
-                lo = 0
-                for x in other.pieces:
-                    lo = new._remove(x, lo)
+                UISet.__sub(new, other)
             else:
                 for x in other:
                     new.remove(x)
@@ -457,9 +457,7 @@ class UISet(object):
         """Update the UISet, removing pieces found in others."""
         for other in others:
             if isinstance(other, UISet):
-                lo = 0
-                for x in other.pieces:
-                    lo = self._remove(x, lo)
+                UISet.__sub(self, other)
             else:
                 for x in other:
                     self.remove(x)
