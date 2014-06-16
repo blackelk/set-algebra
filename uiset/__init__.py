@@ -84,7 +84,7 @@ class UISet(object):
     For example, any two nonempty disjoint UISets are not equal and are not subsets of each other,
     so all of the following return False: a<b, a==b, or a>b.
 
-    Note, the non-operator versions of union(), intersection(), difference(), difference_update(), symmetric_difference(), issubset() and issuperset() methods will accept iterable of scalars and/or intervals as an argument.
+    Note, the non-operator versions of union(), intersection(), difference(), difference_update(), symmetric_difference(), symmetric_difference_update(), issubset() and issuperset() methods will accept iterable of scalars and/or intervals as an argument.
     In contrast, their operator based counterparts require their arguments to be UISets.
 
     In boolean context UISet is True if it is not empty and False if it is empty.
@@ -462,16 +462,52 @@ class UISet(object):
                 for x in other:
                     self.remove(x)
 
+    @staticmethod
+    def __xor(A, B):
+        """Return a new UISet with pieces in either the UISet A or B but not both."""
+        return A - B | B - A
+
     def __xor__(self, other):
         """
         self ^ other
         Return a new UISet with pieces in either the UISet or other but not both."""
-        raise NotImplementedError
+        if not isinstance(other, UISet):
+            emsg = "unsupported operand type for ^: %s and %s"
+            raise TypeError(emsg % (type(self), type(other)))
+        return UISet.__xor(self, other)
 
-    def symmetric_difference(self, other):
+    def __ixor__(self, other):
+        """
+        self ^= other
+        Update the UISet, keeping only pieces found in either UISet, but not in both.
+        """
+        if not isinstance(other, UISet):
+            emsg = "unsupported operand type for ^=: %s and %s"
+            raise TypeError(emsg % (type(self), type(other)))
+        return UISet.__xor(self, other)
+
+    def symmetric_difference(self, *others):
         """
         Return a new UISet with pieces in either the UISet or other but not both."""
-        raise NotImplementedError
+        new = self.copy()
+        for other in others:
+            if isinstance(other, UISet):
+                new = UISet.__xor(new, other)
+            else:
+                new = UISet.__xor(new, UISet(other))
+        return new
+    
+    def symmetric_difference_update(self, *others):
+        """
+        Update the UISet, keeping only pieces found in either UISet, but not in both.
+        """
+        new = self
+        for other in others:
+            if isinstance(other, UISet):
+                new = UISet.__xor(new, other)
+            else:
+                new = UISet.__xor(new, UISet(other))
+        self.pieces = new.pieces
 
     def __iand__(self, other):
         """
@@ -483,19 +519,6 @@ class UISet(object):
     def intersection_update(self, *others):
         """
         Update the UISet, keeping only pieces found in it and all others.
-        """
-        raise NotImplementedError
-
-    def __ixor__(self, other):
-        """
-        self ^= other
-        Update the UISet, keeping only pieces found in either UISet, but not in both.
-        """
-        raise NotImplementedError
-    
-    def symmetric_difference_update(self, other):
-        """
-        Update the UISet, keeping only pieces found in either UISet, but not in both.
         """
         raise NotImplementedError
 

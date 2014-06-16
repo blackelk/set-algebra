@@ -1027,3 +1027,92 @@ def test_uiset_difference_update():
     s.difference_update(~s)
     assert s == UISet('(4, 5), (5, 6), {8}, {9}')
 
+
+def test_uiset_xor():
+
+    s1 = UISet()
+    s2 = UISet()
+    assert s1 ^ s2 == s2 ^ s1 == UISet()
+
+    s1 = UISet('[0, 3]')
+    s2 = UISet('(1, 2)')
+    assert s1 ^ s2 == s2 ^ s1 == UISet('[0, 1], [2, 3]')
+
+    s1 = UISet('{0}, {1}, {2}')
+    s2 = UISet('(0, 2)')
+    assert s1 ^ s2 == s2 ^ s1 == UISet('[0, 1), (1, 2]')
+    assert s1 == UISet('{0}, {1}, {2}')
+    assert s2 == UISet('(0, 2)')
+
+    with pytest.raises(TypeError):
+        s1 ^ 0
+
+
+def test_uiset_ixor():
+
+    s1 = UISet()
+    s2 = UISet('[0, 1]')
+    s1 ^= s2
+    assert s1 == s2
+    assert s2 == UISet('[0, 1]')
+
+    s3 = UISet('{0}, {1}')
+    s1 ^= s3
+    assert s1 == UISet('(0, 1)')
+    assert s3 == UISet('{0}, {1}')
+
+    s4 = UISet('[1, 2]')
+    s1 ^= s4
+    assert s1 == UISet('(0, 2]')
+    assert s4 == UISet('[1, 2]')
+    
+    with pytest.raises(TypeError):
+        s1 ^= '[0, 1]'
+
+
+def test_uiset_symmetric_difference():
+
+    s1 = UISet([1, 2, 3])
+    s2 = UISet([2, 3])
+    assert s1.symmetric_difference(s2) == UISet('{1}')
+    assert s2.symmetric_difference(s1) == UISet('{1}')
+    assert s2 == UISet([2, 3])
+
+    s3 = UISet('[1, 3]')
+    assert s1.symmetric_difference(s3) == UISet('(1, 2), (2, 3)')
+    assert s3.symmetric_difference(s1) == UISet('(1, 2), (2, 3)')
+
+    assert s1.symmetric_difference([1]) == UISet([2, 3])
+    assert s1.symmetric_difference([1], [2, 3]) == UISet()
+    
+    assert s1 == UISet([1, 2, 3])
+
+
+def test_uiset_symmetric_difference_update():
+
+    s1 = UISet([1, 2, 3])
+    s1_id = id(s1)
+    s2 = UISet()
+    s1.symmetric_difference_update(s2)
+    assert s1 == UISet([1, 2, 3])
+    assert s2 == UISet()
+
+    s2 = UISet([2, 3])
+    s1.symmetric_difference_update(s2)
+    assert s1 == UISet([1])
+    assert s2 == UISet([2, 3])
+
+    s2 = UISet('(0, 1), (1, 2), (2, 3)')
+    s1.symmetric_difference_update(s2)
+    assert s1 == UISet('(0, 2), (2, 3)')
+    assert s2 == UISet('(0, 1), (1, 2), (2, 3)')
+
+    i1 = Interval('[1, 3]')
+    i2 = Interval('[4, 5]')
+    s1.symmetric_difference_update([i1, i2], UISet())
+    assert s1 == UISet('(0, 1), {2}, {3}, [4, 5]')
+    assert i1 == Interval('[1, 3]')
+    assert i2 == Interval('[4, 5]')
+
+    assert id(s1) == s1_id
+
