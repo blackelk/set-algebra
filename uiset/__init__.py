@@ -10,7 +10,7 @@ Uncountable Infinite Set
 """
 
 __title__ = 'uiset'
-__version__ = '0.2.1'
+__version__ = '0.2.2'
 __author__ = 'Constantine Parkhimovich'
 __license__ = 'MIT'
 __copyright__ = 'Copyright 2014 Constantine Parkhimovich'
@@ -449,7 +449,22 @@ class UISet(object):
         Return True if none of UISet`s pieces intersect with other`s.
         UISets are disjoint if and only if their intersection is the empty UISet.
         """
-        raise NotImplementedError
+        i = 0
+        for x in other.pieces:
+            if isinstance(x, Interval):
+                i, p = self.search(x.a, i)
+                if p is not None:
+                    return False
+                i2, p = self.search(x.b, i)
+                if i2 > i:
+                    return False
+                if p is not None:
+                    return False
+            else:
+                i, p = self.search(x, i)
+                if p is not None:
+                    return False
+        return True
 
     @staticmethod
     def __sub(A, B):
