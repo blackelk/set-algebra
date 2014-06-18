@@ -10,7 +10,7 @@ Uncountable Infinite Set
 """
 
 __title__ = 'uiset'
-__version__ = '0.2.0'
+__version__ = '0.2.1'
 __author__ = 'Constantine Parkhimovich'
 __license__ = 'MIT'
 __copyright__ = 'Copyright 2014 Constantine Parkhimovich'
@@ -84,7 +84,7 @@ class UISet(object):
     For example, any two nonempty disjoint UISets are not equal and are not subsets of each other,
     so all of the following return False: a<b, a==b, or a>b.
 
-    Note, the non-operator versions of union(), intersection(), difference(), difference_update(), symmetric_difference(), symmetric_difference_update(), issubset() and issuperset() methods will accept iterable of scalars and/or intervals as an argument.
+    Note, the non-operator versions of union(), intersection(), intersection_update(), difference(), difference_update(), symmetric_difference(), symmetric_difference_update(), issubset() and issuperset() methods will accept iterable of scalars and/or intervals as an argument.
     In contrast, their operator based counterparts require their arguments to be UISets.
 
     In boolean context UISet is True if it is not empty and False if it is empty.
@@ -258,13 +258,6 @@ class UISet(object):
 
         return new
 
-    def isdisjoint(self, other):
-        """
-        Return True if none of UISet`s pieces intersect with other`s.
-        UISets are disjoint if and only if their intersection is the empty UISet.
-        """
-        raise NotImplementedError
-
     def __eq__(self, other):
         """
         self == other
@@ -400,15 +393,62 @@ class UISet(object):
             for x in other.pieces:
                 lo = self._add(x, lo)
 
+    @staticmethod
+    def __and(A, B):
+        """Return a new UISet that is an intersection of A and B."""
+        return A - ~B
+
     def __and__(self, other):
         """
         self & other
         Return a new UISet that is an intersection of UISet`s and other`s pieces.
         """
-        raise NotImplementedError
+        if not isinstance(other, UISet):
+            emsg = "unsupported operand type for &: %s and %s"
+            raise TypeError(emsg % (type(self), type(other)))
+        return UISet.__and(self, other)
+
+    @_assert_pieces_are_ascending
+    def __iand__(self, other):
+        """
+        self &= other
+        Update the UISet, keeping only pieces found in it and other.
+        """
+        if not isinstance(other, UISet):
+            emsg = "unsupported operand type for &=: %s and %s"
+            raise TypeError(emsg % (type(self), type(other)))
+        new = UISet.__and(self, other)
+        self.pieces = new.pieces
+        return self
 
     def intersection(self, *others):
-        """Return a new UISet that is an intersection of UISet`s and all other`s pieces."""
+        """
+        Return a new UISet that is an intersection of UISet`s and all other`s pieces.
+        """
+        new = self.copy()
+        for other in others:
+            if isinstance(other, UISet):
+                new = UISet.__and(new, other)
+            else:
+                new = UISet.__and(new, UISet(other))
+        return new
+
+    @_assert_pieces_are_ascending
+    def intersection_update(self, *others):
+        """Update the UISet, keeping only pieces found in it and all others."""
+        new = self
+        for other in others:
+            if isinstance(other, UISet):
+                new = UISet.__and(new, other)
+            else:
+                new = UISet.__and(new, UISet(other))
+        self.pieces = new.pieces
+
+    def isdisjoint(self, other):
+        """
+        Return True if none of UISet`s pieces intersect with other`s.
+        UISets are disjoint if and only if their intersection is the empty UISet.
+        """
         raise NotImplementedError
 
     @staticmethod
@@ -476,6 +516,7 @@ class UISet(object):
             raise TypeError(emsg % (type(self), type(other)))
         return UISet.__xor(self, other)
 
+    @_assert_pieces_are_ascending
     def __ixor__(self, other):
         """
         self ^= other
@@ -484,7 +525,9 @@ class UISet(object):
         if not isinstance(other, UISet):
             emsg = "unsupported operand type for ^=: %s and %s"
             raise TypeError(emsg % (type(self), type(other)))
-        return UISet.__xor(self, other)
+        new = UISet.__xor(self, other)
+        self.pieces = new.pieces
+        return self
 
     def symmetric_difference(self, *others):
         """
@@ -497,6 +540,7 @@ class UISet(object):
                 new = UISet.__xor(new, UISet(other))
         return new
     
+    @_assert_pieces_are_ascending
     def symmetric_difference_update(self, *others):
         """
         Update the UISet, keeping only pieces found in either UISet, but not in both.
@@ -508,19 +552,6 @@ class UISet(object):
             else:
                 new = UISet.__xor(new, UISet(other))
         self.pieces = new.pieces
-
-    def __iand__(self, other):
-        """
-        self &= other
-        Update the UISet, keeping only pieces found in it and other.
-        """
-        raise NotImplementedError
-
-    def intersection_update(self, *others):
-        """
-        Update the UISet, keeping only pieces found in it and all others.
-        """
-        raise NotImplementedError
 
     def _add_scalar(self, x, lo=0):
 

@@ -46,8 +46,4 @@ Not yet implemented features
 uiset is under active development. Currently, the following UISet methods are not implemented:
 
 | isdisjoint
-| __and__
-| __iand__
-| intersection
-| intersection_update
 

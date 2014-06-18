@@ -1028,6 +1028,97 @@ def test_uiset_difference_update():
     assert s == UISet('(4, 5), (5, 6), {8}, {9}')
 
 
+def test_uiset_and():
+
+    s1 = UISet()
+    s2 = UISet()
+    assert s1 & s2 == s2 & s1 == UISet()
+
+    s1 = UISet('[0, 3]')
+    s2 = UISet('(1, 2)')
+    assert s1 & s2 == s2 & s1 == UISet('(1, 2)')
+
+    s1 = UISet('{0}, {1}, {2}')
+    s2 = UISet('(0, 2)')
+    assert s1 & s2 == s2 & s1 == UISet([1])
+    assert s1 == UISet('{0}, {1}, {2}')
+    assert s2 == UISet('(0, 2)')
+
+    with pytest.raises(TypeError):
+        s1 & 0
+
+
+def test_uiset_iand():
+
+    s1 = UISet()
+    s2 = UISet('[0, 1]')
+    s1 &= s2
+    assert s1 == UISet()
+    assert s2 == UISet('[0, 1]')
+
+    s1 = UISet('(0, 2), {3}, [4, 5]')
+    s2 = UISet('(1, 5)')
+    s1 &= s2
+    assert s1 == UISet('(1, 2), {3}, [4, 5)')
+    assert s2 == UISet('(1, 5)')
+
+    s1 = UISet('[0, 1], [3, 4], [5, 6]')
+    s1_id = id(s1)
+    s2 = UISet('{0}, (3, 4), [5, 7), {8}')
+    s1 &= s2
+    assert s1 == UISet('{0}, (3, 4), [5, 6]')
+    assert id(s1) == s1_id
+    
+    with pytest.raises(TypeError):
+        s1 &= '[0, 1]'
+
+
+def test_uiset_intersection():
+
+    s1 = UISet('{0}, (1, 2), [3, 6]')
+    s2 = UISet('[0, 3], [4, 6]')
+    s3 = UISet('(-inf, 6)')
+    assert s1.intersection(s2, s3) == UISet('{0}, (1, 2), {3}, [4, 6)')
+    assert s1 == UISet('{0}, (1, 2), [3, 6]')
+    assert s2 == UISet('[0, 3], [4, 6]')
+    assert s3 == UISet('(-inf, 6)')
+
+    s1 = UISet('[0, 2], [3, 4], (6, inf)')
+    s2 = UISet('(0, 7), {8}')
+    i1 = Interval('(1, 4)')
+    i2 = Interval('[2, 3]')
+    assert s1.intersection(s1, s2, [i1, i2]) == UISet('(1, 2], [3, 4)')
+    assert s1.intersection(s1, s2, [i1], [i2]) == UISet([2, 3])
+    assert s1 == UISet('[0, 2], [3, 4], (6, inf)')
+    assert s2 == UISet('(0, 7), {8}')
+    assert i1 == Interval('(1, 4)')
+    assert i2 == Interval('[2, 3]')
+
+
+def test_uiset_intersection_update():
+
+    s1 = UISet('(-inf, inf)')
+    s1_id = id(s1)
+    s2 = UISet('[0, inf)')
+    s3 = UISet('(-inf, 2), [3, 5), {6}, (7, 8), (9, inf)')
+    i1 = Interval('[2, 3]')
+    i2 = Interval('(4, 8)')
+    i3 = Interval('[9, inf)')
+    s1.intersection_update(s1, s2, s3, [i2, i1, i3])
+    assert s1 == UISet('{3}, (4, 5), {6}, (7, 8), (9, inf)')
+
+    s1.intersection_update(range(11))
+    assert s1 == UISet([3, 6, 10])
+
+    assert id(s1) == s1_id
+
+    assert s2 == UISet('[0, inf)')
+    assert s3 == UISet('(-inf, 2), [3, 5), {6}, (7, 8), (9, inf)')
+    assert i1 == Interval('[2, 3]')
+    assert i2 == Interval('(4, 8)')
+    assert i3 == Interval('[9, inf)')
+
+
 def test_uiset_xor():
 
     s1 = UISet()
@@ -1051,6 +1142,7 @@ def test_uiset_xor():
 def test_uiset_ixor():
 
     s1 = UISet()
+    s1_id = id(s1)
     s2 = UISet('[0, 1]')
     s1 ^= s2
     assert s1 == s2
@@ -1065,6 +1157,8 @@ def test_uiset_ixor():
     s1 ^= s4
     assert s1 == UISet('(0, 2]')
     assert s4 == UISet('[1, 2]')
+
+    assert id(s1) == s1_id
     
     with pytest.raises(TypeError):
         s1 ^= '[0, 1]'
