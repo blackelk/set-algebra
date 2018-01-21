@@ -13,7 +13,7 @@ __title__ = 'uiset'
 __version__ = '0.2.2'
 __author__ = 'Constantine Parkhimovich'
 __license__ = 'MIT'
-__copyright__ = 'Copyright 2014 Constantine Parkhimovich'
+__copyright__ = 'Copyright 2014-18 Constantine Parkhimovich'
 
 
 from uiset.infinity import Infinity, NegativeInfinity, is_finite, inf, neg_inf

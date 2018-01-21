@@ -39,5 +39,5 @@ Infinity() is greater than any of these objects except float('inf') and float('n
 NegativeInfinity included as well.
 
 
-uiset fully supports Python3. Tested on python 2.7, 3.2, 3.3, 3.4.
+uiset fully supports Python3. Tested on python 2.7, 3.2 - 3.6.
 

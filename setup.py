@@ -1,4 +1,5 @@
-from distutils.core import setup
+from setuptools import setup
+
 import uiset
 
 
@@ -10,26 +11,26 @@ setup(
     packages = ['uiset'],
     version = uiset.__version__,
     author = 'Constantine Parkhimovich',
-    author_email = 'cp@core-tech.ru',
+    author_email = 'cparkhimovich@gmail.com',
     url = 'https://github.com/blackelk/uiset',
     download_url = 'https://github.com/blackelk/uiset/tarball/0.2.2',
     description = 'Uncountable Infinite Set',
     license = 'MIT',
     long_description = readme,
-    keywords = ['math', 'set', 'interval'],
+    keywords = 'math set interval',
     classifiers = [
-        'Development Status :: 3 - Alpha',
+        'Development Status :: 4 - Beta',
         'Intended Audience :: Developers',
         'Natural Language :: English',
         'License :: OSI Approved :: MIT License',
         'Operating System :: OS Independent',
         'Programming Language :: Python',
-        'Programming Language :: Python :: 2',
         'Programming Language :: Python :: 2.7',
-        'Programming Language :: Python :: 3',
         'Programming Language :: Python :: 3.2',
         'Programming Language :: Python :: 3.3',
         'Programming Language :: Python :: 3.4',
+        'Programming Language :: Python :: 3.5',
+        'Programming Language :: Python :: 3.6',
         'Topic :: Software Development :: Libraries :: Python Modules',
     ],
 )
