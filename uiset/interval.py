@@ -103,7 +103,7 @@ class Interval(object):
 
     def copy(self):
         """
-        Return a shallow copy of an Interval.
+        Return a shallow copy of the Interval.
         Endpoints are recreated.
         copy is safe as long as endpoint values are of immutable types.
         """

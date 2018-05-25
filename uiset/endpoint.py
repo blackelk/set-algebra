@@ -86,7 +86,7 @@ class Endpoint(object):
         self == other
         When comparing two Endpoints,
             test whether all 3 slots (value, excluded, open) are equal.
-        When other is not Endpoint test whether Endpoint value is equal to other,
+        When other is not Endpoint test whether Endpoint value is equal to the other,
             and if Endpoint is not excluded:
         >>> Endpoint('[1') == 1
         True
@@ -198,7 +198,7 @@ class Endpoint(object):
         return Endpoint(None, self.value, not self.excluded, not self.open)
 
     def copy(self):
-        """Return a shallow copy of an Endpoint"""
+        """Return a shallow copy of the Endpoint"""
         return Endpoint(None, self.value, self.excluded, self.open)
 
 

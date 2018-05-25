@@ -1,11 +1,11 @@
-uiset
-=====
+UISet - Algebra of sets in python
+=================================
 
-| How to have a set containing all numbers from 1 to 10 not including 10?
-| How to add interval from 20 to 30 to that set?
+| How to have a set containing all real numbers from 1 to 10 not including 10?
+| How to add interval from 20 to 30 to the set?
 | How to make sure this set is a subset of set of positive numbers?
 | How to add scalar number to it?
-| How to invert that set?
+| How to get complement of the set?
 
 .. code:: python
 
