@@ -1,5 +1,4 @@
 from uiset.endpoint import Endpoint
-from uiset.infinity import inf, neg_inf
 
 
 class Interval(object):
@@ -119,7 +118,5 @@ def is_scalar(obj):
 
 
 # unbounded represents interval from -inf to inf
-unbounded = Interval(
-    a=Endpoint(value=neg_inf, excluded=True, open=True),
-    b=Endpoint(value=inf, excluded=True, open=False))
+unbounded = Interval('(-inf, inf)')
 
