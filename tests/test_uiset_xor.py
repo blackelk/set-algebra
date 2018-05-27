@@ -7,8 +7,9 @@ def do_bulk_xor_tests(tests):
         X = UISet(x)
         Y = UISet(y)
         Z1 = X ^ Y
-        assert Z1 == UISet(expected), '%s ^ %s -> %s' %\
-            (X.notation, Y.notation, Z1.notation)
+
+        assert Z1 == UISet(expected), '%s ^ %s -> %s' % (X.notation, Y.notation, Z1.notation)
+
         Z2 = Y ^ X
         assert Z1 == Z2
         assert X == UISet(x)
@@ -26,6 +27,7 @@ def test_xor_empty():
         ('{0}, (1, 2)', [], '{0}, (1, 2)'),
         ('(0, 1), {2}', [], '(0, 1), {2}'),
     ]
+
     do_bulk_xor_tests(tests)
 
 
@@ -39,6 +41,7 @@ def test_xor_scalars():
         ([2], [1, 2], [1]),
         (range(0, 10, 2), range(1, 10, 2), range(0, 10)),
     ]
+
     do_bulk_xor_tests(tests)
 
 
@@ -67,11 +70,13 @@ def test_xor_scalars_and_intervals():
             '[0, 1), {2}, {3}, (4, 5), [6, 8)'
         ),
     ]
+
     do_bulk_xor_tests(tests)
 
 
 def test_xor_intervals_unique_values():
     """Both UISets contain intervals only. All the endpoint values are unique."""
+
     tests = [
         (
             # 0   1   2   3   4   5   6   7   8   9
@@ -156,11 +161,13 @@ def test_xor_intervals_unique_values():
             '[0, 1], (2, 3), [4, 4.3], [4.4, 4.6], [4.7, 5], (6, 7), (8, 9), (10, 11), (12, 13), (14, 15), [16, 17], (18, 20)'
         ),
     ]
+
     do_bulk_xor_tests(tests)
 
 
 def test_xor_bounding_intervals():
     """Both UISets contain intervals only. Some endpoint values are same."""
+
     tests = [
         ('[0, 1]', '[0, 1]', []),
         ('[0, 1]', '[0, 1)', '{1}'),
@@ -198,6 +205,7 @@ def test_xor_bounding_intervals():
         ('(0, 2)', '(1, 2], [3, 4)', '(0, 1], {2}, [3, 4)'),
         ('[0, 1)', '(0, 2]', '{0}, [1, 2]'),
     ]
+
     do_bulk_xor_tests(tests)
 
 

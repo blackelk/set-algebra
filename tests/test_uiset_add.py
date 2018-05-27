@@ -37,6 +37,7 @@ def test_add_scalar_to_scalars_only():
         ([1, 3, 5], 4, [1, 3, 4, 5]),
         ([1, 3, 5], 5, [1, 3, 5]),
     ]
+
     do_bulk_add_tests(tests)
 
 
@@ -46,6 +47,7 @@ def test_add_scalar_to_interval():
     i2 = Interval('[1, 3)')
     i3 = Interval('(1, 3]')
     i4 = Interval('[1, 3]')
+
     tests = [
         ([i1], 0, [0, i1]),
         ([i1], 1, [i2]),
@@ -71,7 +73,9 @@ def test_add_scalar_to_interval():
         ([i4], 3, [i4]),
         ([i4], 4, [i4, 4]),
     ]
+
     do_bulk_add_tests(tests)
+
     assert i1 == Interval('(1, 3)')
     assert i2 == Interval('[1, 3)')
     assert i3 == Interval('(1, 3]')
@@ -88,6 +92,7 @@ def test_add_scalar_to_two_intervals():
     i6 = Interval('[5, 7)')
     i7 = Interval('(5, 7]')
     i8 = Interval('[5, 7]')
+
     tests = [
         ([i1, i5], 0, [0, i1, i5]),
         ([i1, i5], 1, [i2, i5]),
@@ -119,7 +124,9 @@ def test_add_scalar_to_two_intervals():
         ([i2, i6], 7, [i2, i8]),
         ([i2, i6], 8, [i2, i6, 8]),
     ]
+
     do_bulk_add_tests(tests)
+
     assert i1 == Interval('(1, 3)')
     assert i2 == Interval('[1, 3)')
     assert i3 == Interval('(1, 3]')
@@ -135,6 +142,7 @@ def test_add_scalar_to_two_close_intervals():
     i1 = Interval('(1, 3)')
     i2 = Interval('(3, 5)')
     s = UISet([i1, i2])
+
     tests = [
         (s, 0, [0, i1, i2]),
         (s, 1, [Interval('[1, 3)'), i2]),
@@ -144,7 +152,9 @@ def test_add_scalar_to_two_close_intervals():
         (s, 5, [i1, Interval('(3, 5]')]),
         (s, 6, [i1, i2, 6]),
     ]
+
     do_bulk_add_tests(tests)
+
     assert i1 == Interval('(1, 3)')
     assert i2 == Interval('(3, 5)')
 
@@ -154,6 +164,7 @@ def test_add_scalar_to_interval_and_scalar():
     i1 = Interval('(1, 3)')
     i2 = Interval('[1, 3)')
     i3 = Interval('(1, 3]')
+
     tests = [
         ([i1, 5], 0, [0, i1, 5]),
         ([i1, 5], 1, [i2, 5]),
@@ -163,7 +174,9 @@ def test_add_scalar_to_interval_and_scalar():
         ([i1, 5], 5, [i1, 5]),
         ([i1, 5], 6, [i1, 5, 6]),
     ]
+
     do_bulk_add_tests(tests)
+
     assert i1 == Interval('(1, 3)')
     assert i2 == Interval('[1, 3)')
     assert i3 == Interval('(1, 3]')
@@ -175,6 +188,7 @@ def test_add_scalar_to_three_intervals_and_2_scalars():
     i2 = Interval('(0, 1)')
     i3 = Interval('[10, inf)')
     pieces = [i1, i2, 5, 7, i3]
+
     tests = [
         (pieces, -5, [i1, i2, 5, 7, i3]),
         (pieces, 0, [Interval('(-inf, 1)'), 5, 7, i3]),
@@ -187,7 +201,9 @@ def test_add_scalar_to_three_intervals_and_2_scalars():
         (pieces, 10, [i1, i2, 5, 7, i3]),
         (pieces, 11, [i1, i2, 5, 7, i3]),
     ]
+
     do_bulk_add_tests(tests)
+
     assert i1 == Interval('(-inf, 0)')
     assert i2 == Interval('(0, 1)')
     assert i3 == Interval('[10, inf)')
@@ -209,6 +225,7 @@ def test_add_interval_to_empty_uiset():
     tests = [
         ([], i, [i]),
     ]
+
     do_bulk_add_tests(tests)
 
 
@@ -218,6 +235,7 @@ def test_add_interval_to_scalar():
     i2 = Interval('[3, 5)')
     i3 = Interval('(3, 5]')
     i4 = Interval('[3, 5]')
+
     tests = [
         ([0], i1, [0, i1]),
         ([3], i1, [i2]),
@@ -243,7 +261,9 @@ def test_add_interval_to_scalar():
         ([5], i4, [i4]),
         ([6], i4, [i4, 6]),
     ]
+
     do_bulk_add_tests(tests)
+
     assert i1 == Interval('(3, 5)')
     assert i2 == Interval('[3, 5)')
     assert i3 == Interval('(3, 5]')
@@ -256,6 +276,7 @@ def test_add_interval_to_two_scalars():
     i2 = Interval('[3, 5)')
     i3 = Interval('(3, 5]')
     i4 = Interval('[3, 5]')
+
     tests = [
         ([0, 1], i1, [0, 1, i1]),
         ([0, 3], i1, [0, i2]),
@@ -273,7 +294,9 @@ def test_add_interval_to_two_scalars():
         ([5, 6], i1, [i3, 6]),
         ([6, 7], i1, [i1, 6, 7]),
     ]
+
     do_bulk_add_tests(tests)
+
     assert i1 == Interval('(3, 5)')
 
 
@@ -300,6 +323,7 @@ def test_add_interval_to_interval():
     i18 = Interval('(4, 7)')
     i19 = Interval('(6, 7)')
     i20 = Interval('[6, 7)')
+
     tests = [
         ([i1], i1, [i1]),
         ([i1], i2, [i2]),
@@ -341,7 +365,9 @@ def test_add_interval_to_interval():
         ([i2], i20, [i15]),
         ([i3], i19, [i14])
     ]
+
     do_bulk_add_tests(tests)
+
     assert i1 == Interval('(3, 6)')
     assert i2 == Interval('[3, 6)')
     assert i3 == Interval('(3, 6]')
@@ -379,6 +405,7 @@ def test_add_interval_to_three_intervals_and_two_scalars():
     i11 = Interval('[0, 10]')
     i12 = Interval('(-inf, inf)')
     pieces = [i1, i2, 5, 7, i3]
+
     tests = [
         (pieces, i4, [i1, i2, 5, 7, i3]),
         (pieces, i5, [Interval('(-inf, 1)'), 5, 7, i3]),
@@ -390,7 +417,9 @@ def test_add_interval_to_three_intervals_and_two_scalars():
         (pieces, i11, [i12]),
         (pieces, i12, [i12]),
     ]
+
     do_bulk_add_tests(tests)
+
     assert i1 == Interval('(-inf, 0)')
     assert i2 == Interval('(0, 1)')
     assert i3 == Interval('[10, inf)')

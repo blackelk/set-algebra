@@ -21,6 +21,7 @@ def test_isdisjoint_empty():
         ([0, 1], [], True),
         ('(0, 1)', [], True),
     ]
+
     do_bulk_isdisjoint_tests(tests)
 
 
@@ -34,6 +35,7 @@ def test_isdisjoint_scalars():
         ([1, 2], [2], False),
         ([1, 2], [3], True),
     ]
+
     do_bulk_isdisjoint_tests(tests)
 
 
@@ -76,6 +78,7 @@ def test_isdisjoint_intervals():
         ('(0, 1), (2, 3), (4, 5)', '[1, 2], [3, 4]', True),
         ('(0, 1), (2, 3), [4, 5)', '[1, 2], [3, 4]', False),
     ]
+
     do_bulk_isdisjoint_tests(tests)
 
 
@@ -112,6 +115,7 @@ def test_isdisjoint_scalars_and_intervals():
         ('[0, 2], [5, 6]', '(2, 3), (3, 4), (4, 5)', True),
         ('[0, 2], [5, 6]', '(2, 3), (3, 4), (4, 5]', False),
     ]
+
     do_bulk_isdisjoint_tests(tests)
 
 
@@ -125,5 +129,6 @@ def test_isdisjoint_inf():
         ('(-inf, 0), (0, inf)', [0], True),
         ('(-inf, 0), (0, inf)', '(0, 1)', False),
     ]
+
     do_bulk_isdisjoint_tests(tests)
 

@@ -31,6 +31,7 @@ def test_search_in_interval():
         ([i3], 5, (0, i3)),
         ([i3], 7, (0, i3)),
     ]
+
     do_bulk_search_tests(tests)
 
 
@@ -39,6 +40,7 @@ def test_search_in_two_intervals():
     i1 = Interval('(1, 3)')
     i2 = Interval('(5, 7)')
     s = UISet([i1, i2])
+
     tests = [
         (s, 0, (0, None)),
         (s, 1, (0, None)),
@@ -49,6 +51,7 @@ def test_search_in_two_intervals():
         (s, 6, (1, i2)),
         (s, 7, (2, None)),
     ]
+
     do_bulk_search_tests(tests)
 
 
@@ -59,6 +62,7 @@ def test_search_in_four_intervals():
     i3 = Interval('(9, 10)')
     i4 = Interval('(10, inf)')
     s = UISet([i1, i2, i3, i4])
+
     tests = [
         (s, float('-inf'), (0, None)),
         (s, -2, (0, i1)),
@@ -72,6 +76,7 @@ def test_search_in_four_intervals():
         (s, 1e+5, (3, i4)),
         (s, float('inf'), (4, None)),
     ]
+
     do_bulk_search_tests(tests)
 
 
@@ -89,6 +94,7 @@ def test_search_in_scalars():
         ([4, 6], 7, (2, None)),
         ([4, 6], float('inf'), (2, None)),
     ]
+
     do_bulk_search_tests(tests)
 
 
@@ -98,6 +104,7 @@ def test_search_in_interval_and_scalar():
     i2 = Interval('[4, 6)')
     i3 = Interval('(4, 6]')
     i4 = Interval('[4, 6]')
+
     tests = [
         ([i1, 8], 0, (0, None)),
         ([i1, 8], 4, (0, None)),
@@ -131,6 +138,7 @@ def test_search_in_interval_and_scalar():
         ([i4, 8], 8, (1, 8)),
         ([i4, 8], 9, (2, None)),
     ]
+
     do_bulk_search_tests(tests)
 
 
@@ -140,6 +148,7 @@ def test_search_in_scalar_and_interval():
     i2 = Interval('[4, 6)')
     i3 = Interval('(4, 6]')
     i4 = Interval('[4, 6]')
+
     tests = [
         ([2, i1], 1, (0, None)),
         ([2, i1], 2, (0, 2)),
@@ -173,6 +182,7 @@ def test_search_in_scalar_and_interval():
         ([2, i4], 6, (1, i4)),
         ([2, i4], 7, (2, None)),
     ]
+
     do_bulk_search_tests(tests)
 
 
@@ -196,5 +206,6 @@ def test_search_in_two_scalars_and_two_intervals():
         (s, 11, (4, None)),
         (s, float('inf'), (4, None)),
     ]
+
     do_bulk_search_tests(tests)
 
