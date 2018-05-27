@@ -2,7 +2,7 @@ import pytest
 from uiset import Endpoint, Interval, are_bounding
 
 
-def test_endpoint_init():
+def test_endpoint_init_from_notation():
 
     e1 = Endpoint('[1')
     assert e1.open
@@ -26,19 +26,19 @@ def test_endpoint_init():
     assert e4.value == 1
 
 
-def test_endpoint_alt_init():
+def test_endpoint_init_from_value_and_bound():
 
-    assert Endpoint(value=1, excluded=False, open=True).notation == '[1'
-    assert Endpoint(value=1, excluded=True, open=True).notation == '(1'
-    assert Endpoint(value=1, excluded=False, open=False).notation == '1]'
-    assert Endpoint(value=1, excluded=True, open=False).notation == '1)'
+    assert Endpoint(1, '[').notation == '[1'
+    assert Endpoint(1, '(').notation == '(1'
+    assert Endpoint(1, ']').notation == '1]'
+    assert Endpoint(1, ')').notation == '1)'
 
 
 def test_endpoint_init_raises():
 
+    with pytest.raises(TypeError): Endpoint(1)
     with pytest.raises(TypeError): Endpoint('[1', 1)
-    with pytest.raises(TypeError): Endpoint('[1', 1, True)
-    with pytest.raises(TypeError): Endpoint('[1', 1, True, True)
+
     with pytest.raises(ValueError): Endpoint('1')
     with pytest.raises(ValueError): Endpoint('[1]')
     with pytest.raises(ValueError): Endpoint('[')
@@ -48,6 +48,7 @@ def test_endpoint_init_raises():
     with pytest.raises(ValueError): Endpoint(')')
     with pytest.raises(ValueError): Endpoint('')
     with pytest.raises(ValueError): Endpoint('a')
+
     with pytest.raises(ValueError): Endpoint('[-inf')
     with pytest.raises(ValueError): Endpoint('inf]')
 
@@ -72,14 +73,14 @@ def test_endpoint_repr():
     e1 = Endpoint('[5')
     e2 = Endpoint('(-inf')
     e3 = Endpoint('inf)')
-    e4 = Endpoint(None, 3, True, False)
-    e5 = Endpoint(None, 'A', True, True)
+    e4 = Endpoint(3, ')')
+    e5 = Endpoint('A', '(')
 
     assert repr(e1) == "Endpoint('[5')"
     assert repr(e2) == "Endpoint('(-inf')"
     assert repr(e3) == "Endpoint('inf)')"
     assert repr(e4) == "Endpoint('3)')"
-    assert repr(e5) == "Endpoint(None, 'A', True, True)"
+    assert repr(e5) == "Endpoint('A', '(')"
 
     assert eval(repr(e1)) == e1
     assert eval(repr(e2)) == e2

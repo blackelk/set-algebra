@@ -144,6 +144,7 @@ def test_uiset_init_from_notation_raises():
         '[2, 3, 4]',
         '{2, 3, 4}',
     ]
+
     for notation in invalid_notations:
         with pytest.raises(ValueError):
             s = UISet(notation)
@@ -250,6 +251,7 @@ def test_uiset_add():
         ('[7, 9]', '(4, 9]'),
         ('[8, 9]', '(4, 7), [8, 9]'),
     ]
+
     for i_notation, res_notation in tests:
         s = s0.copy()
         interval = Interval(i_notation)
@@ -258,6 +260,7 @@ def test_uiset_add():
 
     # Bulk test 2
     s0 = UISet('(0, 4), (6, 8), (9, 10), (12, 15)')
+
     tests = [
         ('(-inf, -1]', '(-inf, -1], (0, 4), (6, 8), (9, 10), (12, 15)'),
         ('(-inf, 0)', '(-inf, 0), (0, 4), (6, 8), (9, 10), (12, 15)'),
@@ -299,6 +302,7 @@ def test_uiset_add():
         ('(15, 16)', '(0, 4), (6, 8), (9, 10), (12, 15), (15, 16)'),
         ('[15, 16)', '(0, 4), (6, 8), (9, 10), (12, 16)'),
     ]
+
     for i_notation, res_notation in tests:
         s = s0.copy()
         interval = Interval(i_notation)
@@ -607,8 +611,8 @@ def test_uiset_copy():
 
     l1 = [1, 2, 3]
     l2 = [4, 5, 6]
-    a = Endpoint(None, l1, True, True)
-    b = Endpoint(None, l2, True, False)
+    a = Endpoint(l1, '(')
+    b = Endpoint(l2, ')')
     i = Interval(None, a, b)
     s1 = UISet([i])
     s2 = s1.copy()

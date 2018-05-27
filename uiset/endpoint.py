@@ -1,5 +1,5 @@
 from uiset.infinity import Infinity, NegativeInfinity, inf, neg_inf, is_finite
-from uiset.parser import parse_endpoint_notation
+from uiset.parser import EXCLUDED_OPEN_TO_BOUNDS_MAPPING, parse_bound, parse_endpoint_notation
 
 
 class Endpoint(object):
@@ -11,18 +11,12 @@ class Endpoint(object):
         1)      Excluded closed
 
     There are 2 ways to instantiate Endpoint:
+
     - From notation string (for numeric values only):
-        Endpoint('[1'), Endpoint('0.6)'), Endpoint('3.4e-5'), Endpoint('(-inf')
-    - From 3 keyword arguments:
-        value
-            must support comparsion operations: ==, >, >=, <, <=
-        excluded
-            bool; True for () and False for []
-        open
-            bool; True for [( and False for )]
-        Example:
-            Endpoint(value=12.3, excluded=False, open=True)
-            will produce Endpoint('[12.3')
+        Endpoint('[1'), Endpoint('-0.6)'), Endpoint('3.4e-5'), Endpoint('(-inf')
+
+    - From value and bound character
+        Endpoint(3, ']'), Endpoint(datetime.date.today(), '(')
 
     Endpoints can be compared with scalars and endpoints.
     Endpoints support bitwise inversion:
@@ -42,17 +36,15 @@ class Endpoint(object):
 
     PARSABLE_TYPES = (int, float, Infinity, NegativeInfinity)
 
-    def __init__(self, notation=None, value=None, excluded=None, open=None):
-
-        if (notation is None) ^ any(k is not None for k in [value, excluded, open]):
-            e = '%s() takes notation or 3 kwargs: value, excluded, and open'
-            raise TypeError(e % type(self).__name__)
-
-        if notation is not None:
-            value, excluded, open = parse_endpoint_notation(notation)
+    def __init__(self, notation_or_value, bound=None):
+        if bound is None:
+            value, excluded, open = parse_endpoint_notation(notation_or_value)
+        else:
+            value = notation_or_value
+            excluded, open = parse_bound(bound)
 
         if not excluded and not is_finite(value):
-            raise ValueError('Not excluded value must be finite')
+            raise ValueError('Not excluded value cannot be infinite, use "(" or ")" as bound')
 
         self.value = value
         self.excluded = excluded
@@ -77,8 +69,9 @@ class Endpoint(object):
             repr_format = "%s('%s')"
             params = (classname, self.notation)
         else:
-            repr_format = '%s(None, %s, %s, %s)'
-            params = (classname, repr(self.value), self.excluded, self.open)
+            repr_format = "%s(%s, '%s')"
+            bound = EXCLUDED_OPEN_TO_BOUNDS_MAPPING[self.excluded, self.open]
+            params = (classname, repr(self.value), bound)
         return repr_format % params
 
     def __eq__(self, other):
@@ -94,8 +87,8 @@ class Endpoint(object):
         False
         """
         if isinstance(other, Endpoint):
-            return self.value == other.value\
-               and self.excluded == other.excluded\
+            return self.value == other.value \
+               and self.excluded == other.excluded \
                and self.open == other.open
         else:
             return not self.excluded and self.value == other
@@ -195,11 +188,13 @@ class Endpoint(object):
         >>> ~Endpoint('[1')
         Endpoint('1)')
         """
-        return Endpoint(None, self.value, not self.excluded, not self.open)
+        bound = EXCLUDED_OPEN_TO_BOUNDS_MAPPING[not self.excluded, not self.open]
+        return Endpoint(self.value, bound)
 
     def copy(self):
         """Return a shallow copy of the Endpoint"""
-        return Endpoint(None, self.value, self.excluded, self.open)
+        bound = EXCLUDED_OPEN_TO_BOUNDS_MAPPING[self.excluded, self.open]
+        return Endpoint(self.value, bound)
 
 
 def are_bounding(e1, e2):

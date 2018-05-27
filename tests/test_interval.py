@@ -4,10 +4,6 @@ import pytest
 
 from uiset import Endpoint, Interval
 
-_ver = sys.version_info
-is_py2 = (_ver[0] == 2)
-is_py3 = (_ver[0] == 3)
-
 
 def test_interval_repr():
 
@@ -17,8 +13,8 @@ def test_interval_repr():
     i4 = Interval('(1, 2)')
     i5 = Interval('(-inf, 2)')
     i6 = Interval('(1, inf)')
-    a = Endpoint(None, 'A', False, True)
-    b = Endpoint(None, 'Z', False, False)
+    a = Endpoint('A', '[')
+    b = Endpoint('Z', ']')
     i7 = Interval(None, a=a, b=b)
 
     assert repr(i1) == "Interval('[1, 2]')"
@@ -27,7 +23,7 @@ def test_interval_repr():
     assert repr(i4) == "Interval('(1, 2)')"
     assert repr(i5) == "Interval('(-inf, 2)')"
     assert repr(i6) == "Interval('(1, inf)')"
-    assert repr(i7) == "Interval(None, Endpoint(None, 'A', False, True), Endpoint(None, 'Z', False, False))"
+    assert repr(i7) == "Interval(None, Endpoint('A', '['), Endpoint('Z', ']'))"
 
     assert eval(repr(i1)) == i1
     assert eval(repr(i2)) == i2
@@ -146,18 +142,21 @@ def test_interval_copy():
 
 def test_str_interval():
 
-    a = Endpoint(value='p', excluded=False, open=True)
-    b = Endpoint(value='q', excluded=True, open=False)
+    a = Endpoint('p', '(')
+    b = Endpoint('q', ']')
     p = Interval(a=a, b=b)
-    assert p.notation == '[p, q)'
+
+    assert p.notation == '(p, q]'
     assert 'o' not in p
-    assert 'p' in p
+    assert 'p' not in p
     assert 'p' * 1000 in p
     assert 'pq' in p
-    assert 'q' not in p
+    assert 'q' in p
+
     assert a in p
     assert b in p
-    if is_py3:
+
+    if sys.version_info[0] == 3:
         with pytest.raises(TypeError):
             1 in p
         with pytest.raises(TypeError):
@@ -168,10 +167,10 @@ def test_date_interval():
 
     today = datetime.date.today()
     tomorrow = today + datetime.timedelta(days=1)
-    inaweek = today + datetime.timedelta(days=7)
+    week_later = today + datetime.timedelta(days=7)
     ad1 = datetime.date(1, 1, 1)
-    a = Endpoint(value=today, excluded=False, open=True)
-    b = Endpoint(value=inaweek, excluded=True, open=False)
+    a = Endpoint(today, '[')
+    b = Endpoint(week_later, ')')
     week = Interval(a=a, b=b)
     assert today in week
     assert tomorrow in week

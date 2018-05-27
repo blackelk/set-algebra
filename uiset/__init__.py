@@ -1,16 +1,15 @@
 """
-uiset Library
+UISet Library
 
-According to set theory, provides instruments to represent and work with:
-Infinity
-Negative Infinity
-Endpoint
-Interval
-Uncountable Infinite Set
+Algebra of sets. Provides:
+    Infinity, Negative Infinity
+    Endpoint
+    Interval
+    Uncountable Infinite Set
 """
 
 __title__ = 'uiset'
-__version__ = '0.2.2'
+__version__ = '0.3.0'
 __author__ = 'Constantine Parkhimovich'
 __license__ = 'MIT'
 __copyright__ = 'Copyright 2014-2018 Constantine Parkhimovich'
@@ -21,7 +20,7 @@ import functools
 from uiset.infinity import Infinity, NegativeInfinity, is_finite, inf, neg_inf
 from uiset.endpoint import Endpoint, are_bounding
 from uiset.interval import Interval, is_interval, is_scalar, unbounded
-from uiset.parser import parse_value, parse_endpoint_notation
+from uiset.parser import EXCLUDED_OPEN_TO_BOUNDS_MAPPING, parse_value, parse_endpoint_notation
 
 
 def _assert_pieces_are_ascending(fn):
@@ -109,7 +108,8 @@ class UISet(object):
                 self.pieces.append(scalar)
             else:
                 value, excluded, open = parse_endpoint_notation(part)
-                endpoint = Endpoint(None, value, excluded, open)
+                bound = EXCLUDED_OPEN_TO_BOUNDS_MAPPING[excluded, open]
+                endpoint = Endpoint(value, bound)
                 if a is None:
                     a = endpoint
                 else:
@@ -231,8 +231,8 @@ class UISet(object):
             if isinstance(i, Interval):
                 endpoints += [i.a, i.b]
             else:
-                e1 = Endpoint(value=i, excluded=False, open=True)
-                e2 = Endpoint(value=i, excluded=False, open=False)
+                e1 = Endpoint(i, '[')
+                e2 = Endpoint(i, ']')
                 endpoints += [e1, e2]
         # Make sure the first endpoint is either -inf or inverted original one.
         if endpoints[0].value == neg_inf:
@@ -593,12 +593,12 @@ class UISet(object):
                     pieces[idx-1:idx+1] = [interval]
                 else:
                     # Adding b to (a, b)
-                    b = Endpoint(value=x, excluded=False, open=False)
+                    b = Endpoint(x, ']')
                     pieces[idx-1] = Interval(a=pre.a.copy(), b=b)
                 return idx
         if nex is not None and nex.a.value == x:
             # Adding a to (a, b)
-            a = Endpoint(value=x, excluded=False, open=True)
+            a = Endpoint(x, '[')
             pieces[idx] = Interval(a=a, b=nex.b.copy())
             return idx
         pieces.insert(idx, x)
@@ -622,7 +622,7 @@ class UISet(object):
                     a = pre.a.copy()
                     idx1 -= 1
             elif pre == x.a.value:
-                a = Endpoint(value=pre, excluded=False, open=True)
+                a = Endpoint(pre, '[')
                 idx1 -= 1
 
         b = x.b.copy()
@@ -637,7 +637,7 @@ class UISet(object):
                     b = nex.b.copy()
                     idx2 += 1
             elif nex == x.b.value:
-                b = Endpoint(value=nex, excluded=False, open=False)
+                b = Endpoint(nex, ']')
                 idx2 += 1
 
         pieces[idx1:idx2] = [Interval(a=a, b=b)]
@@ -671,9 +671,9 @@ class UISet(object):
                 piece.b.excluded = True
             else:
                 # Split interval by x.
-                b1 = Endpoint(value=x, excluded=True, open=False)
+                b1 = Endpoint(x, ')')
                 i1 = Interval(a=piece.a, b=b1)
-                a2 = Endpoint(value=x, excluded=True, open=True)
+                a2 = Endpoint(x, '(')
                 i2 = Interval(a=a2, b=piece.b)
                 self.pieces[idx:idx+1] = [i1, i2]
         else:

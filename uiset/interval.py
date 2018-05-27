@@ -43,8 +43,8 @@ class Interval(object):
     >>> negative in percentage
     False
     >>>
-    >>> a = Endpoint(value='p', excluded=False, open=True)
-    >>> b = Endpoint(value='q', excluded=True, open=False)
+    >>> a = Endpoint('p', '[')
+    >>> b = Endpoint('q', ')')
     >>> p = Interval(a=a, b=b)
     >>> 'o' in p
     False
