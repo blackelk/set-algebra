@@ -34,7 +34,7 @@ def test_set_init():
     assert s1 == s2
     assert s1 is not s2
 
-    s1 = Set([Interval('[1, 2]')])
+    s1 = Set([Interval('[1, 2]'), 3])
     s2 = Set(s1)
     assert s1 == s2
     assert s1 is not s2

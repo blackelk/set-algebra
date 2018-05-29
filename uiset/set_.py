@@ -51,6 +51,10 @@ def _assert_pieces_are_ascending(fn):
     return wrapper
 
 
+def _copy_pieces(pieces):
+    return [p.copy() if is_interval(p) else p for p in pieces]
+
+
 class Set(object):
     """
     Uncountable Infinite Set
@@ -119,7 +123,7 @@ class Set(object):
         if isinstance(arg, Set):
             # Init from Set
             # TODO: "arg" is unclear signature
-            self.pieces = [i.copy() for i in arg.pieces]
+            self.pieces = _copy_pieces(arg.pieces)
             return
         self.pieces = []
         if arg is None:
@@ -739,6 +743,6 @@ class Set(object):
         copy is safe as long as endpoint values are of immutable types.
         """
         new = Set()
-        new.pieces = [p.copy() if is_interval(p) else p for p in self.pieces]
+        new.pieces = _copy_pieces(self.pieces)
         return new
 
