@@ -1,13 +1,13 @@
-from uiset import UISet
+from uiset import Set
 
 
 def do_bulk_isdisjoint_tests(tests):
 
     for x, y, expected in tests:
-        X = UISet(x)
-        Y = UISet(y)
+        X = Set(x)
+        Y = Set(y)
         res1 = X.isdisjoint(Y)
-        emsg = "UISet('%s').isdisjoint(UISet('%s')) returns %s, %s expected"
+        emsg = "Set('%s').isdisjoint(Set('%s')) returns %s, %s expected"
         assert res1 == expected, emsg % (X.notation, Y.notation, res1, expected)
         res2 = Y.isdisjoint(X)
         assert res2 == expected, emsg % (X.notation, Y.notation, res2, expected)

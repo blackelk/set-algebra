@@ -1,5 +1,5 @@
 import pytest
-from uiset import Endpoint, Interval, UISet, inf, unbounded
+from uiset import Endpoint, Interval, Set, inf, unbounded
 
 
 def do_bulk_tests(tests, fn, mode):
@@ -7,14 +7,14 @@ def do_bulk_tests(tests, fn, mode):
     for test in tests:
         arg, x, expected = test
         if isinstance(arg, list):
-            s = UISet()
+            s = Set()
             pieces_copy = []
             for a in arg:
                 pieces_copy.append(a.copy() if isinstance(a, Interval) else a)
             s.pieces = pieces_copy
         elif isinstance(arg, str):
-            s = UISet(arg)
-        elif isinstance(arg, UISet):
+            s = Set(arg)
+        elif isinstance(arg, Set):
             s = arg.copy()
         else:
             assert False
@@ -27,94 +27,94 @@ def do_bulk_tests(tests, fn, mode):
             raise ValueError('Invalid mode')
 
 
-def test_uiset_init():
+def test_set_init():
 
-    s1 = UISet()
-    s2 = UISet(s1)
+    s1 = Set()
+    s2 = Set(s1)
     assert s1 == s2
     assert s1 is not s2
 
-    s1 = UISet([Interval('[1, 2]')])
-    s2 = UISet(s1)
+    s1 = Set([Interval('[1, 2]')])
+    s2 = Set(s1)
     assert s1 == s2
     assert s1 is not s2
 
-    s = UISet()
+    s = Set()
     assert s.pieces == []
 
-    s = UISet([])
+    s = Set([])
     assert s.pieces == []
 
-    s = UISet([5])
+    s = Set([5])
     assert s.pieces == [5]
-    s = UISet([5, 7])
+    s = Set([5, 7])
     assert s.pieces == [5, 7]
 
-    s = UISet(set())
+    s = Set(set())
     assert s.pieces == []
-    s = UISet({''})
+    s = Set({''})
     assert s.pieces == ['']
 
-    s = UISet([2, Interval('(4, 6)'), 5, 6, 8])
+    s = Set([2, Interval('(4, 6)'), 5, 6, 8])
     assert s.pieces == [2, Interval('(4, 6]'), 8]
 
-    s = UISet([unbounded])
+    s = Set([unbounded])
     assert s.pieces[0] == unbounded
     assert s.pieces[0] is not unbounded
 
     i1 = Interval('[1, 4]')
     i2 = Interval('[7, 9]')
-    s = UISet([i1, i2])
+    s = Set([i1, i2])
     assert s.pieces == [Interval('[1, 4]'), Interval('[7, 9]')]
     assert s.pieces[0] is not i1
     assert s.pieces[1] is not i2
 
     i1 = Interval('[7, 9]')
     i2 = Interval('[1, 4]')
-    s = UISet([i1, i2])
+    s = Set([i1, i2])
     assert s.pieces == [Interval('[1, 4]'), Interval('[7, 9]')]
     assert s.pieces[0] is not i1
     assert s.pieces[1] is not i2
 
     i1 = Interval('[1, 9]')
     i2 = Interval('[3, 5]')
-    s = UISet([i1, i2])
+    s = Set([i1, i2])
     assert s.pieces == [Interval('[1, 9]')]
 
     i1 = Interval('[3, 5]')
     i2 = Interval('[1, 9]')
-    s = UISet([i1, i2])
+    s = Set([i1, i2])
     assert s.pieces == [Interval('[1, 9]')]
 
     i1 = Interval('[1, 6]')
     i2 = Interval('[5, 8]')
-    s = UISet([i1, i2])
+    s = Set([i1, i2])
     assert s.pieces == [Interval('[1, 8]')]
 
     i1 = Interval('[5, 8]')
     i2 = Interval('[1, 6]')
-    s = UISet([i1, i2])
+    s = Set([i1, i2])
     assert s.pieces == [Interval('[1, 8]')]
 
     i1 = Interval('(0, 1)')
     i2 = Interval('(1, 2)')
-    s = UISet([i1, i2])
+    s = Set([i1, i2])
     assert s.pieces == [Interval('(0, 1)'), Interval('(1, 2)')]
 
 
-def test_uiset_init_from_notation():
+def test_set_init_from_notation():
 
-    s = UISet('[1, 2]')
+    s = Set('[1, 2]')
     assert s.pieces == [Interval('[1, 2]')]
 
-    s = UISet('[1, 2], (4, 5)')
+    s = Set('[1, 2], (4, 5)')
     assert s.pieces == [Interval('[1, 2]'), Interval('(4, 5)')]
 
-    s = UISet('[1, 2], [5, inf)')
+    s = Set('[1, 2], [5, inf)')
     assert s.pieces == [Interval('[1, 2]'), Interval('[5, inf)')]
 
 
-def test_uiset_init_from_notation_raises():
+def test_set_init_from_notation_raises():
 
     invalid_notations = [
         '',
@@ -147,45 +147,45 @@ def test_uiset_init_from_notation_raises():
 
     for notation in invalid_notations:
         with pytest.raises(ValueError):
-            s = UISet(notation)
+            s = Set(notation)
 
 
-def test_uiset_repr():
+def test_set_repr():
 
-    s = UISet()
-    assert repr(s) == 'UISet([])'
+    s = Set()
+    assert repr(s) == 'Set([])'
 
-    s = UISet([Interval('[1, 2.5)'), Interval('(2.5, 4]'), Interval('[7, 9]')])
+    s = Set([Interval('[1, 2.5)'), Interval('(2.5, 4]'), Interval('[7, 9]')])
     assert eval(repr(s)).pieces == s.pieces
 
-    s = UISet([1, 2, 3])
+    s = Set([1, 2, 3])
     assert eval(repr(s)).pieces == s.pieces
 
-    s = UISet([1, Interval('(2, 3)')])
+    s = Set([1, Interval('(2, 3)')])
     assert eval(repr(s)).pieces == s.pieces
 
 
-def test_uiset_notation():
+def test_set_notation():
 
-    s = UISet()
+    s = Set()
     assert s.notation == ''
 
-    s = UISet([0])
+    s = Set([0])
     assert s.notation == '{0}'
 
-    s = UISet([Interval('(-inf, 0)')])
+    s = Set([Interval('(-inf, 0)')])
     assert s.notation == '(-inf, 0)'
 
-    s = UISet([Interval('(-inf, 0)'), Interval('[1, 2]')])
+    s = Set([Interval('(-inf, 0)'), Interval('[1, 2]')])
     assert s.notation == '(-inf, 0), [1, 2]'
 
-    s = UISet([Interval('(-inf, 0)'), Interval('[1, 2]'), 4])
+    s = Set([Interval('(-inf, 0)'), Interval('[1, 2]'), 4])
     assert s.notation == '(-inf, 0), [1, 2], {4}'
 
 
-def test_uiset_add():
+def test_set_add():
 
-    s = UISet()
+    s = Set()
     i1 = Interval('(-inf, 0)')
     s.add(i1)
     assert s.pieces == [i1]
@@ -206,19 +206,19 @@ def test_uiset_add():
     s.add(i5)
     assert s.pieces == [Interval('(-inf, 1)'), Interval('(1, 2)')]
 
-    s = UISet([i4])
+    s = Set([i4])
     s.add(i3)
     assert s.pieces == [Interval('[-1, 1)')]
 
     i6 = Interval('[0, 1)')
     i7 = Interval('[-1, 0)')
-    s = UISet([i6])
+    s = Set([i6])
     s.add(i7)
     assert s.pieces == [Interval('[-1, 1)')]
 
     i8 = Interval('(0, 1)')
     i9 = Interval('(-1, 0)')
-    s = UISet([i8])
+    s = Set([i8])
     s.add(i9)
     assert s.pieces == [Interval('(-1, 0)'), Interval('(0, 1)')]
 
@@ -234,7 +234,7 @@ def test_uiset_add():
     assert i9 == Interval('(-1, 0)')
 
     # Bulk test 1
-    s0 = UISet('(4, 7)')
+    s0 = Set('(4, 7)')
     tests = [
         ('(1, 2)', '(1, 2), (4, 7)'),
         ('(1, 4)', '(1, 4), (4, 7)'),
@@ -259,7 +259,7 @@ def test_uiset_add():
         assert s.notation == res_notation
 
     # Bulk test 2
-    s0 = UISet('(0, 4), (6, 8), (9, 10), (12, 15)')
+    s0 = Set('(0, 4), (6, 8), (9, 10), (12, 15)')
 
     tests = [
         ('(-inf, -1]', '(-inf, -1], (0, 4), (6, 8), (9, 10), (12, 15)'),
@@ -310,64 +310,64 @@ def test_uiset_add():
         assert s.notation == res_notation
 
 
-def test_uiset_bool():
+def test_set_bool():
 
-    s = UISet()
+    s = Set()
     assert bool(s) is False
 
     s.add(1)
     assert bool(s) is True
 
-    s = UISet('[1, 2]')
+    s = Set('[1, 2]')
     assert bool(s) is True
 
 
-def test_uiset_invert():
+def test_set_invert():
 
     i0 = Interval('(-inf, inf)')
-    s = UISet([i0])
+    s = Set([i0])
     assert (~s).pieces == []
     assert (~~s).pieces == s.pieces
 
-    s = UISet()
+    s = Set()
     assert (~s).pieces == [i0]
     assert (~~s).pieces == s.pieces
 
     i1 = Interval('[1, 4]')
     i2 = Interval('[7, 9]')
-    s = UISet([i1, i2])
+    s = Set([i1, i2])
     expected = [Interval('(-inf, 1)'), Interval('(4, 7)'), Interval('(9, inf)')]
     assert (~s).pieces == expected
     assert (~~s).pieces == s.pieces
 
     i3 = Interval('[5, 8]')
     i4 = Interval('[1, 6]')
-    s = UISet([i3, i4])
+    s = Set([i3, i4])
     assert (~s).pieces == [Interval('(-inf, 1)'), Interval('(8, inf)')]
     assert (~~s).pieces == s.pieces
 
     i5 = Interval('(0, 1)')
     i6 = Interval('(1, 2)')
-    s = UISet([i5, i6])
+    s = Set([i5, i6])
     expected = [Interval('(-inf, 0]'), 1, Interval('[2, inf)')]
     assert (~s).pieces == expected
     assert (~~s).pieces == s.pieces
 
     i7 = Interval('(-inf, 0)')
-    s = UISet([i7])
+    s = Set([i7])
     assert (~s).pieces == [Interval('[0, inf)')]
     assert (~~s).pieces == s.pieces
 
     i8 = Interval('[0, inf)')
-    s = UISet([i8])
+    s = Set([i8])
     assert (~s).pieces == [i7]
     assert (~~s).pieces == s.pieces
 
     i9 = Interval('(0, inf)')
-    s = UISet([i7, i9])
+    s = Set([i7, i9])
     assert (~s).pieces == [0]
 
-    UISet('(-inf, 0), (0, inf)')
+    Set('(-inf, 0), (0, inf)')
     assert i0 == Interval('(-inf, inf)')
     assert i1 == Interval('[1, 4]')
     assert i2 == Interval('[7, 9]')
@@ -379,20 +379,20 @@ def test_uiset_invert():
     assert i8 == Interval('[0, inf)')
     assert i9 == Interval('(0, inf)')
 
-    s = UISet([0])
+    s = Set([0])
     assert (~s).pieces == [Interval('(-inf, 0)'), Interval('(0, inf)')]
-    s = UISet([0, 1])
+    s = Set([0, 1])
     assert (~s).pieces == [Interval('(-inf, 0)'), Interval('(0, 1)'), Interval('(1, inf)')]
 
     i1 = Interval('(-inf, 1]')
     i2 = Interval('(1, 2]')
     i3 = Interval('(2, 3)')
     i4 = Interval('(3, inf)')
-    s = UISet([i2, 3])
+    s = Set([i2, 3])
     assert (~s).pieces == [i1, i3, i4]
-    s = UISet([i1, 3])
+    s = Set([i1, 3])
     assert (~s).pieces == [Interval('(1, 3)'), i4]
-    s = UISet([0, i2])
+    s = Set([0, i2])
     assert (~s).pieces == [Interval('(-inf, 0)'), Interval('(0, 1]'), Interval('(2, inf)')]
     assert i1 == Interval('(-inf, 1]')
     assert i2 == Interval('(1, 2]')
@@ -400,24 +400,24 @@ def test_uiset_invert():
     assert i4 == Interval('(3, inf)')
 
 
-def test_uiset_search():
+def test_set_search():
 
-    s = UISet()
+    s = Set()
     assert s.search(1) == (0, None)
 
-    s = UISet('{1}')
+    s = Set('{1}')
     assert s.search(0) == (0, None)
     assert s.search(1) == (0, 1)
     assert s.search(2) == (1, None)
     
-    s = UISet([unbounded])
+    s = Set([unbounded])
     assert s.search(1) == (0, unbounded)
     assert s.search(float('-inf')) == (0, None)
     assert s.search(float('inf')) == (1, None)
 
     i1 = Interval('[0, 1]')
     i2 = Interval('(2, 3)')
-    s = UISet([i1, i2])
+    s = Set([i1, i2])
     assert s.search(-1) == (0, None)
     assert s.search(0) == (0, i1)
     assert s.search(1) == (0, i1)
@@ -434,7 +434,7 @@ def test_uiset_search():
 
     i1 = Interval('(1, 3)')
     i2 = Interval('[7, 8]')
-    s = UISet([i1, 5, i2])
+    s = Set([i1, 5, i2])
     assert s.search(0) == (0, None)
     assert s.search(1) == (0, None)
     assert s.search(2) == (0, i1)
@@ -447,16 +447,16 @@ def test_uiset_search():
     assert s.search(9) == (3, None)
 
 
-def test_uiset_contains_scalar():
+def test_set_contains_scalar():
 
-    s = UISet()
+    s = Set()
     assert 1 not in s
 
-    s = UISet([unbounded])
+    s = Set([unbounded])
     assert 1 in s
 
     i1 = Interval('[1, 3]')
-    s = UISet([i1])
+    s = Set([i1])
     assert 0 not in s
     assert 1 in s
     assert 2 in s
@@ -500,12 +500,12 @@ def test_uiset_contains_scalar():
     assert inf not in s
 
 
-def test_uiset_contains_interval():
+def test_set_contains_interval():
 
-    s = UISet()
+    s = Set()
     assert Interval('(1, 2)') not in s
 
-    s = UISet('(1, 4)')
+    s = Set('(1, 4)')
     assert Interval('(2, 3)') in s
     assert Interval('[1, 4)') not in s
     assert Interval('(1, 4]') not in s
@@ -514,7 +514,7 @@ def test_uiset_contains_interval():
     assert Interval('(3, 5)') not in s
     assert Interval('(0, 1)') not in s
 
-    s = UISet('[1, 4)')
+    s = Set('[1, 4)')
     assert Interval('(2, 3)') in s
     assert Interval('[1, 4)') in s
     assert Interval('(1, 4]') not in s
@@ -522,7 +522,7 @@ def test_uiset_contains_interval():
     assert Interval('(0, 2)') not in s
     assert Interval('(3, 5)') not in s
 
-    s = UISet('(1, 4]')
+    s = Set('(1, 4]')
     assert Interval('(2, 3)') in s
     assert Interval('[1, 4)') not in s
     assert Interval('(1, 4]') in s
@@ -530,7 +530,7 @@ def test_uiset_contains_interval():
     assert Interval('(0, 2)') not in s
     assert Interval('(3, 5)') not in s
 
-    s = UISet('[1, 4]')
+    s = Set('[1, 4]')
     assert Interval('(2, 3)') in s
     assert Interval('[1, 4)') in s
     assert Interval('(1, 4]') in s
@@ -539,15 +539,15 @@ def test_uiset_contains_interval():
     assert Interval('(3, 5)') not in s
 
 
-def test_uiset_eq_and_ne():
+def test_set_eq_and_ne():
 
-    s1 = UISet()
-    s2 = UISet()
+    s1 = Set()
+    s2 = Set()
     assert s1 == s2
     s1.add(Interval('[1, 2]'))
     assert s1 != s2
 
-    s2 = UISet([Interval('[1, 2]')])
+    s2 = Set([Interval('[1, 2]')])
     assert s1 == s2
 
     s2.remove(2)
@@ -556,17 +556,17 @@ def test_uiset_eq_and_ne():
     assert not s1 == 0
     assert s1 != 0
 
-    s1 = UISet('{1}')
-    s2 = UISet('{1}')
+    s1 = Set('{1}')
+    s2 = Set('{1}')
     assert s1 == s2
-    s2 = UISet('{2}')
+    s2 = Set('{2}')
     assert s1 != s2
 
 
-def test_uiset_remove():
+def test_set_remove():
 
     i1 = Interval('[0, 2]')
-    s = UISet([i1])
+    s = Set([i1])
     s.remove(0)
     assert s.pieces == [Interval('(0, 2]')]
     s.remove(2)
@@ -583,28 +583,28 @@ def test_uiset_remove():
     assert i2 == Interval('[2, inf)')
 
 
-def test_uiset_clear():
+def test_set_clear():
 
     i1 = Interval('[0, 1]')
     i2 = Interval('[2, 3]')
-    s = UISet([i1, i2])
+    s = Set([i1, i2])
     s.clear()
     assert s.pieces == []
 
 
-def test_uiset_copy():
+def test_set_copy():
 
-    s1 = UISet()
+    s1 = Set()
     s2 = s1.copy()
     assert s1 == s2
     assert s1 is not s2
 
-    s1 = UISet('{4}, {8}')
+    s1 = Set('{4}, {8}')
     s2 = s1.copy()
     assert s2.pieces == [4, 8]
 
     i = Interval('[1, 2]')
-    s1 = UISet([i])
+    s1 = Set([i])
     s2 = s1.copy()
     assert s1 == s2
     assert s2.pieces[0] is not i
@@ -614,151 +614,151 @@ def test_uiset_copy():
     a = Endpoint(l1, '(')
     b = Endpoint(l2, ')')
     i = Interval(None, a, b)
-    s1 = UISet([i])
+    s1 = Set([i])
     s2 = s1.copy()
     s2.pieces[0].a.value[2] = -1
     assert i.a.value[2] == -1
 
 
-def test_uiset_ge():
+def test_set_ge():
 
-    s = UISet()
-    assert s >= UISet()
-    assert not s >= UISet('{1}')
-    assert not s >= UISet('[1, 2]')
+    s = Set()
+    assert s >= Set()
+    assert not s >= Set('{1}')
+    assert not s >= Set('[1, 2]')
 
-    s = UISet('{3}, {5}')
-    assert s >= UISet()
-    assert s >= UISet('{3}')
-    assert s >= UISet('{5}')
-    assert s >= UISet('{3}, {5}')
-    assert not s >= UISet('{3}, {4}')
-    assert not s >= UISet('(3, 5)')
-    assert not s >= UISet('[3, 5]')
+    s = Set('{3}, {5}')
+    assert s >= Set()
+    assert s >= Set('{3}')
+    assert s >= Set('{5}')
+    assert s >= Set('{3}, {5}')
+    assert not s >= Set('{3}, {4}')
+    assert not s >= Set('(3, 5)')
+    assert not s >= Set('[3, 5]')
 
-    s = UISet('(1, 6)')
-    assert s >= UISet()
-    assert not s >= UISet('{0}')
-    assert not s >= UISet('{1}')
-    assert s >= UISet('{3}')
-    assert s >= UISet('{2}, {3}, {4}')
-    assert not s >= UISet('{6}')
-    assert not s >= UISet('[5, 6]')
-    assert not s >= UISet('{7}')
-    assert s >= UISet('(2, 3)')
-    assert s >= UISet('(2, 3), {4}')
-    assert s >= UISet('(2, 3), (4, 5)')
-    assert s >= UISet('(1, 3), (4, 6)')
-    assert s >= UISet('(1, 6)')
-    assert not s >= UISet('(4, 6]')
-    assert not s >= UISet('{3}, (4, 6]')
-    assert not s >= UISet('(1, 6]')
-    assert not s >= UISet('[1, 6)')
-    assert not s >= UISet('[1, 6]')
-    assert not s >= UISet('[2, 7]')
+    s = Set('(1, 6)')
+    assert s >= Set()
+    assert not s >= Set('{0}')
+    assert not s >= Set('{1}')
+    assert s >= Set('{3}')
+    assert s >= Set('{2}, {3}, {4}')
+    assert not s >= Set('{6}')
+    assert not s >= Set('[5, 6]')
+    assert not s >= Set('{7}')
+    assert s >= Set('(2, 3)')
+    assert s >= Set('(2, 3), {4}')
+    assert s >= Set('(2, 3), (4, 5)')
+    assert s >= Set('(1, 3), (4, 6)')
+    assert s >= Set('(1, 6)')
+    assert not s >= Set('(4, 6]')
+    assert not s >= Set('{3}, (4, 6]')
+    assert not s >= Set('(1, 6]')
+    assert not s >= Set('[1, 6)')
+    assert not s >= Set('[1, 6]')
+    assert not s >= Set('[2, 7]')
 
-    s = UISet('(2, 4), (4, 6)')
-    assert s >= UISet('(2, 4), (4, 6)')
-    assert s >= UISet('(2, 3), (3, 4), (4, 6)')
-    assert s >= UISet('{3}, {5}')
-    assert not s >= UISet('(1, 3)')
-    assert not s >= UISet('(3, 5)')
-    assert not s >= UISet('(5, 7)')
+    s = Set('(2, 4), (4, 6)')
+    assert s >= Set('(2, 4), (4, 6)')
+    assert s >= Set('(2, 3), (3, 4), (4, 6)')
+    assert s >= Set('{3}, {5}')
+    assert not s >= Set('(1, 3)')
+    assert not s >= Set('(3, 5)')
+    assert not s >= Set('(5, 7)')
 
-    s = UISet('[1, 2]')
-    assert s >= UISet('{1}')
-    assert s >= UISet('{2}')
-    assert not s >= UISet('{3}')
-    assert s >= UISet('(1, 2)')
-    assert s >= UISet('[1, 2]')
+    s = Set('[1, 2]')
+    assert s >= Set('{1}')
+    assert s >= Set('{2}')
+    assert not s >= Set('{3}')
+    assert s >= Set('(1, 2)')
+    assert s >= Set('[1, 2]')
 
-    s = UISet('[1, inf)')
-    assert s >= UISet('{1}')
-    assert s >= UISet('[1, 10]')
-    assert not s >= UISet('(0, 10]')
-
-    with pytest.raises(TypeError):
-        UISet() >= 0
-        UISet() >= -inf
-    inf >= UISet()
-
-
-def test_uiset_le():
-
-    s = UISet()
-    assert s <= UISet()
-    assert s <= UISet('{1}')
-    assert s <= UISet('[1, 2]')
-
-    s = UISet('(1, 6)')
-    assert not s <= UISet()
-    assert not s <= UISet('{3}')
-    assert not s <= UISet('(2, 3)')
-    assert not s <= UISet('(2, 3), (4, 5)')
-    assert not s <= UISet('(1, 3), (4, 6)')
-    assert s <= UISet('(1, 6)')
-    assert not s <= UISet('(4, 6]')
-    assert not s <= UISet('{1}')
-    assert s <= UISet('(1, 6]')
-    assert s <= UISet('[1, 6)')
-    assert s <= UISet('[1, 6]')
-    assert not s <= UISet('[2, 7]')
-
-    s = UISet('(2, 4), (4, 6)')
-    assert s <= UISet('(2, 4), (4, 6)')
-    assert not s <= UISet('(2, 3), (3, 4), (4, 6)')
-    assert not s <= UISet('(1, 3)')
-    assert not s <= UISet('(3, 5)')
-    assert not s <= UISet('(5, 7)')
-
-    s = UISet('[1, 2]')
-    assert not s <= UISet('(1, 2)')
-    assert s <= UISet('[1, 2]')
-
-    s = UISet('[1, inf)')
-    assert not s <= UISet('[1, 10]')
-    assert not s <= UISet('(0, 10]')
+    s = Set('[1, inf)')
+    assert s >= Set('{1}')
+    assert s >= Set('[1, 10]')
+    assert not s >= Set('(0, 10]')
 
     with pytest.raises(TypeError):
-        UISet() <= 0
+        Set() >= 0
+        Set() >= -inf
+    inf >= Set()
 
 
-def test_uiset_issuperset():
+def test_set_le():
 
-    assert UISet('[1, 3]').issuperset(UISet('(1, 3)'))
-    assert UISet('[1, 3]').issuperset(UISet('{1}, {2}, {3}'))
-    assert not UISet().issuperset(UISet('(1, 3)'))
+    s = Set()
+    assert s <= Set()
+    assert s <= Set('{1}')
+    assert s <= Set('[1, 2]')
 
-    assert UISet('[1, 3]').issuperset('(1, 2), {3}')
-    assert UISet('[1, 3]').issuperset([])
-    assert not UISet('[1, 3]').issuperset([0])
+    s = Set('(1, 6)')
+    assert not s <= Set()
+    assert not s <= Set('{3}')
+    assert not s <= Set('(2, 3)')
+    assert not s <= Set('(2, 3), (4, 5)')
+    assert not s <= Set('(1, 3), (4, 6)')
+    assert s <= Set('(1, 6)')
+    assert not s <= Set('(4, 6]')
+    assert not s <= Set('{1}')
+    assert s <= Set('(1, 6]')
+    assert s <= Set('[1, 6)')
+    assert s <= Set('[1, 6]')
+    assert not s <= Set('[2, 7]')
 
-    assert UISet.issuperset(UISet('(0, 8)'), [2, 3, Interval('[3, 5]'), 6])
+    s = Set('(2, 4), (4, 6)')
+    assert s <= Set('(2, 4), (4, 6)')
+    assert not s <= Set('(2, 3), (3, 4), (4, 6)')
+    assert not s <= Set('(1, 3)')
+    assert not s <= Set('(3, 5)')
+    assert not s <= Set('(5, 7)')
+
+    s = Set('[1, 2]')
+    assert not s <= Set('(1, 2)')
+    assert s <= Set('[1, 2]')
+
+    s = Set('[1, inf)')
+    assert not s <= Set('[1, 10]')
+    assert not s <= Set('(0, 10]')
+
+    with pytest.raises(TypeError):
+        Set() <= 0
 
 
-def test_uiset_issubset():
+def test_set_issuperset():
 
-    assert not UISet('[1, 3]').issubset(UISet('(1, 3)'))
-    assert UISet().issubset(UISet('{1}'))
-    assert UISet().issubset(UISet('(1, 3)'))
+    assert Set('[1, 3]').issuperset(Set('(1, 3)'))
+    assert Set('[1, 3]').issuperset(Set('{1}, {2}, {3}'))
+    assert not Set().issuperset(Set('(1, 3)'))
 
-    assert UISet('{1}').issubset('(0, 2)')
-    assert not UISet('{1}, {2}').issubset([1, 3])
+    assert Set('[1, 3]').issuperset('(1, 2), {3}')
+    assert Set('[1, 3]').issuperset([])
+    assert not Set('[1, 3]').issuperset([0])
 
-    assert UISet.issubset(UISet('(-2, -1)'), [Interval('(-inf, 0)')])
+    assert Set.issuperset(Set('(0, 8)'), [2, 3, Interval('[3, 5]'), 6])
 
 
-def test_uiset_gt():
+def test_set_issubset():
 
-    assert not UISet() > UISet()
-    assert not UISet() > UISet('{1}')
-    assert UISet('{1}') > UISet()
-    assert not UISet('{1}') > UISet('{1}')
-    assert not UISet('{1}') > UISet('{2}')
-    s1 = UISet('(1, 2)')
-    s2 = UISet('[1, 2)')
-    s3 = UISet('(1, 2]')
-    s4 = UISet('[1, 2]')
+    assert not Set('[1, 3]').issubset(Set('(1, 3)'))
+    assert Set().issubset(Set('{1}'))
+    assert Set().issubset(Set('(1, 3)'))
+
+    assert Set('{1}').issubset('(0, 2)')
+    assert not Set('{1}, {2}').issubset([1, 3])
+
+    assert Set.issubset(Set('(-2, -1)'), [Interval('(-inf, 0)')])
+
+
+def test_set_gt():
+
+    assert not Set() > Set()
+    assert not Set() > Set('{1}')
+    assert Set('{1}') > Set()
+    assert not Set('{1}') > Set('{1}')
+    assert not Set('{1}') > Set('{2}')
+    s1 = Set('(1, 2)')
+    s2 = Set('[1, 2)')
+    s3 = Set('(1, 2]')
+    s4 = Set('[1, 2]')
     assert not s1 > s1
     assert not s1 > s2
     assert not s1 > s3
@@ -773,394 +773,394 @@ def test_uiset_gt():
     assert s4 > s2
     assert s4 > s3
     
-    s1 = UISet('(1, 2), {4}')
-    s2 = UISet('(1, 2)')
+    s1 = Set('(1, 2), {4}')
+    s2 = Set('(1, 2)')
     assert s1 > s2
     assert not s2 > s1
 
-    s = UISet('(1, 4)')
-    assert s > UISet('{2}')
-    assert s > UISet('{2}, {3}')
-    assert not s > UISet('{0}')
-    assert not s > UISet('{1}')
-    assert not s > UISet('{4}')
-    assert not s > UISet('{5}')
-    assert s > UISet('(1, 3)')
-    assert s > UISet('(2, 3)')
-    assert s > UISet('(2, 4)')
+    s = Set('(1, 4)')
+    assert s > Set('{2}')
+    assert s > Set('{2}, {3}')
+    assert not s > Set('{0}')
+    assert not s > Set('{1}')
+    assert not s > Set('{4}')
+    assert not s > Set('{5}')
+    assert s > Set('(1, 3)')
+    assert s > Set('(2, 3)')
+    assert s > Set('(2, 4)')
 
-    s = UISet('(-inf, inf)')
-    assert s > UISet('[1, 2], (3, inf)')
-    assert not s > UISet('(-inf, inf)')
+    s = Set('(-inf, inf)')
+    assert s > Set('[1, 2], (3, inf)')
+    assert not s > Set('(-inf, inf)')
 
     with pytest.raises(TypeError):
-        UISet('(1, 2)') > Interval('(1, 2)')
-        UISet('(1, 2)') > 0
+        Set('(1, 2)') > Interval('(1, 2)')
+        Set('(1, 2)') > 0
     
 
-def test_uiset_lt():
+def test_set_lt():
 
-    assert not UISet() < UISet()
-    assert UISet() < UISet('{3}')
-    assert UISet() < UISet('(1, 2)')
-    assert not UISet('{0}') < UISet('(1, 2)')
-    assert UISet('{1}') < UISet('{1}, {2}')
+    assert not Set() < Set()
+    assert Set() < Set('{3}')
+    assert Set() < Set('(1, 2)')
+    assert not Set('{0}') < Set('(1, 2)')
+    assert Set('{1}') < Set('{1}, {2}')
 
     with pytest.raises(TypeError):
-        UISet() < 5
+        Set() < 5
 
 
-def test_uiset_or():
+def test_set_or():
 
-    s1 = UISet()
-    s2 = UISet()
-    assert s1 | s2 == UISet()
+    s1 = Set()
+    s2 = Set()
+    assert s1 | s2 == Set()
 
-    s1 = UISet()
-    s2 = UISet('{3}')
+    s1 = Set()
+    s2 = Set('{3}')
     assert s2 | s2 == s2
     assert s1 | s2 == s2 | s1 == s2
 
-    s1 = UISet('(1, 2)')
-    s2 = UISet('[2, 3]')
-    assert s1 | s2 == s2 | s1 == UISet('(1, 3]')
+    s1 = Set('(1, 2)')
+    s2 = Set('[2, 3]')
+    assert s1 | s2 == s2 | s1 == Set('(1, 3]')
 
-    s1 = UISet('(1, 2)')
-    s2 = UISet('{2}')
-    assert s1 | s2 == s2 | s1 == UISet('(1, 2]')
+    s1 = Set('(1, 2)')
+    s2 = Set('{2}')
+    assert s1 | s2 == s2 | s1 == Set('(1, 2]')
 
-    s1 = UISet('(1, 3), (3, 5), (5, 7)')
-    s2 = UISet('{3}, {5}')
-    assert s1 | s2 == s2 | s1 == UISet('(1, 7)')
+    s1 = Set('(1, 3), (3, 5), (5, 7)')
+    s2 = Set('{3}, {5}')
+    assert s1 | s2 == s2 | s1 == Set('(1, 7)')
 
-    s1 = UISet('(-inf, 0), {2}, [4, 6], (9, 12]')
-    s2 = UISet('(-inf, 0], (2, 3), {5}, (7, 8), {9}, (20, inf)')
-    expected = UISet('(-inf, 0], [2, 3), [4, 6], (7, 8), [9, 12], (20, inf)')
+    s1 = Set('(-inf, 0), {2}, [4, 6], (9, 12]')
+    s2 = Set('(-inf, 0], (2, 3), {5}, (7, 8), {9}, (20, inf)')
+    expected = Set('(-inf, 0], [2, 3), [4, 6], (7, 8), [9, 12], (20, inf)')
     assert s1 | s2 == s2 | s1 == expected
-    assert s1 == UISet('(-inf, 0), {2}, [4, 6], (9, 12]')
-    assert s2 == UISet('(-inf, 0], (2, 3), {5}, (7, 8), {9}, (20, inf)')
+    assert s1 == Set('(-inf, 0), {2}, [4, 6], (9, 12]')
+    assert s2 == Set('(-inf, 0], (2, 3), {5}, (7, 8), {9}, (20, inf)')
 
     with pytest.raises(TypeError):
-        UISet() | 0
+        Set() | 0
     
 
-def test_uiset_ior():
+def test_set_ior():
 
-    s1 = UISet()
-    s2 = UISet()
+    s1 = Set()
+    s2 = Set()
     s1 |= s2
-    assert s1 == UISet()
+    assert s1 == Set()
 
-    s1 = UISet()
-    s2 = UISet('{3}')
-    s1 |= s2
-    s2 |= s1
-    assert s1 == s2 == UISet('{3}')
-
-    s1 = UISet('(1, 2)')
-    s2 = UISet('{1}')
+    s1 = Set()
+    s2 = Set('{3}')
     s1 |= s2
     s2 |= s1
-    assert s1 == s2 == UISet('[1, 2)')
+    assert s1 == s2 == Set('{3}')
 
-    s1 = UISet('(1, 2)')
-    s2 = UISet('(2, 3)')
+    s1 = Set('(1, 2)')
+    s2 = Set('{1}')
     s1 |= s2
     s2 |= s1
-    assert s1 == s2 == UISet('(1, 2), (2, 3)')
+    assert s1 == s2 == Set('[1, 2)')
+
+    s1 = Set('(1, 2)')
+    s2 = Set('(2, 3)')
+    s1 |= s2
+    s2 |= s1
+    assert s1 == s2 == Set('(1, 2), (2, 3)')
     s1 |= s1
-    assert s1 == UISet('(1, 2), (2, 3)')
+    assert s1 == Set('(1, 2), (2, 3)')
 
     with pytest.raises(TypeError):
         s1 |= 0
 
 
-def test_uiset_union():
+def test_set_union():
 
-    s1 = UISet()
-    s2 = UISet()
-    s3 = UISet()
-    assert s1.union(s2, s3) == UISet()
+    s1 = Set()
+    s2 = Set()
+    s3 = Set()
+    assert s1.union(s2, s3) == Set()
 
-    s1 = UISet('{1}')
-    s2 = UISet('{3}')
-    s3 = UISet('{2}')
-    assert s1.union(s2, s3) == UISet('{1}, {2}, {3}')
-    assert s1 == UISet('{1}')
-    assert s2 == UISet('{3}')
-    assert s3 == UISet('{2}')
+    s1 = Set('{1}')
+    s2 = Set('{3}')
+    s3 = Set('{2}')
+    assert s1.union(s2, s3) == Set('{1}, {2}, {3}')
+    assert s1 == Set('{1}')
+    assert s2 == Set('{3}')
+    assert s3 == Set('{2}')
 
-    s1 = UISet('(3, 4)')
-    s2 = UISet('[2, 3]')
-    s3 = UISet('[4, 5]')
-    assert s1.union(s2, s3) == s2.union(s1, s3) == s3.union(s1, s2) == UISet('[2, 5]')
-    assert s1.union(s1, s1, s3, s2, s3, s1, s2, s3) == UISet('[2, 5]')
-    assert UISet.union(s1) == s1
-    assert UISet.union(s1, s2, s3) == UISet('[2, 5]')
-    assert s1 == UISet('(3, 4)')
-    assert s2 == UISet('[2, 3]')
-    assert s3 == UISet('[4, 5]')
+    s1 = Set('(3, 4)')
+    s2 = Set('[2, 3]')
+    s3 = Set('[4, 5]')
+    assert s1.union(s2, s3) == s2.union(s1, s3) == s3.union(s1, s2) == Set('[2, 5]')
+    assert s1.union(s1, s1, s3, s2, s3, s1, s2, s3) == Set('[2, 5]')
+    assert Set.union(s1) == s1
+    assert Set.union(s1, s2, s3) == Set('[2, 5]')
+    assert s1 == Set('(3, 4)')
+    assert s2 == Set('[2, 3]')
+    assert s3 == Set('[4, 5]')
 
     i1 = Interval('(-inf, 0)')
     i2 = Interval('(-10, 2)')
-    s1 = UISet('(-inf, -5)')
-    s2 = UISet('{5}')
-    assert s1.union(s2, [i1, i2], [4, i1], []) == UISet('(-inf, 2), {4}, {5}')
+    s1 = Set('(-inf, -5)')
+    s2 = Set('{5}')
+    assert s1.union(s2, [i1, i2], [4, i1], []) == Set('(-inf, 2), {4}, {5}')
 
 
-def test_uiset_update():
+def test_set_update():
 
-    s1 = UISet()
-    s2 = UISet()
-    s3 = UISet()
+    s1 = Set()
+    s2 = Set()
+    s3 = Set()
     s1.update(s2, s3)
-    assert s1 == UISet()
+    assert s1 == Set()
 
-    s1 = UISet('{1}')
-    s2 = UISet('{3}')
-    s3 = UISet('{2}')
+    s1 = Set('{1}')
+    s2 = Set('{3}')
+    s3 = Set('{2}')
     s1.update(s2, s3)
-    assert s1 == UISet('{1}, {2}, {3}')
-    assert s2 == UISet('{3}')
-    assert s3 == UISet('{2}')
+    assert s1 == Set('{1}, {2}, {3}')
+    assert s2 == Set('{3}')
+    assert s3 == Set('{2}')
 
-    s1 = UISet('(3, 4)')
-    s2 = UISet('[2, 3]')
-    s3 = UISet('[4, 5]')
+    s1 = Set('(3, 4)')
+    s2 = Set('[2, 3]')
+    s3 = Set('[4, 5]')
     s1.update(s1, s2, s1, s3, s2, s3, s1, s2, s3)
-    assert s1 == UISet('[2, 5]')
-    assert s2 == UISet('[2, 3]')
-    assert s3 == UISet('[4, 5]')
+    assert s1 == Set('[2, 5]')
+    assert s2 == Set('[2, 3]')
+    assert s3 == Set('[4, 5]')
 
 
-def test_uiset_sub():
+def test_set_sub():
 
-    s0 = UISet()
-    s1 = UISet('{1}')
-    s2 = UISet('{1}, {2}')
-    s3 = UISet('[1, 2]')
+    s0 = Set()
+    s1 = Set('{1}')
+    s2 = Set('{1}, {2}')
+    s3 = Set('[1, 2]')
     assert s0 - s0 == s0
     assert s1 - s0 == s1
     assert s0 - s1 == s0
-    assert s2 - s1 == UISet('{2}')
-    assert s0 == UISet()
-    assert s1 == UISet('{1}')
-    assert s2 == UISet('{1}, {2}')
-    assert s3 == UISet('[1, 2]')
-    assert s3 - s1 == UISet('(1, 2]')
-    assert s3 - s2 == UISet('(1, 2)')
+    assert s2 - s1 == Set('{2}')
+    assert s0 == Set()
+    assert s1 == Set('{1}')
+    assert s2 == Set('{1}, {2}')
+    assert s3 == Set('[1, 2]')
+    assert s3 - s1 == Set('(1, 2]')
+    assert s3 - s2 == Set('(1, 2)')
     assert s3 - s3 == s0
 
-    s1 = UISet('(1, 4)')
-    s2 = UISet('{1}, {2}, {3}, {4}')
-    assert s1 - s2 == UISet('(1, 2), (2, 3), (3, 4)')
-    assert s2 - s1 == UISet('{1}, {4}')
+    s1 = Set('(1, 4)')
+    s2 = Set('{1}, {2}, {3}, {4}')
+    assert s1 - s2 == Set('(1, 2), (2, 3), (3, 4)')
+    assert s2 - s1 == Set('{1}, {4}')
 
-    s1 = UISet('(-inf, 0), {2}, [4, 6], [8, 20]')
-    s2 = UISet('{-3}, {2}, (4, 9), [10, 11], {15}, {20}')
-    assert s1 - s2 == UISet('(-inf, -3), (-3, 0), {4}, [9, 10), (11, 15), (15, 20)')
-    assert s2 - s1 == UISet('(6, 8)')
+    s1 = Set('(-inf, 0), {2}, [4, 6], [8, 20]')
+    s2 = Set('{-3}, {2}, (4, 9), [10, 11], {15}, {20}')
+    assert s1 - s2 == Set('(-inf, -3), (-3, 0), {4}, [9, 10), (11, 15), (15, 20)')
+    assert s2 - s1 == Set('(6, 8)')
 
-    s1 = UISet('(-757, -742), [-541, -539], (-365, -329], [-310, 7], (10, 314], (426, 541), [627, 831), (884, 961]')
-    s2 = UISet('[-750, -724], [-635, -580], (-552, -257], [-239, -195), (-107, 46), (320, 356), [624, 680), [726, 794], (810, 860)')
-    assert s1 - s2 == UISet('(-757, -750), (-257, -239), [-195, -107], [46, 314], (426, 541), [680, 726), (794, 810], (884, 961]')
+    s1 = Set('(-757, -742), [-541, -539], (-365, -329], [-310, 7], (10, 314], (426, 541), [627, 831), (884, 961]')
+    s2 = Set('[-750, -724], [-635, -580], (-552, -257], [-239, -195), (-107, 46), (320, 356), [624, 680), [726, 794], (810, 860)')
+    assert s1 - s2 == Set('(-757, -750), (-257, -239), [-195, -107], [46, 314], (426, 541), [680, 726), (794, 810], (884, 961]')
 
-    s1 = UISet('[-818, -805], [-793, -624], [-548, -520], [-453, -369), (-312, -221), [-72, 321], [503, 657], (684, 712], [715, 891)')
-    s2 = UISet('[-971, -924), (-816, -150), [6, 47], [237, 603)')
-    assert s1 - s2 == UISet('[-818, -816], [-72, 6), (47, 237), [603, 657], (684, 712], [715, 891)')
+    s1 = Set('[-818, -805], [-793, -624], [-548, -520], [-453, -369), (-312, -221), [-72, 321], [503, 657], (684, 712], [715, 891)')
+    s2 = Set('[-971, -924), (-816, -150), [6, 47], [237, 603)')
+    assert s1 - s2 == Set('[-818, -816], [-72, 6), (47, 237), [603, 657], (684, 712], [715, 891)')
 
     with pytest.raises(TypeError):
-        UISet() - 0
+        Set() - 0
 
 
-def test_uiset_isub():
+def test_set_isub():
 
-    s = UISet()
+    s = Set()
     s -= s
-    assert s == UISet()
+    assert s == Set()
 
-    s = UISet('(-inf, inf)')
-    s -= UISet('{0}')
-    assert s == UISet('(-inf, 0), (0, inf)')
-    s -= UISet('{0}, {1}')
-    assert s == UISet('(-inf, 0), (0, 1), (1, inf)')
-    s -= UISet('(-inf, -2), (0, 1), (2, inf)')
-    assert s == UISet('[-2, 0), (1, 2]')
-    s -= UISet('{0}, {1}')
-    assert s == UISet('[-2, 0), (1, 2]')
-    s -= UISet('(-2, 2)')
-    assert s == UISet('{-2}, {2}')
+    s = Set('(-inf, inf)')
+    s -= Set('{0}')
+    assert s == Set('(-inf, 0), (0, inf)')
+    s -= Set('{0}, {1}')
+    assert s == Set('(-inf, 0), (0, 1), (1, inf)')
+    s -= Set('(-inf, -2), (0, 1), (2, inf)')
+    assert s == Set('[-2, 0), (1, 2]')
+    s -= Set('{0}, {1}')
+    assert s == Set('[-2, 0), (1, 2]')
+    s -= Set('(-2, 2)')
+    assert s == Set('{-2}, {2}')
     s -= s.copy()
-    assert s == UISet()
+    assert s == Set()
 
     with pytest.raises(TypeError):
         s -= 5
 
 
-def test_uiset_difference():
+def test_set_difference():
 
-    s = UISet()
+    s = Set()
     assert s.difference(s) == s
 
-    s = UISet('[1, 3], [4, 5], [6, 7], [8, 10]')
-    s = s.difference(UISet('(2, 9)'), UISet())
-    assert s == UISet('[1, 2], [9, 10]')
-    s = s.difference(UISet('{1}, {2}, {3}'), UISet('{4}'), UISet('{8}, {9}, {10}'))
-    assert s == UISet('(1, 2), (9, 10)')
+    s = Set('[1, 3], [4, 5], [6, 7], [8, 10]')
+    s = s.difference(Set('(2, 9)'), Set())
+    assert s == Set('[1, 2], [9, 10]')
+    s = s.difference(Set('{1}, {2}, {3}'), Set('{4}'), Set('{8}, {9}, {10}'))
+    assert s == Set('(1, 2), (9, 10)')
 
-    s = UISet('(-inf, 0), {1}, {2}, [5, 9]')
-    s = s.difference([Interval('(-inf, 3)'), 4, Interval('(5, 6)')], UISet())
-    assert s == UISet('{5}, [6, 9]')
+    s = Set('(-inf, 0), {1}, {2}, [5, 9]')
+    s = s.difference([Interval('(-inf, 3)'), 4, Interval('(5, 6)')], Set())
+    assert s == Set('{5}, [6, 9]')
 
-    s = UISet('[1, 3], {4}, [5, 7], {8}, (10, inf)')
-    expected = UISet('[2, 3], {4}, (5, 6), (6, 7), (10, inf)')
-    assert s.difference([6], [8, 5, 7], UISet('(-inf, 2)')) == expected
+    s = Set('[1, 3], {4}, [5, 7], {8}, (10, inf)')
+    expected = Set('[2, 3], {4}, (5, 6), (6, 7), (10, inf)')
+    assert s.difference([6], [8, 5, 7], Set('(-inf, 2)')) == expected
 
-    assert UISet.difference(UISet('[1, 3]'), UISet('[2, 4]')) == UISet('[1, 2)')
+    assert Set.difference(Set('[1, 3]'), Set('[2, 4]')) == Set('[1, 2)')
 
 
-def test_uiset_difference_update():
+def test_set_difference_update():
 
-    s = UISet()
+    s = Set()
     s.difference_update(s, s)
     assert s == s
 
-    s = UISet('{1}, {2}, {3}, (4, 6), [8, 9]')
-    s.difference_update([Interval('[1, 4]'), 5], UISet('{2}, (8, 9)'))
-    assert s == UISet('(4, 5), (5, 6), {8}, {9}')
+    s = Set('{1}, {2}, {3}, (4, 6), [8, 9]')
+    s.difference_update([Interval('[1, 4]'), 5], Set('{2}, (8, 9)'))
+    assert s == Set('(4, 5), (5, 6), {8}, {9}')
     s.difference_update(~s)
-    assert s == UISet('(4, 5), (5, 6), {8}, {9}')
+    assert s == Set('(4, 5), (5, 6), {8}, {9}')
 
 
-def test_uiset_and():
+def test_set_and():
 
-    s1 = UISet()
-    s2 = UISet()
-    assert s1 & s2 == s2 & s1 == UISet()
+    s1 = Set()
+    s2 = Set()
+    assert s1 & s2 == s2 & s1 == Set()
 
-    s1 = UISet('[0, 3]')
-    s2 = UISet('(1, 2)')
-    assert s1 & s2 == s2 & s1 == UISet('(1, 2)')
+    s1 = Set('[0, 3]')
+    s2 = Set('(1, 2)')
+    assert s1 & s2 == s2 & s1 == Set('(1, 2)')
 
-    s1 = UISet('{0}, {1}, {2}')
-    s2 = UISet('(0, 2)')
-    assert s1 & s2 == s2 & s1 == UISet([1])
-    assert s1 == UISet('{0}, {1}, {2}')
-    assert s2 == UISet('(0, 2)')
+    s1 = Set('{0}, {1}, {2}')
+    s2 = Set('(0, 2)')
+    assert s1 & s2 == s2 & s1 == Set([1])
+    assert s1 == Set('{0}, {1}, {2}')
+    assert s2 == Set('(0, 2)')
 
     with pytest.raises(TypeError):
         s1 & 0
 
 
-def test_uiset_iand():
+def test_set_iand():
 
-    s1 = UISet()
-    s2 = UISet('[0, 1]')
+    s1 = Set()
+    s2 = Set('[0, 1]')
     s1 &= s2
-    assert s1 == UISet()
-    assert s2 == UISet('[0, 1]')
+    assert s1 == Set()
+    assert s2 == Set('[0, 1]')
 
-    s1 = UISet('(0, 2), {3}, [4, 5]')
-    s2 = UISet('(1, 5)')
+    s1 = Set('(0, 2), {3}, [4, 5]')
+    s2 = Set('(1, 5)')
     s1 &= s2
-    assert s1 == UISet('(1, 2), {3}, [4, 5)')
-    assert s2 == UISet('(1, 5)')
+    assert s1 == Set('(1, 2), {3}, [4, 5)')
+    assert s2 == Set('(1, 5)')
 
-    s1 = UISet('[0, 1], [3, 4], [5, 6]')
+    s1 = Set('[0, 1], [3, 4], [5, 6]')
     s1_id = id(s1)
-    s2 = UISet('{0}, (3, 4), [5, 7), {8}')
+    s2 = Set('{0}, (3, 4), [5, 7), {8}')
     s1 &= s2
-    assert s1 == UISet('{0}, (3, 4), [5, 6]')
+    assert s1 == Set('{0}, (3, 4), [5, 6]')
     assert id(s1) == s1_id
     
     with pytest.raises(TypeError):
         s1 &= '[0, 1]'
 
 
-def test_uiset_intersection():
+def test_set_intersection():
 
-    s1 = UISet('{0}, (1, 2), [3, 6]')
-    s2 = UISet('[0, 3], [4, 6]')
-    s3 = UISet('(-inf, 6)')
-    assert s1.intersection(s2, s3) == UISet('{0}, (1, 2), {3}, [4, 6)')
-    assert s1 == UISet('{0}, (1, 2), [3, 6]')
-    assert s2 == UISet('[0, 3], [4, 6]')
-    assert s3 == UISet('(-inf, 6)')
+    s1 = Set('{0}, (1, 2), [3, 6]')
+    s2 = Set('[0, 3], [4, 6]')
+    s3 = Set('(-inf, 6)')
+    assert s1.intersection(s2, s3) == Set('{0}, (1, 2), {3}, [4, 6)')
+    assert s1 == Set('{0}, (1, 2), [3, 6]')
+    assert s2 == Set('[0, 3], [4, 6]')
+    assert s3 == Set('(-inf, 6)')
 
-    s1 = UISet('[0, 2], [3, 4], (6, inf)')
-    s2 = UISet('(0, 7), {8}')
+    s1 = Set('[0, 2], [3, 4], (6, inf)')
+    s2 = Set('(0, 7), {8}')
     i1 = Interval('(1, 4)')
     i2 = Interval('[2, 3]')
-    assert s1.intersection(s1, s2, [i1, i2]) == UISet('(1, 2], [3, 4)')
-    assert s1.intersection(s1, s2, [i1], [i2]) == UISet([2, 3])
-    assert s1 == UISet('[0, 2], [3, 4], (6, inf)')
-    assert s2 == UISet('(0, 7), {8}')
+    assert s1.intersection(s1, s2, [i1, i2]) == Set('(1, 2], [3, 4)')
+    assert s1.intersection(s1, s2, [i1], [i2]) == Set([2, 3])
+    assert s1 == Set('[0, 2], [3, 4], (6, inf)')
+    assert s2 == Set('(0, 7), {8}')
     assert i1 == Interval('(1, 4)')
     assert i2 == Interval('[2, 3]')
 
 
-def test_uiset_intersection_update():
+def test_set_intersection_update():
 
-    s1 = UISet('(-inf, inf)')
+    s1 = Set('(-inf, inf)')
     s1_id = id(s1)
-    s2 = UISet('[0, inf)')
-    s3 = UISet('(-inf, 2), [3, 5), {6}, (7, 8), (9, inf)')
+    s2 = Set('[0, inf)')
+    s3 = Set('(-inf, 2), [3, 5), {6}, (7, 8), (9, inf)')
     i1 = Interval('[2, 3]')
     i2 = Interval('(4, 8)')
     i3 = Interval('[9, inf)')
     s1.intersection_update(s1, s2, s3, [i2, i1, i3])
-    assert s1 == UISet('{3}, (4, 5), {6}, (7, 8), (9, inf)')
+    assert s1 == Set('{3}, (4, 5), {6}, (7, 8), (9, inf)')
 
     s1.intersection_update(range(11))
-    assert s1 == UISet([3, 6, 10])
+    assert s1 == Set([3, 6, 10])
 
     assert id(s1) == s1_id
 
-    assert s2 == UISet('[0, inf)')
-    assert s3 == UISet('(-inf, 2), [3, 5), {6}, (7, 8), (9, inf)')
+    assert s2 == Set('[0, inf)')
+    assert s3 == Set('(-inf, 2), [3, 5), {6}, (7, 8), (9, inf)')
     assert i1 == Interval('[2, 3]')
     assert i2 == Interval('(4, 8)')
     assert i3 == Interval('[9, inf)')
 
 
-def test_uiset_xor():
+def test_set_xor():
 
-    s1 = UISet()
-    s2 = UISet()
-    assert s1 ^ s2 == s2 ^ s1 == UISet()
+    s1 = Set()
+    s2 = Set()
+    assert s1 ^ s2 == s2 ^ s1 == Set()
 
-    s1 = UISet('[0, 3]')
-    s2 = UISet('(1, 2)')
-    assert s1 ^ s2 == s2 ^ s1 == UISet('[0, 1], [2, 3]')
+    s1 = Set('[0, 3]')
+    s2 = Set('(1, 2)')
+    assert s1 ^ s2 == s2 ^ s1 == Set('[0, 1], [2, 3]')
 
-    s1 = UISet('{0}, {1}, {2}')
-    s2 = UISet('(0, 2)')
-    assert s1 ^ s2 == s2 ^ s1 == UISet('[0, 1), (1, 2]')
-    assert s1 == UISet('{0}, {1}, {2}')
-    assert s2 == UISet('(0, 2)')
+    s1 = Set('{0}, {1}, {2}')
+    s2 = Set('(0, 2)')
+    assert s1 ^ s2 == s2 ^ s1 == Set('[0, 1), (1, 2]')
+    assert s1 == Set('{0}, {1}, {2}')
+    assert s2 == Set('(0, 2)')
 
     with pytest.raises(TypeError):
         s1 ^ 0
 
 
-def test_uiset_ixor():
+def test_set_ixor():
 
-    s1 = UISet()
+    s1 = Set()
     s1_id = id(s1)
-    s2 = UISet('[0, 1]')
+    s2 = Set('[0, 1]')
     s1 ^= s2
     assert s1 == s2
-    assert s2 == UISet('[0, 1]')
+    assert s2 == Set('[0, 1]')
 
-    s3 = UISet('{0}, {1}')
+    s3 = Set('{0}, {1}')
     s1 ^= s3
-    assert s1 == UISet('(0, 1)')
-    assert s3 == UISet('{0}, {1}')
+    assert s1 == Set('(0, 1)')
+    assert s3 == Set('{0}, {1}')
 
-    s4 = UISet('[1, 2]')
+    s4 = Set('[1, 2]')
     s1 ^= s4
-    assert s1 == UISet('(0, 2]')
-    assert s4 == UISet('[1, 2]')
+    assert s1 == Set('(0, 2]')
+    assert s4 == Set('[1, 2]')
 
     assert id(s1) == s1_id
     
@@ -1168,47 +1168,47 @@ def test_uiset_ixor():
         s1 ^= '[0, 1]'
 
 
-def test_uiset_symmetric_difference():
+def test_set_symmetric_difference():
 
-    s1 = UISet([1, 2, 3])
-    s2 = UISet([2, 3])
-    assert s1.symmetric_difference(s2) == UISet('{1}')
-    assert s2.symmetric_difference(s1) == UISet('{1}')
-    assert s2 == UISet([2, 3])
+    s1 = Set([1, 2, 3])
+    s2 = Set([2, 3])
+    assert s1.symmetric_difference(s2) == Set('{1}')
+    assert s2.symmetric_difference(s1) == Set('{1}')
+    assert s2 == Set([2, 3])
 
-    s3 = UISet('[1, 3]')
-    assert s1.symmetric_difference(s3) == UISet('(1, 2), (2, 3)')
-    assert s3.symmetric_difference(s1) == UISet('(1, 2), (2, 3)')
+    s3 = Set('[1, 3]')
+    assert s1.symmetric_difference(s3) == Set('(1, 2), (2, 3)')
+    assert s3.symmetric_difference(s1) == Set('(1, 2), (2, 3)')
 
-    assert s1.symmetric_difference([1]) == UISet([2, 3])
-    assert s1.symmetric_difference([1], [2, 3]) == UISet()
+    assert s1.symmetric_difference([1]) == Set([2, 3])
+    assert s1.symmetric_difference([1], [2, 3]) == Set()
     
-    assert s1 == UISet([1, 2, 3])
+    assert s1 == Set([1, 2, 3])
 
 
-def test_uiset_symmetric_difference_update():
+def test_set_symmetric_difference_update():
 
-    s1 = UISet([1, 2, 3])
+    s1 = Set([1, 2, 3])
     s1_id = id(s1)
-    s2 = UISet()
+    s2 = Set()
     s1.symmetric_difference_update(s2)
-    assert s1 == UISet([1, 2, 3])
-    assert s2 == UISet()
+    assert s1 == Set([1, 2, 3])
+    assert s2 == Set()
 
-    s2 = UISet([2, 3])
+    s2 = Set([2, 3])
     s1.symmetric_difference_update(s2)
-    assert s1 == UISet([1])
-    assert s2 == UISet([2, 3])
+    assert s1 == Set([1])
+    assert s2 == Set([2, 3])
 
-    s2 = UISet('(0, 1), (1, 2), (2, 3)')
+    s2 = Set('(0, 1), (1, 2), (2, 3)')
     s1.symmetric_difference_update(s2)
-    assert s1 == UISet('(0, 2), (2, 3)')
-    assert s2 == UISet('(0, 1), (1, 2), (2, 3)')
+    assert s1 == Set('(0, 2), (2, 3)')
+    assert s2 == Set('(0, 1), (1, 2), (2, 3)')
 
     i1 = Interval('[1, 3]')
     i2 = Interval('[4, 5]')
-    s1.symmetric_difference_update([i1, i2], UISet())
-    assert s1 == UISet('(0, 1), {2}, {3}, [4, 5]')
+    s1.symmetric_difference_update([i1, i2], Set())
+    assert s1 == Set('(0, 1), {2}, {3}, [4, 5]')
     assert i1 == Interval('[1, 3]')
     assert i2 == Interval('[4, 5]')
 

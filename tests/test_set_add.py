@@ -1,15 +1,15 @@
 import functools
 import pytest
-from uiset import UISet, Interval
-from test_uiset import do_bulk_tests
+from uiset import Set, Interval
+from test_set import do_bulk_tests
 
 
-do_bulk_add_tests = functools.partial(do_bulk_tests, fn=UISet.add, mode='pieces')
+do_bulk_add_tests = functools.partial(do_bulk_tests, fn=Set.add, mode='pieces')
 
 
 # ADD SCALAR
 
-def test_add_scalar_to_empty_uiset():
+def test_add_scalar_to_empty_set():
 
     tests = [
         ([], 1, [1]),
@@ -141,7 +141,7 @@ def test_add_scalar_to_two_close_intervals():
 
     i1 = Interval('(1, 3)')
     i2 = Interval('(3, 5)')
-    s = UISet([i1, i2])
+    s = Set([i1, i2])
 
     tests = [
         (s, 0, [0, i1, i2]),
@@ -211,7 +211,7 @@ def test_add_scalar_to_three_intervals_and_2_scalars():
 
 def test_add_infinity_raises():
 
-    s = UISet('(1, 3)')
+    s = Set('(1, 3)')
     with pytest.raises(ValueError):
         s.add(float('inf'))
 
@@ -219,7 +219,7 @@ def test_add_infinity_raises():
 # ADD INTERVAL
 
 
-def test_add_interval_to_empty_uiset():
+def test_add_interval_to_empty_set():
 
     i = Interval('(1, 2)')
     tests = [

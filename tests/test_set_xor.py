@@ -1,19 +1,19 @@
-from uiset import UISet
+from uiset import Set
 
 
 def do_bulk_xor_tests(tests):
 
     for x, y, expected in tests:
-        X = UISet(x)
-        Y = UISet(y)
+        X = Set(x)
+        Y = Set(y)
         Z1 = X ^ Y
 
-        assert Z1 == UISet(expected), '%s ^ %s -> %s' % (X.notation, Y.notation, Z1.notation)
+        assert Z1 == Set(expected), '%s ^ %s -> %s' % (X.notation, Y.notation, Z1.notation)
 
         Z2 = Y ^ X
         assert Z1 == Z2
-        assert X == UISet(x)
-        assert Y == UISet(y)
+        assert X == Set(x)
+        assert Y == Set(y)
 
 
 def test_xor_empty():
@@ -75,7 +75,7 @@ def test_xor_scalars_and_intervals():
 
 
 def test_xor_intervals_unique_values():
-    """Both UISets contain intervals only. All the endpoint values are unique."""
+    """Both Sets contain intervals only. All the endpoint values are unique."""
 
     tests = [
         (
@@ -166,7 +166,7 @@ def test_xor_intervals_unique_values():
 
 
 def test_xor_bounding_intervals():
-    """Both UISets contain intervals only. Some endpoint values are same."""
+    """Both Sets contain intervals only. Some endpoint values are same."""
 
     tests = [
         ('[0, 1]', '[0, 1]', []),

@@ -5,11 +5,11 @@ Algebra of sets. Provides:
     Infinity, Negative Infinity
     Endpoint
     Interval
-    Uncountable Infinite Set
+    Set
 """
 
 __title__ = 'uiset'
-__version__ = '0.3.0'
+__version__ = '0.3.1'
 __author__ = 'Constantine Parkhimovich'
 __license__ = 'MIT'
 __copyright__ = 'Copyright 2014-2018 Constantine Parkhimovich'
@@ -25,7 +25,7 @@ from uiset.parser import EXCLUDED_OPEN_TO_BOUNDS_MAPPING, parse_value, parse_end
 
 def _assert_pieces_are_ascending(fn):
     """
-    Debug decorator for UISet methods.
+    Debug decorator for Set methods.
     Makes sure pieces are sorted in ascending order and do not intersect.
     """
     @functools.wraps(fn)
@@ -37,29 +37,29 @@ def _assert_pieces_are_ascending(fn):
             if isinstance(cur, Interval):
                 if isinstance(nex, Interval):
                     if cur.b >= nex.a:
-                        error = '%s >= %s in UISet %s'
+                        error = '%s >= %s in Set %s'
                         params = (cur.b.notation, nex.a.notation, self.notation)
                     elif are_bounding(cur.b, nex.a):
-                        error = 'no gap between %s and %s! in UISet %s'
+                        error = 'no gap between %s and %s! in Set %s'
                         params = (cur.b.notation, nex.a.notation, self.notation)
                 else:
                     if cur.b >= nex:
-                        error = '%s >= %s in UISet %s'
+                        error = '%s >= %s in Set %s'
                         params = (cur, nex.a.notation, self.notation)
                     elif cur.b.value == nex:
-                        error = 'no gap between %s and %s! in UISet %s'
+                        error = 'no gap between %s and %s! in Set %s'
                         params = (cur.b.notation, nex, self.notation)
             else:
                 if isinstance(nex, Interval):
                     if cur >= nex.a:
-                        error = '%s >= %s in UISet %s'
+                        error = '%s >= %s in Set %s'
                         params = (cur, nex.a.notation, self.notation)
                     elif cur == nex.a.value:
-                        error = 'no gap between %s and %s! in UISet %s'
+                        error = 'no gap between %s and %s! in Set %s'
                         params = (cur, nex.a.notation, self.notation)
                 else:
                     if cur >= nex:
-                        error = '%s >= %s in UISet %s'
+                        error = '%s >= %s in Set %s'
                         params = (cur, nex, self.notation)
             if error:
                 assert False, error % params
@@ -67,27 +67,27 @@ def _assert_pieces_are_ascending(fn):
     return wrapper
 
 
-class UISet(object):
+class Set(object):
     """
     Uncountable Infinite Set
 
-    UISet can be instantiated from either:
+    Set can be instantiated from either:
         - iterable of intervals or scalars:
-            UISet([Interval('[1, 2]'), Interval('[5, inf)')])
-            UISet([Interval('1, 2'), 0, Interval('[6, 7]')])
-        - notation string: UISet('[1, 2], {3}, [5, inf)'). Note that in this case all
+            Set([Interval('[1, 2]'), Interval('[5, inf)')])
+            Set([Interval('1, 2'), 0, Interval('[6, 7]')])
+        - notation string: Set('[1, 2], {3}, [5, inf)'). Note that in this case all
             the pieces must be sorted in ascending order and must not intersect.
-        - another UISet. Intervals will be copied.
-        - nothing for empty UISet: UISet() 
+        - another Set. Intervals will be copied.
+        - nothing for empty Set: Set()
     
     The subset and equality comparisons do not generalize to a total ordering function.
-    For example, any two nonempty disjoint UISets are not equal and are not subsets of each other,
+    For example, any two nonempty disjoint Sets are not equal and are not subsets of each other,
     so all of the following return False: a < b, a == b, or a > b.
 
     Note, the non-operator versions of union(), intersection(), intersection_update(), difference(), difference_update(), symmetric_difference(), symmetric_difference_update(), issubset() and issuperset() methods will accept iterable of scalars and/or intervals as an argument.
-    In contrast, their operator based counterparts require their arguments to be UISets.
+    In contrast, their operator based counterparts require their arguments to be Sets.
 
-    In boolean context UISet is True if it is not empty and False if it is empty.
+    In boolean context Set is True if it is not empty and False if it is empty.
     """
 
     def __init_from_notation(self, notation):
@@ -131,20 +131,22 @@ class UISet(object):
 
     @_assert_pieces_are_ascending
     def __init__(self, arg=None):
-        
-        if isinstance(arg, type(self)):
-            # Init from UISet
+        # TODO: init from interval?
+        if isinstance(arg, Set):
+            # Init from Set
+            # TODO: "arg" is unclear signature
+            # TODO: another set should be created
             self.pieces = [i.copy() for i in arg.pieces]
             return
         self.pieces = []
         if arg is None:
-            # Init empty UISet from None
+            # Init empty Set from None
             return
         elif isinstance(arg, str):
             # Init from notation string
             self.__init_from_notation(arg)
         else:
-            # Init from iterable of intervals or scalars.
+            # Init from iterable of intervals and/or scalars.
             for p in arg:
                 self.add(p)
 
@@ -169,9 +171,9 @@ class UISet(object):
 
     def search(self, x, lo=0, hi=None):
         """
-        Search scalar x in UISet.
+        Search scalar x in Set.
         Return tuple of two elements:
-            the index where to insert x in list of UISet pieces.
+            the index where to insert x in list of Set pieces.
             piece that contains x or equals to x, or None if none found.
 
         Implements Binary search.
@@ -202,7 +204,7 @@ class UISet(object):
     def __contains__(self, x):
         """
         x in self
-        Test scalar or interval x for membership in UISet.
+        Test scalar or interval x for membership in Set.
         Note that if x is interval, returning True does not mean that one of
         intervals equals to x, because there can be an interval larger than x.
         """
@@ -216,16 +218,16 @@ class UISet(object):
     def __invert__(self):
         """
         ~self
-        Return a new UISet that is a compliment of the UISet.
-        Double inversion (~~self) returns UISet that is equal to self.
+        Return a new Set that is a compliment of the Set.
+        Double inversion (~~self) returns Set that is equal to self.
         """
-        new = UISet()
+        new = Set()
         if not self.pieces:
             new.pieces.append(unbounded.copy())
             return new
         if self.pieces[0] == unbounded.copy():
             return new
-        # Get plain list of endpoints from original UISet.
+        # Get plain list of endpoints from original Set.
         endpoints = []
         for i in self.pieces:
             if isinstance(i, Interval):
@@ -248,7 +250,7 @@ class UISet(object):
             endpoints.append(Endpoint('inf)'))
         # Invert inner endpoints.
         endpoints[1:-1] = [~e for e in endpoints[1:-1]]
-        # Construct new UISet`s intervals from endpoint pairs.
+        # Construct new Set`s intervals from endpoint pairs.
         # If values of endpoints are same add scalar.
         for a, b in zip(endpoints[::2], endpoints[1::2]):
             if a.value == b.value:
@@ -262,33 +264,33 @@ class UISet(object):
     def __eq__(self, other):
         """
         self == other
-        Test whether the UISet contains all the pieces of the other and vice versa.
+        Test whether the Set contains all the pieces of the other and vice versa.
         """
-        return isinstance(other, UISet) and self.pieces == other.pieces
+        return isinstance(other, Set) and self.pieces == other.pieces
 
     def __ne__(self, other):
         """
         self != other
-        Test whether the UISet contains anything that the other does not contain or vice versa.
+        Test whether the Set contains anything that the other does not contain or vice versa.
         """
-        return not isinstance(other, UISet) or self.pieces != other.pieces
+        return not isinstance(other, Set) or self.pieces != other.pieces
 
     def __gt__(self, other):
         """
         self > other
-        Test whether the UISet is a proper superset of the other.
+        Test whether the Set is a proper superset of the other.
         """
-        if not isinstance(other, UISet):
-            raise TypeError('Can only compare to an UISet')
+        if not isinstance(other, Set):
+            raise TypeError('Can only compare to an Set')
         return self != other and self >= other
 
     def __ge__(self, other):
         """
         self >= other
-        Test if the other has not anything that is not in the UISet.
+        Test if the other has not anything that is not in the Set.
         """
-        if not isinstance(other, UISet):
-            raise TypeError('Can only compare to an UISet')
+        if not isinstance(other, Set):
+            raise TypeError('Can only compare to an Set')
         lo = 0
         X = iter(other.pieces)
         try:
@@ -314,43 +316,43 @@ class UISet(object):
         return False
 
     def issuperset(self, other):
-        """Test if the other has not anything that is not in the UISet."""
-        if isinstance(other, UISet):
+        """Test if the other has not anything that is not in the Set."""
+        if isinstance(other, Set):
             return self >= other
         else:
-            return self >= UISet(other)
+            return self >= Set(other)
 
     def __le__(self, other):
         """
         self <= other
         Test whether the USSet has not anything that is not in the other.
         """
-        if not isinstance(other, UISet):
-            raise TypeError('Can only compare to an UISet')
+        if not isinstance(other, Set):
+            raise TypeError('Can only compare to an Set')
         return NotImplemented # so that other.__ge__ will be called
 
     def issubset(self, other):
         """Test whether the USSet has not anything that is not in the other."""
-        if isinstance(other, UISet):
+        if isinstance(other, Set):
             return self <= other
         else:
-            return self <= UISet(other)
+            return self <= Set(other)
 
     def __lt__(self, other):
         """
         self < other
-        Test whether the UISet is a proper subset of the other.
+        Test whether the Set is a proper subset of the other.
         """
-        if not isinstance(other, UISet):
-            raise TypeError('Can only compare to an UISet')
+        if not isinstance(other, Set):
+            raise TypeError('Can only compare to an Set')
         return NotImplemented # so that other.__gt__ will be called
 
     def __or__(self, other):
         """
         self | other
-        Return a new UISet that is a union of the UISet and the other.
+        Return a new Set that is a union of the Set and the other.
         """
-        if not isinstance(other, UISet):
+        if not isinstance(other, Set):
             emsg = "unsupported operand type for |: %s and %s"
             raise TypeError(emsg % (type(self), type(other)))
         new = self.copy()
@@ -363,9 +365,9 @@ class UISet(object):
     def __ior__(self, other):
         """
         self |= other
-        Update the UISet, adding pieces from the other.
+        Update the Set, adding pieces from the other.
         """
-        if not isinstance(other, UISet):
+        if not isinstance(other, Set):
             emsg = "unsupported operand type for |=: %s and %s"
             raise TypeError(emsg % (type(self), type(other)))
         lo = 0
@@ -374,10 +376,10 @@ class UISet(object):
         return self
         
     def union(self, *others):
-        """Return a new UISet that is a union with the UISet and all the others."""
+        """Return a new Set that is a union with the Set and all the others."""
         new = self.copy()
         for other in others:
-            if isinstance(other, UISet):
+            if isinstance(other, Set):
                 lo = 0
                 for x in other.pieces:
                     lo = new._add(x, lo)
@@ -388,7 +390,7 @@ class UISet(object):
 
     @_assert_pieces_are_ascending
     def update(self, *others):
-        """Update the UISet, adding pieces from all the others."""
+        """Update the Set, adding pieces from all the others."""
         for other in others:
             lo = 0
             for x in other.pieces:
@@ -396,59 +398,59 @@ class UISet(object):
 
     @staticmethod
     def __and(A, B):
-        """Return a new UISet that is an intersection of A and B."""
+        """Return a new Set that is an intersection of A and B."""
         return A - ~B
 
     def __and__(self, other):
         """
         self & other
-        Return a new UISet that is an intersection of the UISet`s and the other.
+        Return a new Set that is an intersection of the Set`s and the other.
         """
-        if not isinstance(other, UISet):
+        if not isinstance(other, Set):
             emsg = "unsupported operand type for &: %s and %s"
             raise TypeError(emsg % (type(self), type(other)))
-        return UISet.__and(self, other)
+        return Set.__and(self, other)
 
     @_assert_pieces_are_ascending
     def __iand__(self, other):
         """
         self &= other
-        Update the UISet, removing everything that is not in the other.
+        Update the Set, removing everything that is not in the other.
         """
-        if not isinstance(other, UISet):
+        if not isinstance(other, Set):
             emsg = "unsupported operand type for &=: %s and %s"
             raise TypeError(emsg % (type(self), type(other)))
-        new = UISet.__and(self, other)
+        new = Set.__and(self, other)
         self.pieces = new.pieces
         return self
 
     def intersection(self, *others):
         """
-        Return a new UISet that is an intersection of the UISet`s and all the others.
+        Return a new Set that is an intersection of the Set`s and all the others.
         """
         new = self.copy()
         for other in others:
-            if isinstance(other, UISet):
-                new = UISet.__and(new, other)
+            if isinstance(other, Set):
+                new = Set.__and(new, other)
             else:
-                new = UISet.__and(new, UISet(other))
+                new = Set.__and(new, Set(other))
         return new
 
     @_assert_pieces_are_ascending
     def intersection_update(self, *others):
-        """Update the UISet, removing everything that is not in any of the others."""
+        """Update the Set, removing everything that is not in any of the others."""
         new = self
         for other in others:
-            if isinstance(other, UISet):
-                new = UISet.__and(new, other)
+            if isinstance(other, Set):
+                new = Set.__and(new, other)
             else:
-                new = UISet.__and(new, UISet(other))
+                new = Set.__and(new, Set(other))
         self.pieces = new.pieces
 
     def isdisjoint(self, other):
         """
-        Return True if none of UISet`s pieces intersect with the other`s.
-        UISets are disjoint if and only if their intersection is the empty UISet.
+        Return True if none of Set`s pieces intersect with the other`s.
+        Sets are disjoint if and only if their intersection is the empty Set.
         """
         i = 0
         for x in other.pieces:
@@ -469,7 +471,7 @@ class UISet(object):
 
     @staticmethod
     def __sub(A, B):
-        """Subtract UISet B from UISet A"""
+        """Subtract Set B from Set A"""
         lo = 0
         for x in B.pieces:
             lo = A._remove(x, lo)
@@ -478,34 +480,34 @@ class UISet(object):
     def __sub__(self, other):
         """
         self - other
-        Return a new UISet with everything that is in the UISet but not in the other.
+        Return a new Set with everything that is in the Set but not in the other.
         """
-        if not isinstance(other, UISet):
+        if not isinstance(other, Set):
             emsg = "unsupported operand type for -: %s and %s"
             raise TypeError(emsg % (type(self), type(other)))
         new = self.copy()
-        return UISet.__sub(new, other)
+        return Set.__sub(new, other)
 
     @_assert_pieces_are_ascending
     def __isub__(self, other):
         """
         self -= other
-        Update the UISet, removing everything found in the other.
+        Update the Set, removing everything found in the other.
         """
-        if not isinstance(other, UISet):
+        if not isinstance(other, Set):
             emsg = "unsupported operand type for -=: %s and %s"
             raise TypeError(emsg % (type(self), type(other)))
-        return UISet.__sub(self, other)
+        return Set.__sub(self, other)
 
     def difference(self, *others):
         """
-        Return a new UISet with everything that is in the UISet
+        Return a new Set with everything that is in the Set
         but not in any of the others.
         """
         new = self.copy()
         for other in others:
-            if isinstance(other, UISet):
-                UISet.__sub(new, other)
+            if isinstance(other, Set):
+                Set.__sub(new, other)
             else:
                 for x in other:
                     new.remove(x)
@@ -513,63 +515,63 @@ class UISet(object):
 
     @_assert_pieces_are_ascending
     def difference_update(self, *others):
-        """Update the UISet, removing everything found in the others."""
+        """Update the Set, removing everything found in the others."""
         for other in others:
-            if isinstance(other, UISet):
-                UISet.__sub(self, other)
+            if isinstance(other, Set):
+                Set.__sub(self, other)
             else:
                 for x in other:
                     self.remove(x)
 
     @staticmethod
     def __xor(A, B):
-        """Return a new UISet with pieces in either the UISet A or B but not in both."""
+        """Return a new Set with pieces in either the Set A or B but not in both."""
         return A - B | B - A
 
     def __xor__(self, other):
         """
         self ^ other
-        Return a new UISet with pieces in either the UISet or the other but not in both."""
-        if not isinstance(other, UISet):
+        Return a new Set with pieces in either the Set or the other but not in both."""
+        if not isinstance(other, Set):
             emsg = "unsupported operand type for ^: %s and %s"
             raise TypeError(emsg % (type(self), type(other)))
-        return UISet.__xor(self, other)
+        return Set.__xor(self, other)
 
     @_assert_pieces_are_ascending
     def __ixor__(self, other):
         """
         self ^= other
-        Update the UISet, keeping only pieces found in either UISet, but not in both.
+        Update the Set, keeping only pieces found in either Set, but not in both.
         """
-        if not isinstance(other, UISet):
+        if not isinstance(other, Set):
             emsg = "unsupported operand type for ^=: %s and %s"
             raise TypeError(emsg % (type(self), type(other)))
-        new = UISet.__xor(self, other)
+        new = Set.__xor(self, other)
         self.pieces = new.pieces
         return self
 
     def symmetric_difference(self, *others):
         """
-        Return a new UISet with pieces in either the UISet or the other but not in both."""
+        Return a new Set with pieces in either the Set or the other but not in both."""
         new = self.copy()
         for other in others:
-            if isinstance(other, UISet):
-                new = UISet.__xor(new, other)
+            if isinstance(other, Set):
+                new = Set.__xor(new, other)
             else:
-                new = UISet.__xor(new, UISet(other))
+                new = Set.__xor(new, Set(other))
         return new
     
     @_assert_pieces_are_ascending
     def symmetric_difference_update(self, *others):
         """
-        Update the UISet, keeping only pieces found in either UISet, but not in both.
+        Update the Set, keeping only pieces found in either Set, but not in both.
         """
         new = self
         for other in others:
-            if isinstance(other, UISet):
-                new = UISet.__xor(new, other)
+            if isinstance(other, Set):
+                new = Set.__xor(new, other)
             else:
-                new = UISet.__xor(new, UISet(other))
+                new = Set.__xor(new, Set(other))
         self.pieces = new.pieces
 
     def _add_scalar(self, x, lo=0):
@@ -645,7 +647,7 @@ class UISet(object):
 
     def _add(self, x, lo=0):
         """
-        Add scalar or interval x to UISet, starting from piece at index lo.
+        Add scalar or interval x to Set, starting from piece at index lo.
         return index of the first piece that does not intersect with x.
         """
         if isinstance(x, Interval):
@@ -655,7 +657,7 @@ class UISet(object):
         
     @_assert_pieces_are_ascending
     def add(self, x):
-        """Add scalar or interval x to UISet, merge ones that intersect."""
+        """Add scalar or interval x to Set, merge ones that intersect."""
         self._add(x)
 
     def _remove_scalar(self, x, lo=0):
@@ -730,7 +732,7 @@ class UISet(object):
 
     def _remove(self, x, lo=0):
         """
-        Remove scalar or interval x from UISet, starting from piece at index lo.
+        Remove scalar or interval x from Set, starting from piece at index lo.
         return index of the first piece that does not intersect with x.
         """
         if isinstance(x, Interval):
@@ -740,20 +742,20 @@ class UISet(object):
 
     @_assert_pieces_are_ascending
     def remove(self, x):
-        """Remove scalar or interval x from the UISet."""
+        """Remove scalar or interval x from the Set."""
         self._remove(x)
 
     def clear(self):
-        """Remove all pieces from the UISet."""
+        """Remove all pieces from the Set."""
         self.pieces = []
 
     def copy(self):
         """
-        Return a copy of the UISet.
+        Return a copy of the Set.
         Intervals are recreated.
         copy is safe as long as endpoint values are of immutable types.
         """
-        new = UISet()
+        new = Set()
         new.pieces = [p.copy() if is_interval(p) else p for p in self.pieces]
         return new
 

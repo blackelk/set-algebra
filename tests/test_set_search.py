@@ -1,14 +1,15 @@
 import functools
-from uiset import UISet, Interval
-from test_uiset import do_bulk_tests
+
+from uiset import Set, Interval
+from test_set import do_bulk_tests
 
 
-do_bulk_search_tests = functools.partial(do_bulk_tests, fn=UISet.search, mode='return')
+do_bulk_search_tests = functools.partial(do_bulk_tests, fn=Set.search, mode='return')
 
 
-def test_search_in_empty_uiset():
+def test_search_in_empty_set():
 
-    assert UISet().search(0) == (0, None)
+    assert Set().search(0) == (0, None)
 
 
 def test_search_in_interval():
@@ -39,7 +40,7 @@ def test_search_in_two_intervals():
 
     i1 = Interval('(1, 3)')
     i2 = Interval('(5, 7)')
-    s = UISet([i1, i2])
+    s = Set([i1, i2])
 
     tests = [
         (s, 0, (0, None)),
@@ -61,7 +62,7 @@ def test_search_in_four_intervals():
     i2 = Interval('[5, 7]')
     i3 = Interval('(9, 10)')
     i4 = Interval('(10, inf)')
-    s = UISet([i1, i2, i3, i4])
+    s = Set([i1, i2, i3, i4])
 
     tests = [
         (s, float('-inf'), (0, None)),
@@ -190,7 +191,8 @@ def test_search_in_two_scalars_and_two_intervals():
 
     i1 = Interval('(-inf, 0)')
     i2 = Interval('[5, 7)')
-    s = UISet([i1, 3, i2, 10])
+    s = Set([i1, 3, i2, 10])
+
     tests = [
         (s, float('-inf'), (0, None)),
         (s, -5, (0, i1)),

@@ -1,4 +1,4 @@
-UISet - Algebra of sets in python
+Algebra of sets in python
 =================================
 
 | How to have a set containing all real numbers from 1 to 10 not including 10?
@@ -9,8 +9,8 @@ UISet - Algebra of sets in python
 
 .. code:: python
 
-    >>> from uiset import Interval, UISet
-    >>> s = UISet('[1, 10)')
+    >>> from uiset import Interval, Set
+    >>> s = Set('[1, 10)')
     >>> 1 in s
     True
     >>> 10 in s
@@ -18,7 +18,7 @@ UISet - Algebra of sets in python
     >>> s.add(Interval('[20, 30]'))
     >>> 25 in s
     True
-    >>> s <= UISet('(0, inf)')
+    >>> s <= Set('(0, inf)')
     True
     >>> s.add(100)
     >>> s.notation

@@ -1,14 +1,15 @@
 import functools
-from uiset import UISet, Interval
-from test_uiset import do_bulk_tests
+
+from uiset import Set, Interval
+from test_set import do_bulk_tests
 
 
-do_bulk_remove_tests = functools.partial(do_bulk_tests, fn=UISet.remove, mode='pieces')
+do_bulk_remove_tests = functools.partial(do_bulk_tests, fn=Set.remove, mode='pieces')
 
 
 # REMOVE SCALAR
 
-def test_remove_scalar_from_empty_uiset():
+def test_remove_scalar_from_empty_set():
 
     tests = [
         ([], 1, []),
@@ -87,7 +88,7 @@ def test_remove_scalar_from_two_close_intervals():
     i2 = Interval('[1, 3)')
     i3 = Interval('(3, 5)')
     i4 = Interval('(3, 5]')
-    s = UISet([i2, i4])
+    s = Set([i2, i4])
 
     tests = [
         (s, 0, [i2, i4]),
@@ -156,10 +157,10 @@ def test_remove_scalar_from_three_intervals_and_2_scalars():
 # REMOVE INTERVAL
 
 
-def test_remove_interval_from_empty_uiset():
+def test_remove_interval_from_empty_set():
 
     tests = [
-        (UISet(), Interval('(4, 5)'), []),
+        (Set(), Interval('(4, 5)'), []),
     ]
     do_bulk_remove_tests(tests)
 
