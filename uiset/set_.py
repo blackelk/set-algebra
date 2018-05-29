@@ -3,7 +3,8 @@ import functools
 from uiset.infinity import is_finite, inf, neg_inf
 from uiset.endpoint import Endpoint, are_bounding
 from uiset.interval import Interval, is_interval, unbounded
-from uiset.parser import EXCLUDED_OPEN_TO_BOUNDS_MAPPING, parse_value, parse_endpoint_notation
+from uiset.parser import (EXCLUDED_OPEN_TO_BOUNDS_MAPPING, parse_value,
+                          parse_endpoint_notation, string_types)
 
 
 def _assert_pieces_are_ascending(fn):
@@ -118,14 +119,13 @@ class Set(object):
         if isinstance(arg, Set):
             # Init from Set
             # TODO: "arg" is unclear signature
-            # TODO: another set should be created
             self.pieces = [i.copy() for i in arg.pieces]
             return
         self.pieces = []
         if arg is None:
             # Init empty Set from None
             return
-        elif isinstance(arg, str):
+        elif isinstance(arg, string_types):
             # Init from notation string
             self.__init_from_notation(arg)
         else:
