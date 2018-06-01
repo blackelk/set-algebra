@@ -1,5 +1,6 @@
 import pytest
-from uiset import Endpoint, Interval, are_bounding
+
+from set_algebra import Endpoint, Interval, are_bounding
 
 
 def test_endpoint_init_from_notation():

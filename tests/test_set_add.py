@@ -1,6 +1,7 @@
 import functools
 import pytest
-from uiset import Set, Interval
+
+from set_algebra import Set, Interval
 from test_set import do_bulk_tests
 
 

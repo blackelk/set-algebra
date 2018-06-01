@@ -2,7 +2,7 @@ import datetime
 import sys
 import pytest
 
-from uiset import Endpoint, Interval
+from set_algebra import Endpoint, Interval
 
 
 def test_interval_repr():

@@ -1,4 +1,4 @@
-from uiset import inf, neg_inf
+from set_algebra import inf, neg_inf
 
 
 def test_inf():

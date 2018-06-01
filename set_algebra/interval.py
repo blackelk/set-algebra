@@ -1,4 +1,4 @@
-from uiset.endpoint import Endpoint
+from set_algebra.endpoint import Endpoint
 
 
 class Interval(object):

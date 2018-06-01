@@ -1,20 +1,19 @@
 from setuptools import setup
 
-import uiset
+import set_algebra
 
 
 with open('README.rst') as f:
     readme = f.read()
 
 setup(
-    name = 'uiset',
-    packages = ['uiset'],
-    version = uiset.__version__,
+    name = 'set-algebra',
+    packages = ['set_algebra'],
+    version = set_algebra.__version__,
     author = 'Constantine Parkhimovich',
     author_email = 'cparkhimovich@gmail.com',
-    url = 'https://github.com/blackelk/uiset',
-    download_url = 'https://github.com/blackelk/uiset/tarball/0.2.2',
-    description = 'Uncountable Infinite Set',
+    url = 'https://github.com/blackelk/set_algebra',
+    description = 'Algebra of Sets',
     license = 'MIT',
     long_description = readme,
     keywords = 'math set interval',

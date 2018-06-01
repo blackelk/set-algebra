@@ -1,9 +1,9 @@
 import functools
 
-from uiset.infinity import is_finite, inf, neg_inf
-from uiset.endpoint import Endpoint, are_bounding
-from uiset.interval import Interval, is_interval, unbounded
-from uiset.parser import (EXCLUDED_OPEN_TO_BOUNDS_MAPPING, parse_value,
+from set_algebra.infinity import is_finite, inf, neg_inf
+from set_algebra.endpoint import Endpoint, are_bounding
+from set_algebra.interval import Interval, is_interval, unbounded
+from set_algebra.parser import (EXCLUDED_OPEN_TO_BOUNDS_MAPPING, parse_value,
                           parse_endpoint_notation, string_types)
 
 

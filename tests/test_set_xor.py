@@ -1,4 +1,4 @@
-from uiset import Set
+from set_algebra import Set
 
 
 def do_bulk_xor_tests(tests):

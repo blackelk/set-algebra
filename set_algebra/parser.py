@@ -1,4 +1,4 @@
-from uiset.infinity import inf, neg_inf
+from set_algebra.infinity import inf, neg_inf
 
 
 try:

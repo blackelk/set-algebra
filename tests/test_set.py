@@ -1,5 +1,6 @@
 import pytest
-from uiset import Endpoint, Interval, Set, inf, unbounded
+
+from set_algebra import Endpoint, Interval, Set, inf, unbounded
 
 
 def do_bulk_tests(tests, fn, mode):

@@ -1,5 +1,6 @@
-from uiset.infinity import Infinity, NegativeInfinity, inf, neg_inf, is_finite
-from uiset.parser import EXCLUDED_OPEN_TO_BOUNDS_MAPPING, parse_bound, parse_endpoint_notation
+from set_algebra.infinity import Infinity, NegativeInfinity, inf, neg_inf, is_finite
+from set_algebra.parser import (EXCLUDED_OPEN_TO_BOUNDS_MAPPING, parse_bound,
+    parse_endpoint_notation)
 
 
 class Endpoint(object):
