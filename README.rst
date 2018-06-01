@@ -1,4 +1,4 @@
-Algebra of sets in python
+Algebra of Sets in Python
 =================================
 
 | How to have a set containing all real numbers from 1 to 10 not including 10?
@@ -9,7 +9,7 @@ Algebra of sets in python
 
 .. code:: python
 
-    >>> from uiset import Interval, Set
+    >>> from set_algebra import Interval, Set
     >>> s = Set('[1, 10)')
     >>> 1 in s
     True
@@ -26,18 +26,18 @@ Algebra of sets in python
     >>> (~s).notation
     '(-inf, 1), [10, 20), (30, 100), (100, inf)'
 
-uiset provides classes representing math concepts:
+Set-Algebra provides classes representing math concepts:
 
 - Infinity
 - Endpoint
 - Interval
 - Uncountable Infinite Set
 
-Besides numbers, uiset supports all objects that can be compared to each other - strings, datetimes, etc.
+Besides numbers, Set-Algebra supports all objects that can be compared to each other - strings, datetimes, etc.
 
 Infinity() is greater than any of these objects except float('inf') and float('nan').
 NegativeInfinity included as well.
 
 
-uiset fully supports Python3. Tested on python 2.7, 3.2 - 3.6.
+Set-Algebra fully supports Python3. Tested on python 2.7, 3.2 - 3.6.
 
