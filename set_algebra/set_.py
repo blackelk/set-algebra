@@ -3,8 +3,7 @@ import functools
 from set_algebra.infinity import is_finite, inf, neg_inf
 from set_algebra.endpoint import Endpoint, are_bounding
 from set_algebra.interval import Interval, is_interval, unbounded
-from set_algebra.parser import (EXCLUDED_OPEN_TO_BOUNDS_MAPPING, parse_value,
-                          parse_endpoint_notation, string_types)
+from set_algebra.parser import parse_value, parse_endpoint_notation, string_types
 
 
 def _assert_pieces_are_ascending(fn):
@@ -97,9 +96,7 @@ class Set(object):
                 self.pieces.append(scalar)
 
             else:
-                value, excluded, open = parse_endpoint_notation(part)
-                bound = EXCLUDED_OPEN_TO_BOUNDS_MAPPING[excluded, open]
-                endpoint = Endpoint(value, bound)
+                endpoint = Endpoint(part)
                 if a is None:
                     a = endpoint
                 else:
