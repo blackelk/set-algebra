@@ -6,23 +6,23 @@ from set_algebra import Endpoint, Interval, are_bounding
 def test_endpoint_init_from_notation():
 
     e1 = Endpoint('[1')
-    assert e1.open
-    assert not e1.closed
+    assert e1.left
+    assert not e1.right
     assert not e1.excluded
     assert e1.value == 1
     e2 = Endpoint('(1')
-    assert e2.open
-    assert not e2.closed
+    assert e2.left
+    assert not e2.right
     assert e2.excluded
     assert e2.value == 1
     e3 = Endpoint('1]')
-    assert not e3.open
-    assert e3.closed
+    assert not e3.left
+    assert e3.right
     assert not e3.excluded
     assert e3.value == 1
     e4 = Endpoint('1)')
-    assert not e4.open
-    assert e4.closed
+    assert not e4.left
+    assert e4.right
     assert e4.excluded
     assert e4.value == 1
 

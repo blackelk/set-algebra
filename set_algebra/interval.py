@@ -1,5 +1,5 @@
 from set_algebra.endpoint import Endpoint
-from set_algebra.parser import EXCLUDED_OPEN_TO_BOUNDS_MAPPING, string_types
+from set_algebra.parser import EXCLUDED_LEFT_TO_BOUNDS_MAPPING, string_types
 
 
 class Interval(object):
@@ -74,11 +74,11 @@ class Interval(object):
             if bounds is not None:
                 raise TypeError('bounds are only accepted with both "notation_or_a" and "b"')
             notation = notation_or_a.strip()
-            left, right = notation.split(',')
-            if ',' in right:
+            a_str, b_str = notation.split(',')
+            if ',' in b_str:
                 raise ValueError('There should be one and only one comma in interval notation')
-            a = Endpoint(left)
-            b = Endpoint(right)
+            a = Endpoint(a_str)
+            b = Endpoint(b_str)
 
         else:
             if isinstance(notation_or_a, Endpoint) ^ isinstance(b, Endpoint):
@@ -106,10 +106,10 @@ class Interval(object):
                 a = Endpoint(value_a, bounds[0])
                 b = Endpoint(value_b, bounds[1])
 
-        if not a.open:
-            raise ValueError('First endpoint ("a") must be open')
-        if b.open:
-            raise ValueError('Second endpoint ("b") must be closed')
+        if a.right:
+            raise ValueError('First endpoint ("a") must be left')
+        if b.left:
+            raise ValueError('Second endpoint ("b") must be right')
         if a > b:
             raise ValueError('First endpoint ("a") must be less than the second one')
         # a == b Allowed for degenerate interval.
@@ -128,8 +128,8 @@ class Interval(object):
         else:
             a = self.a
             b = self.b
-            bound_a = EXCLUDED_OPEN_TO_BOUNDS_MAPPING[a.excluded, a.open]
-            bound_b = EXCLUDED_OPEN_TO_BOUNDS_MAPPING[b.excluded, b.open]
+            bound_a = EXCLUDED_LEFT_TO_BOUNDS_MAPPING[a.excluded, a.left]
+            bound_b = EXCLUDED_LEFT_TO_BOUNDS_MAPPING[b.excluded, b.left]
             bounds = bound_a + bound_b
             return "%s(%s, %s, '%s')" % (classname, repr(a.value), repr(b.value), bounds)
 
