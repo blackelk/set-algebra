@@ -1,4 +1,5 @@
 from set_algebra.endpoint import Endpoint
+from set_algebra.parser import EXCLUDED_OPEN_TO_BOUNDS_MAPPING, string_types
 
 
 class Interval(object):
@@ -6,16 +7,22 @@ class Interval(object):
     Class representing interval on an axis.
     Contains two Endpoint instances - a and b.
 
-    There are 2 ways to instantiate Interval:
+    There are 3 ways to instantiate Interval:
     - From notation string (for numeric values only):
-        Interval('[0, 1]'), Interval('(3.4e+7, 5.6e+7]'), Interval('[0, inf]')
+        Interval('[0, 1]')
+        Interval('(3.4e+7, 5.6e+7]')
+        Interval('[0, inf]')
+
+    - From two values and bounds string:
+        Interval(1, 2, '[)')
+
     - From two endpoints:
         a = Endpoint('[0')
         b = Endpoint('1]');
-        Interval(a=a, b=b)
-        will produce Interval('[0, 1]')
-    Values of two endpoints must be comparable to each other.
-    
+        Interval(Endpoint('[0'), Endpoint('1]'))
+
+    Left and right values must be comparable to each other.
+
     Instances of Interval support membership test ("in") operation for scalars,
         Endpoint instances and other Interval instances.
 
@@ -43,9 +50,12 @@ class Interval(object):
     >>> negative in percentage
     False
     >>>
+    >>> digits = Interval('0', '9', '[]')
+    >>> '5' in digits
+    True
     >>> a = Endpoint('p', '[')
     >>> b = Endpoint('q', ')')
-    >>> p = Interval(a=a, b=b)
+    >>> p = Interval(a, b)
     >>> 'o' in p
     False
     >>> 'p' in p
@@ -54,28 +64,56 @@ class Interval(object):
     True
     >>> 'q' in p
     False
+    >>>
     """
     __slots__ = ('a', 'b')
 
-    def __init__(self, notation=None, a=None, b=None):
+    def __init__(self, notation_or_a, b=None, bounds=None):
+        if b is None:
+            # Init from notation.
+            if bounds is not None:
+                raise TypeError('bounds are only accepted with both "notation_or_a" and "b"')
+            notation = notation_or_a.strip()
+            left, right = notation.split(',')
+            if ',' in right:
+                raise ValueError('There should be one and only one comma in interval notation')
+            a = Endpoint(left)
+            b = Endpoint(right)
 
-        if (notation is None) ^ any(k is not None for k in [a, b]):
-            emsg = '%s() takes notation or 2 kwargs: a and b'
-            raise TypeError(emsg % type(self).__name__)
-        if notation is None:
-            if not isinstance(a, Endpoint) or not isinstance(b, Endpoint):
-                raise TypeError('Kwargs a and b must be instances of Endpoint')
         else:
-            parts = notation.split(',')
-            if len(parts) != 2:
-                raise ValueError('Invalid notation')
-            a, b = (Endpoint(part) for part in parts)
+            if isinstance(notation_or_a, Endpoint) ^ isinstance(b, Endpoint):
+                raise TypeError('Either both notation_or_a and b must be instances of Endpoint'
+                                ' or none of them')
+
+            if isinstance(b, Endpoint):
+                # Init from two Endpoints.
+                if bounds is not None:
+                    raise TypeError('When initializing Interval from two Endpoints,'
+                                    ' bounds must not be provided')
+                a = notation_or_a
+
+            else:
+                # Init from two values and bounds.
+                if bounds is None:
+                    raise TypeError('When initializing Interval from two values, '
+                                    'bounds must be provided')
+                value_a = notation_or_a
+                value_b = b
+                if not isinstance(bounds, string_types):
+                    raise TypeError('bounds must be a string, not %s' % type(bounds).__name__)
+                if len(bounds) != 2:
+                    raise ValueError('bounds must be a string of length 2, e.g. "[)"')
+                a = Endpoint(value_a, bounds[0])
+                b = Endpoint(value_b, bounds[1])
+
         if not a.open:
-            raise ValueError('First endpoint must be open')
+            raise ValueError('First endpoint ("a") must be open')
         if b.open:
-            raise ValueError('Second endpoint must be closed')
-        if b < a:
-            raise ValueError('Second endpoint is less than the first one')
+            raise ValueError('Second endpoint ("b") must be closed')
+        if a > b:
+            raise ValueError('First endpoint ("a") must be less than the second one')
+        # a == b Allowed for degenerate interval.
+
         self.a = a
         self.b = b
 
@@ -88,10 +126,15 @@ class Interval(object):
         if isinstance(self.a.value, Endpoint.PARSABLE_TYPES):
             return "%s('%s')" % (classname, self.notation)
         else:
-            return "%s(None, %s, %s)" % (classname, self.a, self.b)
+            a = self.a
+            b = self.b
+            bound_a = EXCLUDED_OPEN_TO_BOUNDS_MAPPING[a.excluded, a.open]
+            bound_b = EXCLUDED_OPEN_TO_BOUNDS_MAPPING[b.excluded, b.open]
+            bounds = bound_a + bound_b
+            return "%s(%s, %s, '%s')" % (classname, repr(a.value), repr(b.value), bounds)
 
     def __eq__(self, other):
-        return isinstance(other, Interval)\
+        return isinstance(other, Interval) \
            and self.a == other.a and self.b == other.b
 
     def __contains__(self, other):
@@ -106,7 +149,7 @@ class Interval(object):
         Endpoints are recreated.
         copy is safe as long as endpoint values are of immutable types.
         """
-        return Interval(a=self.a.copy(), b=self.b.copy())
+        return Interval(self.a.copy(), self.b.copy())
 
 
 def is_interval(obj):

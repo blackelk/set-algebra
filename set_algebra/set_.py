@@ -83,6 +83,7 @@ class Set(object):
         a = None
         for part in notation.split(','):
             part = part.strip()
+
             if part.startswith('{') and part.endswith('}'):
                 scalar = parse_value(part[1:-1])
                 if not is_finite(scalar):
@@ -94,6 +95,7 @@ class Set(object):
                     if pre >= scalar:
                         raise ValueError('%s >= %s!' % (pre, scalar))
                 self.pieces.append(scalar)
+
             else:
                 value, excluded, open = parse_endpoint_notation(part)
                 bound = EXCLUDED_OPEN_TO_BOUNDS_MAPPING[excluded, open]
@@ -101,7 +103,7 @@ class Set(object):
                 if a is None:
                     a = endpoint
                 else:
-                    interval = Interval(a=a, b=endpoint)
+                    interval = Interval(a, endpoint)
                     if self.pieces:
                         pre = self.pieces[-1]
                         if isinstance(pre, Interval):
@@ -114,6 +116,7 @@ class Set(object):
                                 raise ValueError('%s >= %s!' % (pre, interval.a))
                     self.pieces.append(interval)
                     a = None
+
         if a is not None:
             raise ValueError('Invalid notation')
 
@@ -243,7 +246,7 @@ class Set(object):
             if a.value == b.value:
                 p = a.value
             else:
-                p = Interval(a=a, b=b)
+                p = Interval(a, b)
             new.pieces.append(p)
 
         return new
@@ -578,17 +581,17 @@ class Set(object):
             if pre.b.value == x:
                 if nex is not None and nex.a.value == x:
                     # Adding b to (a, b), (b, c)
-                    interval = Interval(a=pre.a.copy(), b=nex.b.copy())
+                    interval = Interval(pre.a.copy(), nex.b.copy())
                     pieces[idx-1:idx+1] = [interval]
                 else:
                     # Adding b to (a, b)
                     b = Endpoint(x, ']')
-                    pieces[idx-1] = Interval(a=pre.a.copy(), b=b)
+                    pieces[idx-1] = Interval(pre.a.copy(), b)
                 return idx
         if nex is not None and nex.a.value == x:
             # Adding a to (a, b)
             a = Endpoint(x, '[')
-            pieces[idx] = Interval(a=a, b=nex.b.copy())
+            pieces[idx] = Interval(a, nex.b.copy())
             return idx
         pieces.insert(idx, x)
         
@@ -629,7 +632,7 @@ class Set(object):
                 b = Endpoint(nex, ']')
                 idx2 += 1
 
-        pieces[idx1:idx2] = [Interval(a=a, b=b)]
+        pieces[idx1:idx2] = [Interval(a, b)]
         return min([idx2, len(self.pieces)])
 
     def _add(self, x, lo=0):
@@ -661,9 +664,9 @@ class Set(object):
             else:
                 # Split interval by x.
                 b1 = Endpoint(x, ')')
-                i1 = Interval(a=piece.a, b=b1)
+                i1 = Interval(piece.a, b1)
                 a2 = Endpoint(x, '(')
-                i2 = Interval(a=a2, b=piece.b)
+                i2 = Interval(a2, piece.b)
                 self.pieces[idx:idx+1] = [i1, i2]
         else:
             self.pieces[idx:idx+1] = []
@@ -682,12 +685,12 @@ class Set(object):
                 if x.a.excluded and not piece1.a.excluded:
                     new_pieces.append(x.a.value)
             else:
-                new_pieces.append(Interval(a=piece1.a, b=~x.a))
+                new_pieces.append(Interval(piece1.a, ~x.a))
             if x.b.value == piece1.b.value:
                 if x.b.excluded and not piece1.b.excluded:
                     new_pieces.append(x.b.value)
             else:
-                new_pieces.append(Interval(a=~x.b, b=piece2.b))
+                new_pieces.append(Interval(~x.b, piece2.b))
             pieces[idx1:idx1+1] = new_pieces
             return idx1
 

@@ -614,7 +614,7 @@ def test_set_copy():
     l2 = [4, 5, 6]
     a = Endpoint(l1, '(')
     b = Endpoint(l2, ')')
-    i = Interval(None, a, b)
+    i = Interval(a, b)
     s1 = Set([i])
     s2 = s1.copy()
     s2.pieces[0].a.value[2] = -1
