@@ -30,37 +30,39 @@ def parse_value(value_str):
     return value
 
 
-BOUNDS_TO_EXCLUDED_LEFT_MAPPING = {
+BOUNDS_TO_OPEN_LEFT_MAPPING = {
     '[': (False, True),
     '(': (True, True),
     ']': (False, False),
     ')': (True, False),
 }
 
-EXCLUDED_LEFT_TO_BOUNDS_MAPPING = {v: k for k, v in BOUNDS_TO_EXCLUDED_LEFT_MAPPING.items()}
+OPEN_LEFT_TO_BOUNDS_MAPPING = {v: k for k, v in BOUNDS_TO_OPEN_LEFT_MAPPING.items()}
 
 
 def parse_bound(bound):
     """
-    Given 1 length string, return a tuple of two booleans: (excluded, left)
+    Given 1 length string, return a tuple of two booleans: (open, left)
     """
     if not isinstance(bound, string_types):
         raise TypeError('bound must be a string, not %s' % type(bound).__name__)
 
     try:
-        return BOUNDS_TO_EXCLUDED_LEFT_MAPPING[bound]
+        return BOUNDS_TO_OPEN_LEFT_MAPPING[bound]
     except KeyError:
         raise ValueError('bound must be one of [](), not %s' % bound)
 
 
 def parse_endpoint_notation(notation):
     """
-    Parses string representing Endpoint (endpoint notation).
+    Parse string representing Endpoint (endpoint notation).
+
     Returns tuple of 3 elements:
         0: int or float instance, or inf or neg_inf
-        1: bool indicating whether endpoint is excluded
+        1: bool indicating whether endpoint is open
         2: bool indicating whether endpoint is left
     Raises ValueError for invalid notation.
+
     >>> parse_endpoint_notation('[5.7')
     (5.7, False, True)
     >>> parse_endpoint_notation('9]')
@@ -82,8 +84,8 @@ def parse_endpoint_notation(notation):
     else:
         raise ValueError('Invalid notation')
 
-    excluded, left = BOUNDS_TO_EXCLUDED_LEFT_MAPPING[bound]
+    open, left = BOUNDS_TO_OPEN_LEFT_MAPPING[bound]
 
     value = parse_value(value_str)
 
-    return value, excluded, left
+    return value, open, left

@@ -655,9 +655,9 @@ class Set(object):
         
         if isinstance(piece, Interval):
             if piece.a.value == x:
-                piece.a.excluded = True
+                piece.a.open = True
             elif piece.b.value == x:
-                piece.b.excluded = True
+                piece.b.open = True
             else:
                 # Split interval by x.
                 b1 = Endpoint(x, ')')
@@ -679,12 +679,12 @@ class Set(object):
         if piece1 is piece2 and piece1 is not None: # same interval
             new_pieces = []
             if x.a.value == piece1.a.value:
-                if x.a.excluded and not piece1.a.excluded:
+                if x.a.open and not piece1.a.open:
                     new_pieces.append(x.a.value)
             else:
                 new_pieces.append(Interval(piece1.a, ~x.a))
             if x.b.value == piece1.b.value:
-                if x.b.excluded and not piece1.b.excluded:
+                if x.b.open and not piece1.b.open:
                     new_pieces.append(x.b.value)
             else:
                 new_pieces.append(Interval(~x.b, piece2.b))
@@ -694,7 +694,7 @@ class Set(object):
         if piece1 is not None:
             if isinstance(piece1, Interval):
                 if x.a.value == piece1.a.value:
-                    if x.a.excluded and not piece1.a.excluded:
+                    if x.a.open and not piece1.a.open:
                         pieces[idx1] = x.a.value
                         idx1 += 1
                 else:
@@ -704,7 +704,7 @@ class Set(object):
         if piece2 is not None:
             if isinstance(piece2, Interval):
                 if x.b.value == piece2.b.value:
-                    if x.b.excluded and not piece2.b.excluded:
+                    if x.b.open and not piece2.b.open:
                         pieces[idx2] = x.b.value
                     else:
                         idx2 += 1

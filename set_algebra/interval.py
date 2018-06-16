@@ -1,5 +1,5 @@
 from set_algebra.endpoint import Endpoint
-from set_algebra.parser import EXCLUDED_LEFT_TO_BOUNDS_MAPPING, string_types
+from set_algebra.parser import OPEN_LEFT_TO_BOUNDS_MAPPING, string_types
 
 
 class Interval(object):
@@ -128,8 +128,8 @@ class Interval(object):
         else:
             a = self.a
             b = self.b
-            bound_a = EXCLUDED_LEFT_TO_BOUNDS_MAPPING[a.excluded, a.left]
-            bound_b = EXCLUDED_LEFT_TO_BOUNDS_MAPPING[b.excluded, b.left]
+            bound_a = OPEN_LEFT_TO_BOUNDS_MAPPING[a.open, a.left]
+            bound_b = OPEN_LEFT_TO_BOUNDS_MAPPING[b.open, b.left]
             bounds = bound_a + bound_b
             return "%s(%s, %s, '%s')" % (classname, repr(a.value), repr(b.value), bounds)
 

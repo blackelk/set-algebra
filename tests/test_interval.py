@@ -9,13 +9,13 @@ def test_interval_init_from_notation():
 
     i1 = Interval('[1, 2]')
     assert i1.a.value == 1
-    assert not i1.a.excluded
+    assert not i1.a.open
     assert i1.a.left
     assert i1.b.value == 2
 
     i2 = Interval('(1, inf)')
     assert i2.a.value == 1
-    assert i2.a.excluded
+    assert i2.a.open
     assert not i2.b.left
     assert i2.b.value == inf
 
@@ -24,13 +24,13 @@ def test_interval_init_from_values_and_bounds():
 
     i1 = Interval(1, 2, '[]')
     assert i1.a.value == 1
-    assert not i1.a.excluded
+    assert not i1.a.open
     assert i1.a.left
     assert i1.b.value == 2
 
     i2 = Interval(1, inf, '()')
     assert i2.a.value == 1
-    assert i2.a.excluded
+    assert i2.a.open
     assert not i2.b.left
     assert i2.b.value == inf
 
@@ -39,13 +39,13 @@ def test_interval_init_from_endpoints():
 
     i1 = Interval(Endpoint(1, '['), Endpoint(2, ']'))
     assert i1.a.value == 1
-    assert not i1.a.excluded
+    assert not i1.a.open
     assert i1.a.left
     assert i1.b.value == 2
 
     i2 = Interval(Endpoint(1, '('), Endpoint(inf, ')'))
     assert i2.a.value == 1
-    assert i2.a.excluded
+    assert i2.a.open
     assert not i2.b.left
     assert i2.b.value == inf
 

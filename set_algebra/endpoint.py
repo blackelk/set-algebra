@@ -1,15 +1,15 @@
 from set_algebra.infinity import Infinity, NegativeInfinity, inf, neg_inf, is_finite
-from set_algebra.parser import (EXCLUDED_LEFT_TO_BOUNDS_MAPPING, parse_bound,
+from set_algebra.parser import (OPEN_LEFT_TO_BOUNDS_MAPPING, parse_bound,
     parse_endpoint_notation)
 
 
 class Endpoint(object):
     """
     Class representing point on an axis. Can be of four kinds:
-        [1      Not excluded left 
-        (1      Excluded left
-        1]      Not excluded right
-        1)      Excluded right
+        [1      left-closed
+        (1      left-open
+        1]      right-closed
+        1)      right-open
 
     There are 2 ways to instantiate Endpoint:
 
@@ -33,22 +33,22 @@ class Endpoint(object):
     See tests/test_endpoint.py for details.
     """
 
-    __slots__ = ('value', 'excluded', 'left')
+    __slots__ = ('value', 'open', 'left')
 
     PARSABLE_TYPES = (int, float, Infinity, NegativeInfinity)
 
     def __init__(self, notation_or_value, bound=None):
         if bound is None:
-            value, excluded, left = parse_endpoint_notation(notation_or_value)
+            value, open, left = parse_endpoint_notation(notation_or_value)
         else:
             value = notation_or_value
-            excluded, left = parse_bound(bound)
+            open, left = parse_bound(bound)
 
-        if not excluded and not is_finite(value):
-            raise ValueError('Not excluded value cannot be infinite, use "(" or ")" as bound')
+        if not open and not is_finite(value):
+            raise ValueError('Not open value cannot be infinite, use "(" or ")" as bound')
 
         self.value = value
-        self.excluded = excluded
+        self.open = open
         self.left = left
 
     @property
@@ -58,9 +58,9 @@ class Endpoint(object):
     @property
     def notation(self):
         if self.left:
-            _format = self.excluded and '(%s' or '[%s'
+            _format = self.open and '(%s' or '[%s'
         else:
-            _format = self.excluded and '%s)' or '%s]'
+            _format = self.open and '%s)' or '%s]'
         value_str = self.value == neg_inf and '-inf' or str(self.value)
         return _format % value_str
 
@@ -71,7 +71,7 @@ class Endpoint(object):
             params = (classname, self.notation)
         else:
             repr_format = "%s(%s, '%s')"
-            bound = EXCLUDED_LEFT_TO_BOUNDS_MAPPING[self.excluded, self.left]
+            bound = OPEN_LEFT_TO_BOUNDS_MAPPING[self.open, self.left]
             params = (classname, repr(self.value), bound)
         return repr_format % params
 
@@ -79,9 +79,9 @@ class Endpoint(object):
         """
         self == other
         When comparing two Endpoints,
-            test whether all 3 slots (value, excluded, left) are equal.
+            test whether all 3 slots (value, open, left) are equal.
         When other is not Endpoint test whether Endpoint value is equal to the other,
-            and if Endpoint is not excluded:
+            and if Endpoint is not open:
         >>> Endpoint('[1') == 1
         True
         >>> Endpoint('(1') == 1
@@ -89,10 +89,10 @@ class Endpoint(object):
         """
         if isinstance(other, Endpoint):
             return self.value == other.value \
-               and self.excluded == other.excluded \
+               and self.open == other.open \
                and self.left == other.left
         else:
-            return not self.excluded and self.value == other
+            return not self.open and self.value == other
 
     def __ne__(self, other):
         """ self != other """
@@ -107,7 +107,7 @@ class Endpoint(object):
                 return self.value > other.value
         else:
             if self.value == other:
-                return self.excluded and self.left
+                return self.open and self.left
             else:
                 return self.value > other
 
@@ -120,7 +120,7 @@ class Endpoint(object):
                 return self.value > other.value
         else:
             if self.value == other:
-                return not self.excluded or self.left
+                return not self.open or self.left
             else:
                 return self.value > other
 
@@ -133,7 +133,7 @@ class Endpoint(object):
                 return self.value < other.value
         else:
             if self.value == other:
-                return self.excluded and self.right
+                return self.open and self.right
             else:
                 return self.value < other
 
@@ -146,7 +146,7 @@ class Endpoint(object):
                 return self.value < other.value
         else:
             if self.value == other:
-                return not self.excluded or self.right
+                return not self.open or self.right
             else:
                 return self.value < other
 
@@ -154,47 +154,47 @@ class Endpoint(object):
         """Compare two Endpoints with equal values."""
         if self.left:
             if other.left:
-                if not self.excluded and not other.excluded:
+                if not self.open and not other.open:
                     return 0
-                if not self.excluded and other.excluded:
+                if not self.open and other.open:
                     return -1
-                if self.excluded and not other.excluded:
+                if self.open and not other.open:
                     return 1
                 else:
                     return 0
             else:
-                if not self.excluded and not other.excluded:
+                if not self.open and not other.open:
                     return 0
                 else:
                     return 1
         else:
             if other.left:
-                if not self.excluded and not other.excluded:
+                if not self.open and not other.open:
                     return 0
                 else:
                     return -1
             else:
-                if not self.excluded and not other.excluded:
+                if not self.open and not other.open:
                     return 0
-                if not self.excluded and other.excluded:
+                if not self.open and other.open:
                     return 1
-                if self.excluded and not other.excluded:
+                if self.open and not other.open:
                     return -1
                 else:
                     return 0
 
     def __invert__(self):
         """
-        Return Endpoint with same value but opposite "excluded" and "left" attributes.
+        Return Endpoint with same value but opposite "open" and "left" attributes.
         >>> ~Endpoint('[1')
         Endpoint('1)')
         """
-        bound = EXCLUDED_LEFT_TO_BOUNDS_MAPPING[not self.excluded, not self.left]
+        bound = OPEN_LEFT_TO_BOUNDS_MAPPING[not self.open, not self.left]
         return Endpoint(self.value, bound)
 
     def copy(self):
         """Return a shallow copy of the Endpoint"""
-        bound = EXCLUDED_LEFT_TO_BOUNDS_MAPPING[self.excluded, self.left]
+        bound = OPEN_LEFT_TO_BOUNDS_MAPPING[self.open, self.left]
         return Endpoint(self.value, bound)
 
 
@@ -209,5 +209,5 @@ def are_bounding(e1, e2):
     False
     """
     assert e1.left is not e2.left
-    return e1.value == e2.value and (not e1.excluded or not e2.excluded)
+    return e1.value == e2.value and (not e1.open or not e2.open)
 
