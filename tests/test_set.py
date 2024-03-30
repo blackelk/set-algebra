@@ -3,31 +3,6 @@ import pytest
 from set_algebra import Endpoint, Interval, Set, inf, unbounded
 
 
-def do_bulk_tests(tests, fn, mode):
-
-    for test in tests:
-        arg, x, expected = test
-        if isinstance(arg, list):
-            s = Set()
-            pieces_copy = []
-            for a in arg:
-                pieces_copy.append(a.copy() if isinstance(a, Interval) else a)
-            s.pieces = pieces_copy
-        elif isinstance(arg, str):
-            s = Set(arg)
-        elif isinstance(arg, Set):
-            s = arg.copy()
-        else:
-            assert False
-        res = fn(s, x)
-        if mode == 'return':
-            assert res == expected
-        elif mode == 'pieces':
-            assert s.pieces == expected
-        else:
-            raise ValueError('Invalid mode')
-
-
 def test_set_init():
 
     s1 = Set()
@@ -190,19 +165,19 @@ def test_set_add():
     i1 = Interval('(-inf, 0)')
     s.add(i1)
     assert s.pieces == [i1]
-    
+
     i2 = Interval('(-inf, 0)')
     s.add(i2)
     assert s.pieces == [i1]
-    
+
     i3 = Interval('[-1, 0]')
     s.add(i3)
     assert s.pieces == [Interval('(-inf, 0]')]
-    
+
     i4 = Interval('(0, 1)')
     s.add(i4)
     assert s.pieces == [Interval('(-inf, 1)')]
-    
+
     i5 = Interval('(1, 2)')
     s.add(i5)
     assert s.pieces == [Interval('(-inf, 1)'), Interval('(1, 2)')]
@@ -410,7 +385,7 @@ def test_set_search():
     assert s.search(0) == (0, None)
     assert s.search(1) == (0, 1)
     assert s.search(2) == (1, None)
-    
+
     s = Set([unbounded])
     assert s.search(1) == (0, unbounded)
     assert s.search(float('-inf')) == (0, None)
@@ -773,7 +748,7 @@ def test_set_gt():
     assert s4 > s1
     assert s4 > s2
     assert s4 > s3
-    
+
     s1 = Set('(1, 2), {4}')
     s2 = Set('(1, 2)')
     assert s1 > s2
@@ -797,7 +772,7 @@ def test_set_gt():
     with pytest.raises(TypeError):
         Set('(1, 2)') > Interval('(1, 2)')
         Set('(1, 2)') > 0
-    
+
 
 def test_set_lt():
 
@@ -843,7 +818,7 @@ def test_set_or():
 
     with pytest.raises(TypeError):
         Set() | 0
-    
+
 
 def test_set_ior():
 
@@ -1073,7 +1048,7 @@ def test_set_iand():
     s1 &= s2
     assert s1 == Set('{0}, (3, 4), [5, 6]')
     assert id(s1) == s1_id
-    
+
     with pytest.raises(TypeError):
         s1 &= '[0, 1]'
 
@@ -1164,7 +1139,7 @@ def test_set_ixor():
     assert s4 == Set('[1, 2]')
 
     assert id(s1) == s1_id
-    
+
     with pytest.raises(TypeError):
         s1 ^= '[0, 1]'
 
@@ -1183,7 +1158,7 @@ def test_set_symmetric_difference():
 
     assert s1.symmetric_difference([1]) == Set([2, 3])
     assert s1.symmetric_difference([1], [2, 3]) == Set()
-    
+
     assert s1 == Set([1, 2, 3])
 
 
@@ -1214,4 +1189,3 @@ def test_set_symmetric_difference_update():
     assert i2 == Interval('[4, 5]')
 
     assert id(s1) == s1_id
-

@@ -1,4 +1,4 @@
-from set_algebra.infinity import Infinity, NegativeInfinity, inf, neg_inf, is_finite
+from set_algebra.infinity import Infinity, NegativeInfinity, neg_inf, is_finite
 from set_algebra.parser import (OPEN_LEFT_TO_BOUNDS_MAPPING, parse_bound,
     parse_endpoint_notation)
 
@@ -58,11 +58,11 @@ class Endpoint(object):
     @property
     def notation(self):
         if self.left:
-            _format = self.open and '(%s' or '[%s'
+            format_ = '(%s' if self.open else '[%s'
         else:
-            _format = self.open and '%s)' or '%s]'
+            format_ = '%s)' if self.open else '%s]'
         value_str = self.value == neg_inf and '-inf' or str(self.value)
-        return _format % value_str
+        return format_ % value_str
 
     def __repr__(self):
         classname = type(self).__name__
@@ -210,4 +210,3 @@ def are_bounding(e1, e2):
     """
     assert e1.left is not e2.left
     return e1.value == e2.value and (not e1.open or not e2.open)
-

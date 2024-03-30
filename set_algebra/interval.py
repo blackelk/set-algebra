@@ -162,4 +162,3 @@ def is_scalar(obj):
 
 # unbounded represents interval from -inf to inf
 unbounded = Interval('(-inf, inf)')
-

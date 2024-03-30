@@ -1,7 +1,8 @@
 import functools
 
 from set_algebra import Set, Interval
-from test_set import do_bulk_tests
+
+from ._utils import do_bulk_tests
 
 
 do_bulk_remove_tests = functools.partial(do_bulk_tests, fn=Set.remove, mode='pieces')
@@ -348,4 +349,3 @@ def test_remove_interval_from_three_intervals_and_two_scalars():
     assert i1 == Interval('(-inf, 0)')
     assert i2 == Interval('(0, 1)')
     assert i3 == Interval('[10, inf)')
-

@@ -1,9 +1,10 @@
 import functools
+
 import pytest
 
 from set_algebra import Set, Interval
-from test_set import do_bulk_tests
 
+from ._utils import do_bulk_tests
 
 do_bulk_add_tests = functools.partial(do_bulk_tests, fn=Set.add, mode='pieces')
 
@@ -433,4 +434,3 @@ def test_add_interval_to_three_intervals_and_two_scalars():
     assert i10 == Interval('(1, 7)')
     assert i11 == Interval('[0, 10]')
     assert i12 == Interval('(-inf, inf)')
-

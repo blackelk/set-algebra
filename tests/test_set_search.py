@@ -1,7 +1,8 @@
 import functools
 
 from set_algebra import Set, Interval
-from test_set import do_bulk_tests
+
+from ._utils import do_bulk_tests
 
 
 do_bulk_search_tests = functools.partial(do_bulk_tests, fn=Set.search, mode='return')
@@ -23,7 +24,7 @@ def test_search_in_interval():
         ([i1], 5, (0, i1)),
         ([i1], 7, (1, None)),
         ([i1], 9, (1, None)),
-        
+
         ([i2], 4, (0, i2)),
         ([i2], 5, (0, i2)),
         ([i2], 7, (1, None)),
@@ -210,4 +211,3 @@ def test_search_in_two_scalars_and_two_intervals():
     ]
 
     do_bulk_search_tests(tests)
-

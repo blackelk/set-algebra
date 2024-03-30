@@ -3,7 +3,7 @@ import functools
 from set_algebra.infinity import is_finite, inf, neg_inf
 from set_algebra.endpoint import Endpoint, are_bounding
 from set_algebra.interval import Interval, is_interval, unbounded
-from set_algebra.parser import parse_value, parse_endpoint_notation, string_types
+from set_algebra.parser import parse_value, string_types
 
 
 def _assert_pieces_are_ascending(fn):
@@ -200,7 +200,7 @@ class Set(object):
             return piece is not None and is_interval(piece) and x.b <= piece.b
         else:
             return self.search(x)[1] is not None
-        
+
     @_assert_pieces_are_ascending
     def __invert__(self):
         """
@@ -361,7 +361,7 @@ class Set(object):
         for x in other.pieces:
             lo = self._add(x, lo)
         return self
-        
+
     def union(self, *others):
         """Return a new Set that is a union with the Set and all the others."""
         new = self.copy()
@@ -547,7 +547,7 @@ class Set(object):
             else:
                 new = Set.__xor(new, Set(other))
         return new
-    
+
     @_assert_pieces_are_ascending
     def symmetric_difference_update(self, *others):
         """
@@ -568,7 +568,7 @@ class Set(object):
         idx, piece = self.search(x, lo)
         if piece is not None:
             return idx
-        
+
         pieces = self.pieces
         pre = pieces[idx-1] if idx > 0 else None
         nex = pieces[idx] if len(pieces) >= idx+1 else None
@@ -591,9 +591,9 @@ class Set(object):
             pieces[idx] = Interval(a, nex.b.copy())
             return idx
         pieces.insert(idx, x)
-        
+
         return idx + 1
-            
+
     def _add_interval(self, x, lo=0):
 
         pieces = self.pieces
@@ -641,7 +641,7 @@ class Set(object):
             return self._add_interval(x, lo)
         else:
             return self._add_scalar(x, lo)
-        
+
     @_assert_pieces_are_ascending
     def add(self, x):
         """Add scalar or interval x to Set, merge ones that intersect."""
@@ -652,7 +652,7 @@ class Set(object):
         idx, piece = self.search(x, lo)
         if piece is None:
             return idx
-        
+
         if isinstance(piece, Interval):
             if piece.a.value == x:
                 piece.a.open = True
@@ -745,4 +745,3 @@ class Set(object):
         new = Set()
         new.pieces = _copy_pieces(self.pieces)
         return new
-

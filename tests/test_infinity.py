@@ -20,7 +20,7 @@ def test_inf():
     assert inf >= float('inf')
     assert inf >= 1
     assert inf >= 'Z'
-    
+
     assert inf <= inf
     assert inf <= float('inf')
     assert not inf <= 1
@@ -53,7 +53,7 @@ def test_neg_inf():
     assert neg_inf >= float('-inf')
     assert not neg_inf >= 1
     assert not neg_inf >= 'Z'
-    
+
     assert neg_inf <= neg_inf
     assert neg_inf <= float('-inf')
     assert neg_inf <= 1
@@ -65,4 +65,3 @@ def test_neg_inf():
     assert neg_inf < 'Z'
 
     assert -neg_inf is inf
-

@@ -201,7 +201,7 @@ def test_scalar_in_interval():
     assert 3 not in Interval('[1, 2)')
     assert 3 not in Interval('(1, 2]')
     assert 3 not in Interval('(1, 2)')
-    
+
 
 def test_endpoint_in_interval():
 
@@ -297,4 +297,3 @@ def test_date_interval():
     assert tomorrow in week
     assert ad1 not in week
     assert week in week
-

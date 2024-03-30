@@ -131,4 +131,3 @@ def test_isdisjoint_inf():
     ]
 
     do_bulk_isdisjoint_tests(tests)
-

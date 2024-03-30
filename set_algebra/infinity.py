@@ -66,4 +66,3 @@ def is_finite(value):
 
 inf = Infinity()
 neg_inf = NegativeInfinity()
-
