@@ -178,15 +178,19 @@ class Set:
         """
         if lo < 0:
             raise ValueError('lo must be non-negative')
+
         if hi is None:
             hi = len(self.pieces)
+
         while lo < hi:
             mid = (lo+hi) // 2
             piece = self.pieces[mid]
+
             if isinstance(piece, Interval):
                 start, end = piece.a, piece.b
             else:
                 start, end = piece, piece
+
             if end < x:
                 lo = mid + 1
             elif start > x:
@@ -217,11 +221,14 @@ class Set:
         Double inversion (~~self) returns Set that is equal to self.
         """
         new = Set()
+
         if not self.pieces:
             new.pieces.append(unbounded.copy())
             return new
+
         if self.pieces[0] == unbounded.copy():
             return new
+
         # Get plain list of endpoints from original Set.
         endpoints = []
         for i in self.pieces:
@@ -231,20 +238,24 @@ class Set:
                 e1 = Endpoint(i, '[')
                 e2 = Endpoint(i, ']')
                 endpoints += [e1, e2]
+
         # Make sure the first endpoint is either -inf or inverted original one.
         if endpoints[0].value == neg_inf:
             del endpoints[0]
             endpoints[0] = ~endpoints[0]
         else:
             endpoints.insert(0, Endpoint('(-inf'))
+
         # Make sure the last endpoint is either inf or inverted original one.
         if endpoints[-1].value == inf:
             del endpoints[-1]
             endpoints[-1] = ~endpoints[-1]
         else:
             endpoints.append(Endpoint('inf)'))
+
         # Invert inner endpoints.
         endpoints[1:-1] = [~e for e in endpoints[1:-1]]
+
         # Construct new Set`s intervals from endpoint pairs.
         # If values of endpoints are same add scalar.
         for a, b in zip(endpoints[::2], endpoints[1::2]):
@@ -277,6 +288,7 @@ class Set:
         """
         if not isinstance(other, Set):
             raise TypeError('Can only compare to an Set')
+
         return self != other and self >= other
 
     def __ge__(self, other):
@@ -332,7 +344,7 @@ class Set:
     def __le__(self, other):
         """
         self <= other
-        Test whether the USSet has not anything that is not in the other.
+        Test if this Set has not nothing outside of the other.
         """
         if not isinstance(other, Set):
             raise TypeError('Can only compare to an Set')
@@ -340,7 +352,9 @@ class Set:
         return NotImplemented # so that other.__ge__ will be called
 
     def issubset(self, other):
-        """Test whether the USSet has not anything that is not in the other."""
+        """
+        Test if this Set has not nothing outside of the other.
+        """
         if isinstance(other, Set):
             return self <= other
 
@@ -353,6 +367,7 @@ class Set:
         """
         if not isinstance(other, Set):
             raise TypeError('Can only compare to an Set')
+
         return NotImplemented # so that other.__gt__ will be called
 
     def __or__(self, other):
@@ -363,10 +378,12 @@ class Set:
         if not isinstance(other, Set):
             emsg = "unsupported operand type for |: %s and %s"
             raise TypeError(emsg % (type(self), type(other)))
+
         new = self.copy()
         lo = 0
         for x in other.pieces:
             lo = new._add(x, lo)
+
         return new
 
     @_assert_pieces_are_ascending
@@ -378,14 +395,17 @@ class Set:
         if not isinstance(other, Set):
             emsg = "unsupported operand type for |=: %s and %s"
             raise TypeError(emsg % (type(self), type(other)))
+
         lo = 0
         for x in other.pieces:
             lo = self._add(x, lo)
+
         return self
 
     def union(self, *others):
         """Return a new Set that is a union with the Set and all the others."""
         new = self.copy()
+
         for other in others:
             if isinstance(other, Set):
                 lo = 0
@@ -417,6 +437,7 @@ class Set:
         if not isinstance(other, Set):
             emsg = "unsupported operand type for &: %s and %s"
             raise TypeError(emsg % (type(self), type(other)))
+
         return Set.__and(self, other)
 
     @_assert_pieces_are_ascending
@@ -428,8 +449,10 @@ class Set:
         if not isinstance(other, Set):
             emsg = "unsupported operand type for &=: %s and %s"
             raise TypeError(emsg % (type(self), type(other)))
+
         new = Set.__and(self, other)
         self.pieces = new.pieces
+
         return self
 
     def intersection(self, *others):
@@ -437,22 +460,26 @@ class Set:
         Return a new Set that is an intersection of the Set`s and all the others.
         """
         new = self.copy()
+
         for other in others:
             if isinstance(other, Set):
                 new = Set.__and(new, other)
             else:
                 new = Set.__and(new, Set(other))
+
         return new
 
     @_assert_pieces_are_ascending
     def intersection_update(self, *others):
         """Update the Set, removing everything that is not in any of the others."""
         new = self
+
         for other in others:
             if isinstance(other, Set):
                 new = Set.__and(new, other)
             else:
                 new = Set.__and(new, Set(other))
+
         self.pieces = new.pieces
 
     def isdisjoint(self, other):
@@ -461,18 +488,22 @@ class Set:
         Sets are disjoint if and only if their intersection is the empty Set.
         """
         i = 0
+
         for x in other.pieces:
             if isinstance(x, Interval):
                 i, p = self.search(x.a, i)
                 if p is not None:
                     return False
+
                 i2, p = self.search(x.b, i)
                 if i2 > i:
                     return False
+
                 if p is not None:
                     return False
             else:
                 i, p = self.search(x, i)
+
                 if p is not None:
                     return False
         return True
@@ -483,6 +514,7 @@ class Set:
         lo = 0
         for x in B.pieces:
             lo = A._remove(x, lo)
+
         return A
 
     def __sub__(self, other):
@@ -493,7 +525,9 @@ class Set:
         if not isinstance(other, Set):
             emsg = "unsupported operand type for -: %s and %s"
             raise TypeError(emsg % (type(self), type(other)))
+
         new = self.copy()
+
         return Set.__sub(new, other)
 
     @_assert_pieces_are_ascending
@@ -505,6 +539,7 @@ class Set:
         if not isinstance(other, Set):
             emsg = "unsupported operand type for -=: %s and %s"
             raise TypeError(emsg % (type(self), type(other)))
+
         return Set.__sub(self, other)
 
     def difference(self, *others):
@@ -513,6 +548,7 @@ class Set:
         but not in any of the others.
         """
         new = self.copy()
+
         for other in others:
             if isinstance(other, Set):
                 Set.__sub(new, other)
@@ -543,6 +579,7 @@ class Set:
         if not isinstance(other, Set):
             emsg = "unsupported operand type for ^: %s and %s"
             raise TypeError(emsg % (type(self), type(other)))
+
         return Set.__xor(self, other)
 
     @_assert_pieces_are_ascending
@@ -554,19 +591,23 @@ class Set:
         if not isinstance(other, Set):
             emsg = "unsupported operand type for ^=: %s and %s"
             raise TypeError(emsg % (type(self), type(other)))
+
         new = Set.__xor(self, other)
         self.pieces = new.pieces
+
         return self
 
     def symmetric_difference(self, *others):
         """
         Return a new Set with pieces in either the Set or the other but not in both."""
         new = self.copy()
+
         for other in others:
             if isinstance(other, Set):
                 new = Set.__xor(new, other)
             else:
                 new = Set.__xor(new, Set(other))
+
         return new
 
     @_assert_pieces_are_ascending
@@ -575,18 +616,22 @@ class Set:
         Update the Set, keeping only pieces found in either Set, but not in both.
         """
         new = self
+
         for other in others:
             if isinstance(other, Set):
                 new = Set.__xor(new, other)
             else:
                 new = Set.__xor(new, Set(other))
+
         self.pieces = new.pieces
 
     def _add_scalar(self, x, lo=0):
 
         if not is_finite(x):
             raise ValueError('x must be finite')
+
         idx, piece = self.search(x, lo)
+
         if piece is not None:
             return idx
 
@@ -606,11 +651,13 @@ class Set:
                     b = Endpoint(x, ']')
                     pieces[idx-1] = Interval(pre.a.copy(), b)
                 return idx
+
         if nex is not None and nex.a.value == x:
             # Adding a to (a, b)
             a = Endpoint(x, '[')
             pieces[idx] = Interval(a, nex.b.copy())
             return idx
+
         pieces.insert(idx, x)
 
         return idx + 1
@@ -622,9 +669,11 @@ class Set:
         idx2, piece2 = self.search(x.b, idx1)
 
         a = x.a.copy()
+
         if piece1 is not None:
             if isinstance(piece1, Interval):
                 a = piece1.a.copy()
+
         elif idx1 > 0:
             pre = pieces[idx1-1]
             if isinstance(pre, Interval):
@@ -636,10 +685,12 @@ class Set:
                 idx1 -= 1
 
         b = x.b.copy()
+
         if piece2 is not None:
             idx2 += 1
             if isinstance(piece2, Interval):
                 b = piece2.b.copy()
+
         elif len(pieces) >= idx2+1:
             nex = pieces[idx2]
             if isinstance(nex, Interval):
@@ -672,6 +723,7 @@ class Set:
     def _remove_scalar(self, x, lo=0):
 
         idx, piece = self.search(x, lo)
+
         if piece is None:
             return idx
 
@@ -695,22 +747,27 @@ class Set:
     def _remove_interval(self, x, lo=0):
 
         pieces = self.pieces
+
         idx1, piece1 = self.search(x.a, lo)
         idx2, piece2 = self.search(x.b, idx1)
 
         if piece1 is piece2 and piece1 is not None: # same interval
             new_pieces = []
+
             if x.a.value == piece1.a.value:
                 if x.a.open and not piece1.a.open:
                     new_pieces.append(x.a.value)
             else:
                 new_pieces.append(Interval(piece1.a, ~x.a))
+
             if x.b.value == piece1.b.value:
                 if x.b.open and not piece1.b.open:
                     new_pieces.append(x.b.value)
             else:
                 new_pieces.append(Interval(~x.b, piece2.b))
+
             pieces[idx1:idx1+1] = new_pieces
+
             return idx1
 
         if piece1 is not None:
