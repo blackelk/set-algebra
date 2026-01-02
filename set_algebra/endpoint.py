@@ -3,7 +3,7 @@ from set_algebra.parser import (OPEN_LEFT_TO_BOUNDS_MAPPING, parse_bound,
     parse_endpoint_notation)
 
 
-class Endpoint(object):
+class Endpoint:
     """
     Class representing point on an axis. Can be of four kinds:
         [1      left-closed
@@ -39,16 +39,16 @@ class Endpoint(object):
 
     def __init__(self, notation_or_value, bound=None):
         if bound is None:
-            value, open, left = parse_endpoint_notation(notation_or_value)
+            value, open_, left = parse_endpoint_notation(notation_or_value)
         else:
             value = notation_or_value
-            open, left = parse_bound(bound)
+            open_, left = parse_bound(bound)
 
-        if not open and not is_finite(value):
+        if not open_ and not is_finite(value):
             raise ValueError('Not open value cannot be infinite, use "(" or ")" as bound')
 
         self.value = value
-        self.open = open
+        self.open = open_
         self.left = left
 
     @property
@@ -91,8 +91,8 @@ class Endpoint(object):
             return self.value == other.value \
                and self.open == other.open \
                and self.left == other.left
-        else:
-            return not self.open and self.value == other
+
+        return not self.open and self.value == other
 
     def __ne__(self, other):
         """ self != other """
@@ -103,52 +103,48 @@ class Endpoint(object):
         if isinstance(other, Endpoint):
             if self.value == other.value:
                 return self._cmp(other) == 1
-            else:
-                return self.value > other.value
-        else:
-            if self.value == other:
-                return self.open and self.left
-            else:
-                return self.value > other
+            return self.value > other.value
+
+        if self.value == other:
+            return self.open and self.left
+
+        return self.value > other
 
     def __ge__(self, other):
         """ self >= other """
         if isinstance(other, Endpoint):
             if self.value == other.value:
                 return self._cmp(other) != -1
-            else:
-                return self.value > other.value
-        else:
-            if self.value == other:
-                return not self.open or self.left
-            else:
-                return self.value > other
+            return self.value > other.value
+
+        if self.value == other:
+            return not self.open or self.left
+
+        return self.value > other
 
     def __lt__(self, other):
         """ self < other """
         if isinstance(other, Endpoint):
             if self.value == other.value:
                 return self._cmp(other) == -1
-            else:
-                return self.value < other.value
-        else:
-            if self.value == other:
-                return self.open and self.right
-            else:
-                return self.value < other
+            return self.value < other.value
+
+        if self.value == other:
+            return self.open and self.right
+
+        return self.value < other
 
     def __le__(self, other):
         """ self <= other """
         if isinstance(other, Endpoint):
             if self.value == other.value:
                 return self._cmp(other) != 1
-            else:
-                return self.value < other.value
-        else:
-            if self.value == other:
-                return not self.open or self.right
-            else:
-                return self.value < other
+            return self.value < other.value
+
+        if self.value == other:
+            return not self.open or self.right
+
+        return self.value < other
 
     def _cmp(self, other):
         """Compare two Endpoints with equal values."""
@@ -160,28 +156,27 @@ class Endpoint(object):
                     return -1
                 if self.open and not other.open:
                     return 1
-                else:
-                    return 0
-            else:
-                if not self.open and not other.open:
-                    return 0
-                else:
-                    return 1
-        else:
-            if other.left:
-                if not self.open and not other.open:
-                    return 0
-                else:
-                    return -1
-            else:
-                if not self.open and not other.open:
-                    return 0
-                if not self.open and other.open:
-                    return 1
-                if self.open and not other.open:
-                    return -1
-                else:
-                    return 0
+                return 0
+
+            if not self.open and not other.open:
+                return 0
+            return 1
+
+        if other.left:
+            if not self.open and not other.open:
+                return 0
+            return -1
+
+        if not self.open and not other.open:
+            return 0
+
+        if not self.open and other.open:
+            return 1
+
+        if self.open and not other.open:
+            return -1
+
+        return 0
 
     def __invert__(self):
         """

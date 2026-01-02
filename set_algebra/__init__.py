@@ -8,10 +8,10 @@ Provides:
     Set
 """
 
-__version__ = '0.3.6'
+__version__ = '0.3.7.dev1'
 __author__ = 'Constantine Parkhimovich'
 __license__ = 'MIT'
-__copyright__ = 'Copyright 2014-2024 Constantine Parkhimovich'
+__copyright__ = 'Copyright 2014-present Constantine Parkhimovich'
 
 
 from set_algebra.endpoint import Endpoint, are_bounding

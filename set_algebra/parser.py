@@ -1,12 +1,6 @@
 from set_algebra.infinity import inf, neg_inf
 
 
-try:
-    string_types = basestring
-except NameError:
-    string_types = str
-
-
 def parse_value(value_str):
     """
     Parse numeric string, return either:
@@ -14,7 +8,7 @@ def parse_value(value_str):
     float
     Infinity, NegativeInfinity
     """
-    if not isinstance(value_str, string_types):
+    if not isinstance(value_str, str):
         raise TypeError('value_str must be a string, not %s' % type(value_str).__name__)
 
     value_str = value_str.strip()
@@ -44,7 +38,7 @@ def parse_bound(bound):
     """
     Given 1 length string, return a tuple of two booleans: (open, left)
     """
-    if not isinstance(bound, string_types):
+    if not isinstance(bound, str):
         raise TypeError('bound must be a string, not %s' % type(bound).__name__)
 
     try:
@@ -70,7 +64,7 @@ def parse_endpoint_notation(notation):
     >>> parse_endpoint_notation('inf)')
     (inf, True, False)
     """
-    if not isinstance(notation, string_types):
+    if not isinstance(notation, str):
         raise TypeError('notation must be a string, not %s' % type(notation).__name__)
 
     notation = notation.strip()
@@ -84,8 +78,8 @@ def parse_endpoint_notation(notation):
     else:
         raise ValueError('Invalid notation')
 
-    open, left = BOUNDS_TO_OPEN_LEFT_MAPPING[bound]
+    open_, left = BOUNDS_TO_OPEN_LEFT_MAPPING[bound]
 
     value = parse_value(value_str)
 
-    return value, open, left
+    return value, open_, left

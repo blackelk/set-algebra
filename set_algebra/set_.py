@@ -3,7 +3,7 @@ import functools
 from set_algebra.infinity import is_finite, inf, neg_inf
 from set_algebra.endpoint import Endpoint, are_bounding
 from set_algebra.interval import Interval, is_interval, unbounded
-from set_algebra.parser import parse_value, string_types
+from set_algebra.parser import parse_value
 
 
 def _assert_pieces_are_ascending(fn):
@@ -13,40 +13,44 @@ def _assert_pieces_are_ascending(fn):
     """
     @functools.wraps(fn)
     def wrapper(self, *args, **kwargs):
-        res = fn(self, *args, **kwargs)
+        result = fn(self, *args, **kwargs)
         error = None
+
         for i, cur in enumerate(self.pieces[:-1]):
             nex = self.pieces[i+1]
+
             if isinstance(cur, Interval):
                 if isinstance(nex, Interval):
                     if cur.b >= nex.a:
                         error = '%s >= %s in Set %s'
-                        params = (cur.b.notation, nex.a.notation, self.notation)
+                        err_format_args = (cur.b.notation, nex.a.notation, self.notation)
                     elif are_bounding(cur.b, nex.a):
                         error = 'no gap between %s and %s! in Set %s'
-                        params = (cur.b.notation, nex.a.notation, self.notation)
+                        err_format_args = (cur.b.notation, nex.a.notation, self.notation)
                 else:
                     if cur.b >= nex:
                         error = '%s >= %s in Set %s'
-                        params = (cur, nex.a.notation, self.notation)
+                        err_format_args = (cur, nex.a.notation, self.notation)
                     elif cur.b.value == nex:
                         error = 'no gap between %s and %s! in Set %s'
-                        params = (cur.b.notation, nex, self.notation)
+                        err_format_args = (cur.b.notation, nex, self.notation)
             else:
                 if isinstance(nex, Interval):
                     if cur >= nex.a:
                         error = '%s >= %s in Set %s'
-                        params = (cur, nex.a.notation, self.notation)
+                        err_format_args = (cur, nex.a.notation, self.notation)
                     elif cur == nex.a.value:
                         error = 'no gap between %s and %s! in Set %s'
-                        params = (cur, nex.a.notation, self.notation)
+                        err_format_args = (cur, nex.a.notation, self.notation)
                 else:
                     if cur >= nex:
                         error = '%s >= %s in Set %s'
-                        params = (cur, nex, self.notation)
+                        err_format_args = (cur, nex, self.notation)
             if error:
-                assert False, error % params
-        return res
+                assert False, error % err_format_args # pylint: disable=used-before-assignment
+
+        return result
+
     return wrapper
 
 
@@ -54,7 +58,7 @@ def _copy_pieces(pieces):
     return [p.copy() if is_interval(p) else p for p in pieces]
 
 
-class Set(object):
+class Set:
     """
     Uncountable Infinite Set
 
@@ -66,7 +70,7 @@ class Set(object):
             the pieces must be sorted in ascending order and must not intersect.
         - another Set. Intervals will be copied.
         - nothing for empty Set: Set()
-    
+
     The subset and equality comparisons do not generalize to a total ordering function.
     For example, any two nonempty disjoint Sets are not equal and are not subsets of each other,
     so all of the following return False: a < b, a == b, or a > b.
@@ -125,13 +129,17 @@ class Set(object):
             # TODO: "arg" is unclear signature
             self.pieces = _copy_pieces(arg.pieces)
             return
+
         self.pieces = []
+
         if arg is None:
             # Init empty Set from None
             return
-        elif isinstance(arg, string_types):
+
+        if isinstance(arg, str):
             # Init from notation string
             self.__init_from_notation(arg)
+
         else:
             # Init from iterable of intervals and/or scalars.
             for p in arg:
@@ -198,8 +206,8 @@ class Set(object):
         if isinstance(x, Interval):
             _, piece = self.search(x.a)
             return piece is not None and is_interval(piece) and x.b <= piece.b
-        else:
-            return self.search(x)[1] is not None
+
+        return self.search(x)[1] is not None
 
     @_assert_pieces_are_ascending
     def __invert__(self):
@@ -278,36 +286,48 @@ class Set(object):
         """
         if not isinstance(other, Set):
             raise TypeError('Can only compare to an Set')
+
         lo = 0
         X = iter(other.pieces)
+
         try:
             x = next(X)
+
             while True:
-                xa, xb = isinstance(x, Interval) and (x.a, x.b) or (x, x)
+                xa, xb = (x.a, x.b) if isinstance(x, Interval) else (x, x)
                 lo, p = self.search(xa, lo=lo)
+
                 if p is None:
                     return False
-                pa, pb = isinstance(p, Interval) and (p.a, p.b) or (p, p)
+
+                pa, pb = (p.a, p.b) if isinstance(p, Interval) else (p, p)
+
                 if xb > pb:
                     return False
+
                 while True:
                     x = next(X)
-                    xa, xb = isinstance(x, Interval) and (x.a, x.b) or (x, x)
+                    xa, xb = (x.a, x.b) if isinstance(x, Interval) else (x, x)
+
                     if xa >= pb or xb == pb:
                         break
+
                     if xb < pb:
                         continue
+
                     return False
+
         except StopIteration:
             return True
+
         return False
 
     def issuperset(self, other):
         """Test if the other has not anything that is not in the Set."""
         if isinstance(other, Set):
             return self >= other
-        else:
-            return self >= Set(other)
+
+        return self >= Set(other)
 
     def __le__(self, other):
         """
@@ -316,14 +336,15 @@ class Set(object):
         """
         if not isinstance(other, Set):
             raise TypeError('Can only compare to an Set')
+
         return NotImplemented # so that other.__ge__ will be called
 
     def issubset(self, other):
         """Test whether the USSet has not anything that is not in the other."""
         if isinstance(other, Set):
             return self <= other
-        else:
-            return self <= Set(other)
+
+        return self <= Set(other)
 
     def __lt__(self, other):
         """
@@ -630,6 +651,7 @@ class Set(object):
                 idx2 += 1
 
         pieces[idx1:idx2] = [Interval(a, b)]
+
         return min([idx2, len(self.pieces)])
 
     def _add(self, x, lo=0):
@@ -639,8 +661,8 @@ class Set(object):
         """
         if isinstance(x, Interval):
             return self._add_interval(x, lo)
-        else:
-            return self._add_scalar(x, lo)
+
+        return self._add_scalar(x, lo)
 
     @_assert_pieces_are_ascending
     def add(self, x):
@@ -724,8 +746,8 @@ class Set(object):
         """
         if isinstance(x, Interval):
             return self._remove_interval(x, lo)
-        else:
-            return self._remove_scalar(x, lo)
+
+        return self._remove_scalar(x, lo)
 
     @_assert_pieces_are_ascending
     def remove(self, x):

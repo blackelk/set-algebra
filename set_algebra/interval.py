@@ -1,8 +1,8 @@
 from set_algebra.endpoint import Endpoint
-from set_algebra.parser import OPEN_LEFT_TO_BOUNDS_MAPPING, string_types
+from set_algebra.parser import OPEN_LEFT_TO_BOUNDS_MAPPING
 
 
-class Interval(object):
+class Interval:
     """
     Class representing interval on an axis.
     Contains two Endpoint instances - a and b.
@@ -99,19 +99,25 @@ class Interval(object):
                                     'bounds must be provided')
                 value_a = notation_or_a
                 value_b = b
-                if not isinstance(bounds, string_types):
+
+                if not isinstance(bounds, str):
                     raise TypeError('bounds must be a string, not %s' % type(bounds).__name__)
+
                 if len(bounds) != 2:
                     raise ValueError('bounds must be a string of length 2, e.g. "[)"')
+
                 a = Endpoint(value_a, bounds[0])
                 b = Endpoint(value_b, bounds[1])
 
         if a.right:
             raise ValueError('First endpoint ("a") must be left')
+
         if b.left:
             raise ValueError('Second endpoint ("b") must be right')
+
         if a > b:
             raise ValueError('First endpoint ("a") must be less than the second one')
+
         # a == b Allowed for degenerate interval.
 
         self.a = a
@@ -125,13 +131,15 @@ class Interval(object):
         classname = type(self).__name__
         if isinstance(self.a.value, Endpoint.PARSABLE_TYPES):
             return "%s('%s')" % (classname, self.notation)
-        else:
-            a = self.a
-            b = self.b
-            bound_a = OPEN_LEFT_TO_BOUNDS_MAPPING[a.open, a.left]
-            bound_b = OPEN_LEFT_TO_BOUNDS_MAPPING[b.open, b.left]
-            bounds = bound_a + bound_b
-            return "%s(%s, %s, '%s')" % (classname, repr(a.value), repr(b.value), bounds)
+
+        a = self.a
+        b = self.b
+
+        bound_a = OPEN_LEFT_TO_BOUNDS_MAPPING[a.open, a.left]
+        bound_b = OPEN_LEFT_TO_BOUNDS_MAPPING[b.open, b.left]
+        bounds = bound_a + bound_b
+
+        return "%s(%s, %s, '%s')" % (classname, repr(a.value), repr(b.value), bounds)
 
     def __eq__(self, other):
         return isinstance(other, Interval) \
@@ -140,8 +148,8 @@ class Interval(object):
     def __contains__(self, other):
         if isinstance(other, Interval):
             return self.a <= other.a and other.b <= self.b
-        else:
-            return self.a <= other and self.b >= other
+
+        return self.a <= other <= self.b
 
     def copy(self):
         """
