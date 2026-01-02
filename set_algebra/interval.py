@@ -73,10 +73,13 @@ class Interval:
             # Init from notation.
             if bounds is not None:
                 raise TypeError('bounds are only accepted with both "notation_or_a" and "b"')
+
             notation = notation_or_a.strip()
             a_str, b_str = notation.split(',')
+
             if ',' in b_str:
                 raise ValueError('There should be one and only one comma in interval notation')
+
             a = Endpoint(a_str)
             b = Endpoint(b_str)
 
@@ -158,6 +161,10 @@ class Interval:
         copy is safe as long as endpoint values are of immutable types.
         """
         return Interval(self.a.copy(), self.b.copy())
+
+    @property
+    def is_degenerate(self):
+        return self.a.value == self.b.value
 
 
 def is_interval(obj):

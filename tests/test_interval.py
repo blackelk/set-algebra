@@ -262,6 +262,16 @@ def test_interval_copy():
     assert b is not i2.b
 
 
+def test_interval_is_degenerate_True():
+    i = Interval('[1, 1)')
+    assert i.is_degenerate
+
+
+def test_interval_is_degenerate_True():
+    i = Interval('[1, 1.01)')
+    assert not i.is_degenerate
+
+
 def test_str_interval():
 
     a = Endpoint('p', '(')

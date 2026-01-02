@@ -665,6 +665,7 @@ class Set:
     def _add_interval(self, x, lo=0):
 
         pieces = self.pieces
+
         idx1, piece1 = self.search(x.a, lo)
         idx2, piece2 = self.search(x.b, idx1)
 
@@ -711,6 +712,13 @@ class Set:
         return index of the first piece that does not intersect with x.
         """
         if isinstance(x, Interval):
+            if x.is_degenerate:
+                # Collapse degenerate interval into scalar.
+                # Only [a,a] contains that point; the other bound combos are empty.
+                if (not x.a.open) and (not x.b.open):
+                    return self._add_scalar(x.a.value, lo)
+                return lo  # empty interval, nothing to add
+
             return self._add_interval(x, lo)
 
         return self._add_scalar(x, lo)
@@ -802,6 +810,12 @@ class Set:
         return index of the first piece that does not intersect with x.
         """
         if isinstance(x, Interval):
+            if x.is_degenerate:
+                # Collapse degenerate interval into scalar.
+                # Only [a,a] contains that point; the other bound combos are empty.
+                if (not x.a.open) and (not x.b.open):
+                    return self._remove_scalar(x.a.value, lo)
+
             return self._remove_interval(x, lo)
 
         return self._remove_scalar(x, lo)

@@ -1,3 +1,16 @@
+## 0.3.7
+#### 2026 January 2
+- Interval.is\_degenerate property
+- Collapse degenerate intervals into scalars when adding/removing them to/from Set
+- Tested on python3.12 - 3.13
+- discontinued python 2.x support
+
+
+## 0.3.6
+#### 2024 March 30
+- Tested on python3.10 - 3.11
+
+
 ## 0.3.5
 ##### 2018 June 16
 Renamed excluded to open
