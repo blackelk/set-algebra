@@ -14,7 +14,7 @@ def _assert_pieces_are_ascending(fn):
     @functools.wraps(fn)
     def wrapper(self, *args, **kwargs):
         result = fn(self, *args, **kwargs)
-        error = None
+        err_tpl = None
 
         for i, cur in enumerate(self.pieces[:-1]):
             nex = self.pieces[i+1]
@@ -22,32 +22,32 @@ def _assert_pieces_are_ascending(fn):
             if isinstance(cur, Interval):
                 if isinstance(nex, Interval):
                     if cur.b >= nex.a:
-                        error = '%s >= %s in Set %s'
+                        err_tpl = '%s >= %s in Set %s'
                         err_format_args = (cur.b.notation, nex.a.notation, self.notation)
                     elif are_bounding(cur.b, nex.a):
-                        error = 'no gap between %s and %s! in Set %s'
+                        err_tpl = 'no gap between %s and %s! in Set %s'
                         err_format_args = (cur.b.notation, nex.a.notation, self.notation)
                 else:
                     if cur.b >= nex:
-                        error = '%s >= %s in Set %s'
+                        err_tpl = '%s >= %s in Set %s'
                         err_format_args = (cur, nex.a.notation, self.notation)
                     elif cur.b.value == nex:
-                        error = 'no gap between %s and %s! in Set %s'
+                        err_tpl = 'no gap between %s and %s! in Set %s'
                         err_format_args = (cur.b.notation, nex, self.notation)
             else:
                 if isinstance(nex, Interval):
                     if cur >= nex.a:
-                        error = '%s >= %s in Set %s'
+                        err_tpl = '%s >= %s in Set %s'
                         err_format_args = (cur, nex.a.notation, self.notation)
                     elif cur == nex.a.value:
-                        error = 'no gap between %s and %s! in Set %s'
+                        err_tpl = 'no gap between %s and %s! in Set %s'
                         err_format_args = (cur, nex.a.notation, self.notation)
                 else:
                     if cur >= nex:
-                        error = '%s >= %s in Set %s'
+                        err_tpl = '%s >= %s in Set %s'
                         err_format_args = (cur, nex, self.notation)
-            if error:
-                assert False, error % err_format_args # pylint: disable=used-before-assignment
+            if err_tpl:
+                raise AssertionError(err_tpl % err_format_args) # pylint: disable=used-before-assignment
 
         return result
 
