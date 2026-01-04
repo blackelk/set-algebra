@@ -1,9 +1,14 @@
-## 0.3.7
-#### 2026 January 2
+## 0.4.0
+#### 2026 January 4
+- Infinity ordering semantics refined:
+    - comparisons apply only to orderable values
+    - propagate comparisons via reflected operators
+    - treat NaN as unordered.
+    - is\_finite() no longer considers NaN finite.
 - Interval.is\_degenerate property
 - Collapse degenerate intervals into scalars when adding/removing them to/from Set
 - Tested on python3.12 - 3.13
-- discontinued python 2.x support
+- Discontinued python <3.10 support
 
 
 ## 0.3.6
@@ -42,7 +47,7 @@ uiset -> set-algebra
 
 
 ## 0.2.2
-##### Jun 20, 2014
+##### 2014 June 20
 - Released on PyPI
 
 ##### 2014 June 18
