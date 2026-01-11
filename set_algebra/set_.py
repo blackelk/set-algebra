@@ -1,10 +1,15 @@
+from __future__ import annotations
 import functools
+from types import NotImplementedType
+from typing import Iterable
 
 from set_algebra.infinity import is_finite, inf, neg_inf
 from set_algebra.endpoint import Endpoint, are_bounding
 from set_algebra.interval import Interval, is_interval, unbounded
 from set_algebra.parser import parse_value
 
+
+Scalar = object # For type annotations
 
 def _assert_pieces_are_ascending(fn):
     """
@@ -30,7 +35,7 @@ def _assert_pieces_are_ascending(fn):
                 else:
                     if cur.b >= nex:
                         err_tpl = '%s >= %s in Set %s'
-                        err_format_args = (cur, nex.a.notation, self.notation)
+                        err_format_args = (cur, nex, self.notation)
                     elif cur.b.value == nex:
                         err_tpl = 'no gap between %s and %s! in Set %s'
                         err_format_args = (cur.b.notation, nex, self.notation)
@@ -68,6 +73,7 @@ class Set:
             Set([Interval('1, 2'), 0, Interval('[6, 7]')])
         - notation string: Set('[1, 2], {3}, [5, inf)'). Note that in this case all
             the pieces must be sorted in ascending order and must not intersect.
+            Notation is comma-tokenized; interval [a, b] is parsed as two tokens "[a" and "b]"
         - another Set. Intervals will be copied.
         - nothing for empty Set: Set()
 
@@ -81,7 +87,7 @@ class Set:
     In boolean context Set is True if it is not empty and False if it is empty.
     """
 
-    def __init_from_notation(self, notation):
+    def __init_from_notation(self, notation: str):
 
         a = None
         for part in notation.split(','):
@@ -122,7 +128,7 @@ class Set:
             raise ValueError('Invalid notation')
 
     @_assert_pieces_are_ascending
-    def __init__(self, arg=None):
+    def __init__(self, arg: str | Iterable[Interval|Scalar] | Set | None = None):
         # TODO: init from interval?
         if isinstance(arg, Set):
             # Init from Set
@@ -145,26 +151,26 @@ class Set:
             for p in arg:
                 self.add(p)
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         return '%s(%s)' % (type(self).__name__, self.pieces)
 
     @property
-    def notation(self):
+    def notation(self) -> str:
         chunks = []
         for i in self.pieces:
             if isinstance(i, Interval):
                 chunks.append(i.notation)
             else:
                 chunks.append('{%s}' % i)
+
         return ', '.join(chunks)
 
-    def __bool__(self):
+    def __bool__(self) -> bool:
         return len(self.pieces) > 0
 
-    def __nonzero__(self):
-        return len(self.pieces) > 0
-
-    def search(self, x, lo=0, hi=None):
+    def search(self, x: Scalar,
+               lo: int = 0,
+               hi: int|None = None) -> tuple[int, Interval|Scalar|None]:
         """
         Search scalar x in Set.
         Return tuple of two elements:
@@ -200,7 +206,7 @@ class Set:
 
         return lo, None
 
-    def __contains__(self, x):
+    def __contains__(self, x: Interval|Scalar) -> bool:
         """
         x in self
         Test scalar or interval x for membership in Set.
@@ -214,7 +220,7 @@ class Set:
         return self.search(x)[1] is not None
 
     @_assert_pieces_are_ascending
-    def __invert__(self):
+    def __invert__(self) -> Set:
         """
         ~self
         Return a new Set that is a compliment of the Set.
@@ -267,37 +273,37 @@ class Set:
 
         return new
 
-    def __eq__(self, other):
+    def __eq__(self, other: Set|object) -> bool:
         """
         self == other
         Test whether the Set contains all the pieces of the other and vice versa.
         """
         return isinstance(other, Set) and self.pieces == other.pieces
 
-    def __ne__(self, other):
+    def __ne__(self, other: Set|object) -> bool:
         """
         self != other
         Test whether the Set contains anything that the other does not contain or vice versa.
         """
         return not isinstance(other, Set) or self.pieces != other.pieces
 
-    def __gt__(self, other):
+    def __gt__(self, other: Set|object) -> bool|NotImplementedType:
         """
         self > other
         Test whether the Set is a proper superset of the other.
         """
         if not isinstance(other, Set):
-            raise TypeError('Can only compare to an Set')
+            return NotImplemented
 
         return self != other and self >= other
 
-    def __ge__(self, other):
+    def __ge__(self, other: Set|object) -> bool|NotImplementedType:
         """
         self >= other
         Test if the other has not anything that is not in the Set.
         """
         if not isinstance(other, Set):
-            raise TypeError('Can only compare to an Set')
+            return NotImplemented
 
         lo = 0
         X = iter(other.pieces)
@@ -312,7 +318,9 @@ class Set:
                 if p is None:
                     return False
 
-                pa, pb = (p.a, p.b) if isinstance(p, Interval) else (p, p)
+                _pa, pb = (p.a, p.b) if isinstance(p, Interval) else (p, p)
+                # I only need the right boundary of the containing piece p
+                # once it has located p by searching for xa.
 
                 if xb > pb:
                     return False
@@ -334,24 +342,24 @@ class Set:
 
         return False
 
-    def issuperset(self, other):
+    def issuperset(self, other: Set|object) -> bool:
         """Test if the other has not anything that is not in the Set."""
         if isinstance(other, Set):
             return self >= other
 
         return self >= Set(other)
 
-    def __le__(self, other):
+    def __le__(self, other: Set|object) -> NotImplementedType:
         """
         self <= other
         Test if this Set has not nothing outside of the other.
         """
-        if not isinstance(other, Set):
-            raise TypeError('Can only compare to an Set')
+        # I'll return NotImplemented so that other.__ge__ will be called.
+        # If other is not Set then most likely there will be TypeError,
+        # but I'll won't raise myself - let the other have a chance.
+        return NotImplemented
 
-        return NotImplemented # so that other.__ge__ will be called
-
-    def issubset(self, other):
+    def issubset(self, other: Set|object) -> bool:
         """
         Test if this Set has not nothing outside of the other.
         """
@@ -360,17 +368,18 @@ class Set:
 
         return self <= Set(other)
 
-    def __lt__(self, other):
+    def __lt__(self, other: Set|object) -> NotImplementedType:
         """
         self < other
         Test whether the Set is a proper subset of the other.
+        Return NotImplemented so that other.__gt__ will be called
         """
-        if not isinstance(other, Set):
-            raise TypeError('Can only compare to an Set')
+        # I'll return NotImplemented so that other.__gt__ will be called.
+        # If other is not Set then most likely there will be TypeError,
+        # but I'll won't raise myself - let the other have a chance.
+        return NotImplemented
 
-        return NotImplemented # so that other.__gt__ will be called
-
-    def __or__(self, other):
+    def __or__(self, other: Set) -> Set:
         """
         self | other
         Return a new Set that is a union of the Set and the other.
@@ -387,10 +396,11 @@ class Set:
         return new
 
     @_assert_pieces_are_ascending
-    def __ior__(self, other):
+    def __ior__(self, other: Set) -> Set:
         """
         self |= other
         Update the Set, adding pieces from the other.
+        Retutn the updated Set.
         """
         if not isinstance(other, Set):
             emsg = "unsupported operand type for |=: %s and %s"
@@ -402,7 +412,7 @@ class Set:
 
         return self
 
-    def union(self, *others):
+    def union(self, *others: Set | Iterable[Interval|Scalar] ) -> Set:
         """Return a new Set that is a union with the Set and all the others."""
         new = self.copy()
 
@@ -417,7 +427,7 @@ class Set:
         return new
 
     @_assert_pieces_are_ascending
-    def update(self, *others):
+    def update(self, *others: Set) -> None:
         """Update the Set, adding pieces from all the others."""
         for other in others:
             lo = 0
@@ -425,11 +435,11 @@ class Set:
                 lo = self._add(x, lo)
 
     @staticmethod
-    def __and(A, B):
+    def __and(A: Set, B: Set) -> Set:
         """Return a new Set that is an intersection of A and B."""
         return A - ~B
 
-    def __and__(self, other):
+    def __and__(self, other: Set) -> Set:
         """
         self & other
         Return a new Set that is an intersection of the Set`s and the other.
@@ -441,10 +451,11 @@ class Set:
         return Set.__and(self, other)
 
     @_assert_pieces_are_ascending
-    def __iand__(self, other):
+    def __iand__(self, other: Set) -> Set:
         """
         self &= other
         Update the Set, removing everything that is not in the other.
+        Retutn the updated Set.
         """
         if not isinstance(other, Set):
             emsg = "unsupported operand type for &=: %s and %s"
@@ -455,38 +466,39 @@ class Set:
 
         return self
 
-    def intersection(self, *others):
+    def intersection(self, *others: Set | str | Iterable[Interval|Scalar] | None) -> Set:
         """
         Return a new Set that is an intersection of the Set`s and all the others.
         """
-        new = self.copy()
+        accumulator = self.copy()
 
         for other in others:
-            if isinstance(other, Set):
-                new = Set.__and(new, other)
-            else:
-                new = Set.__and(new, Set(other))
+            if not isinstance(other, Set):
+                other = Set(other)
+            accumulator = Set.__and(accumulator, other)
 
-        return new
+        return accumulator
 
     @_assert_pieces_are_ascending
-    def intersection_update(self, *others):
+    def intersection_update(self, *others: Set | str | Iterable[Interval|Scalar] | None) -> None:
         """Update the Set, removing everything that is not in any of the others."""
-        new = self
+        accumulator = self
 
         for other in others:
-            if isinstance(other, Set):
-                new = Set.__and(new, other)
-            else:
-                new = Set.__and(new, Set(other))
+            if not isinstance(other, Set):
+                other = Set(other)
+            accumulator = Set.__and(accumulator, other)
 
-        self.pieces = new.pieces
+        self.pieces = accumulator.pieces
 
-    def isdisjoint(self, other):
+    def isdisjoint(self, other: Set) -> bool:
         """
         Return True if none of Set`s pieces intersect with the other`s.
         Sets are disjoint if and only if their intersection is the empty Set.
         """
+        if not isinstance(other, Set):
+            raise TypeError(f'isdisjoint is unsupported for {type(other)} - Set required')
+
         i = 0
 
         for x in other.pieces:
@@ -509,15 +521,15 @@ class Set:
         return True
 
     @staticmethod
-    def __sub(A, B):
-        """Subtract Set B from Set A"""
+    def __sub(A: Set, B: Set) -> Set:
+        """Subtract Set B from Set A returning A"""
         lo = 0
         for x in B.pieces:
             lo = A._remove(x, lo)
 
         return A
 
-    def __sub__(self, other):
+    def __sub__(self, other: Set) -> Set:
         """
         self - other
         Return a new Set with everything that is in the Set but not in the other.
@@ -531,10 +543,11 @@ class Set:
         return Set.__sub(new, other)
 
     @_assert_pieces_are_ascending
-    def __isub__(self, other):
+    def __isub__(self, other: Set) -> Set:
         """
         self -= other
         Update the Set, removing everything found in the other.
+        Retutn the updated Set.
         """
         if not isinstance(other, Set):
             emsg = "unsupported operand type for -=: %s and %s"
@@ -542,7 +555,7 @@ class Set:
 
         return Set.__sub(self, other)
 
-    def difference(self, *others):
+    def difference(self, *others: Set | Iterable[Interval|Scalar] ) -> Set:
         """
         Return a new Set with everything that is in the Set
         but not in any of the others.
@@ -558,7 +571,7 @@ class Set:
         return new
 
     @_assert_pieces_are_ascending
-    def difference_update(self, *others):
+    def difference_update(self, *others: Set | Iterable[Interval|Scalar]) -> None:
         """Update the Set, removing everything found in the others."""
         for other in others:
             if isinstance(other, Set):
@@ -568,11 +581,11 @@ class Set:
                     self.remove(x)
 
     @staticmethod
-    def __xor(A, B):
+    def __xor(A: Set, B: Set) -> Set:
         """Return a new Set with pieces in either the Set A or B but not in both."""
         return A - B | B - A
 
-    def __xor__(self, other):
+    def __xor__(self, other: Set) -> Set:
         """
         self ^ other
         Return a new Set with pieces in either the Set or the other but not in both."""
@@ -583,10 +596,11 @@ class Set:
         return Set.__xor(self, other)
 
     @_assert_pieces_are_ascending
-    def __ixor__(self, other):
+    def __ixor__(self, other: Set) -> Set:
         """
         self ^= other
         Update the Set, keeping only pieces found in either Set, but not in both.
+        Retutn the updated Set.
         """
         if not isinstance(other, Set):
             emsg = "unsupported operand type for ^=: %s and %s"
@@ -597,7 +611,7 @@ class Set:
 
         return self
 
-    def symmetric_difference(self, *others):
+    def symmetric_difference(self, *others: Set | str | Iterable[Interval|Scalar] | None) -> Set:
         """
         Return a new Set with pieces in either the Set or the other but not in both."""
         new = self.copy()
@@ -611,21 +625,20 @@ class Set:
         return new
 
     @_assert_pieces_are_ascending
-    def symmetric_difference_update(self, *others):
+    def symmetric_difference_update(self, *others: Set | str | Iterable[Interval|Scalar] | None) -> None:
         """
         Update the Set, keeping only pieces found in either Set, but not in both.
         """
-        new = self
+        accumulator = self
 
         for other in others:
-            if isinstance(other, Set):
-                new = Set.__xor(new, other)
-            else:
-                new = Set.__xor(new, Set(other))
+            if not isinstance(other, Set):
+                other = Set(other)
+            accumulator = Set.__xor(accumulator, other)
 
-        self.pieces = new.pieces
+        self.pieces = accumulator.pieces
 
-    def _add_scalar(self, x, lo=0):
+    def _add_scalar(self, x: Scalar, lo: int = 0) -> int:
 
         if not is_finite(x):
             raise ValueError('x must be finite')
@@ -650,19 +663,21 @@ class Set:
                     # Adding b to (a, b)
                     b = Endpoint(x, ']')
                     pieces[idx-1] = Interval(pre.a.copy(), b)
+
                 return idx
 
         if nex is not None and nex.a.value == x:
             # Adding a to (a, b)
             a = Endpoint(x, '[')
             pieces[idx] = Interval(a, nex.b.copy())
+
             return idx
 
         pieces.insert(idx, x)
 
         return idx + 1
 
-    def _add_interval(self, x, lo=0):
+    def _add_interval(self, x: Interval, lo: int = 0) -> int:
 
         pieces = self.pieces
 
@@ -698,6 +713,7 @@ class Set:
                 if are_bounding(x.b, nex.a):
                     b = nex.b.copy()
                     idx2 += 1
+
             elif nex == x.b.value:
                 b = Endpoint(nex, ']')
                 idx2 += 1
@@ -706,7 +722,7 @@ class Set:
 
         return min([idx2, len(self.pieces)])
 
-    def _add(self, x, lo=0):
+    def _add(self, x: Interval|Scalar, lo: int = 0) -> int:
         """
         Add scalar or interval x to Set, starting from piece at index lo.
         return index of the first piece that does not intersect with x.
@@ -724,11 +740,11 @@ class Set:
         return self._add_scalar(x, lo)
 
     @_assert_pieces_are_ascending
-    def add(self, x):
+    def add(self, x: Interval|Scalar) -> None:
         """Add scalar or interval x to Set, merge ones that intersect."""
         self._add(x)
 
-    def _remove_scalar(self, x, lo=0):
+    def _remove_scalar(self, x: Scalar, lo: int = 0) -> int:
 
         idx, piece = self.search(x, lo)
 
@@ -752,7 +768,7 @@ class Set:
 
         return idx
 
-    def _remove_interval(self, x, lo=0):
+    def _remove_interval(self, x: Interval, lo: int = 0) -> int:
 
         pieces = self.pieces
 
@@ -804,7 +820,7 @@ class Set:
 
         return idx1
 
-    def _remove(self, x, lo=0):
+    def _remove(self, x: Interval|Scalar, lo: int = 0) -> int:
         """
         Remove scalar or interval x from Set, starting from piece at index lo.
         return index of the first piece that does not intersect with x.
@@ -821,15 +837,15 @@ class Set:
         return self._remove_scalar(x, lo)
 
     @_assert_pieces_are_ascending
-    def remove(self, x):
+    def remove(self, x: Interval|Scalar) -> None:
         """Remove scalar or interval x from the Set."""
         self._remove(x)
 
-    def clear(self):
+    def clear(self) -> None:
         """Remove all pieces from the Set."""
         self.pieces = []
 
-    def copy(self):
+    def copy(self) -> Set:
         """
         Return a copy of the Set.
         Intervals are recreated.

@@ -9,6 +9,8 @@
 - Collapse degenerate intervals into scalars when adding/removing them to/from Set
 - Tested on python3.12 - 3.13
 - Discontinued python <3.10 support
+- Added type annotations
+- Set comparisons now return NotImplemented (instead of raising TypeError) when the other operand is not a Set
 
 
 ## 0.3.6

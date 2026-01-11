@@ -1,7 +1,11 @@
+from __future__ import annotations
+
 from set_algebra.infinity import Infinity, NegativeInfinity, neg_inf, is_finite
 from set_algebra.parser import (OPEN_LEFT_TO_BOUNDS_MAPPING, parse_bound,
     parse_endpoint_notation)
 
+
+Scalar = object # For type annotations
 
 class Endpoint:
     """
@@ -37,7 +41,8 @@ class Endpoint:
 
     PARSABLE_TYPES = (int, float, Infinity, NegativeInfinity)
 
-    def __init__(self, notation_or_value, bound=None):
+    def __init__(self, notation_or_value: str|Scalar,
+                       bound: str|None = None) -> None:
         if bound is None:
             value, open_, left = parse_endpoint_notation(notation_or_value)
         else:
@@ -48,34 +53,38 @@ class Endpoint:
             raise ValueError('Not open value cannot be infinite, use "(" or ")" as bound')
 
         self.value = value
-        self.open = open_
-        self.left = left
+        self.open: bool = open_
+        self.left: bool = left
 
     @property
-    def right(self):
+    def right(self) -> bool:
         return not self.left
 
     @property
-    def notation(self):
+    def notation(self) -> str:
         if self.left:
             format_ = '(%s' if self.open else '[%s'
         else:
             format_ = '%s)' if self.open else '%s]'
+
         value_str = self.value == neg_inf and '-inf' or str(self.value)
+
         return format_ % value_str
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         classname = type(self).__name__
-        if isinstance(self.value, self.PARSABLE_TYPES):
+
+        if isinstance(self.value, self.PARSABLE_TYPES) and not isinstance(self.value, bool):
             repr_format = "%s('%s')"
-            params = (classname, self.notation)
+            args = (classname, self.notation)
         else:
             repr_format = "%s(%s, '%s')"
             bound = OPEN_LEFT_TO_BOUNDS_MAPPING[self.open, self.left]
-            params = (classname, repr(self.value), bound)
-        return repr_format % params
+            args = (classname, repr(self.value), bound)
 
-    def __eq__(self, other):
+        return repr_format % args
+
+    def __eq__(self, other: Endpoint|object) -> bool:
         """
         self == other
         When comparing two Endpoints,
@@ -94,11 +103,11 @@ class Endpoint:
 
         return not self.open and self.value == other
 
-    def __ne__(self, other):
+    def __ne__(self, other: Endpoint|object) -> bool:
         """ self != other """
         return not self == other
 
-    def __gt__(self, other):
+    def __gt__(self, other: Endpoint|object) -> bool:
         """ self > other """
         if isinstance(other, Endpoint):
             if self.value == other.value:
@@ -110,7 +119,7 @@ class Endpoint:
 
         return self.value > other
 
-    def __ge__(self, other):
+    def __ge__(self, other: Endpoint|object) -> bool:
         """ self >= other """
         if isinstance(other, Endpoint):
             if self.value == other.value:
@@ -122,7 +131,7 @@ class Endpoint:
 
         return self.value > other
 
-    def __lt__(self, other):
+    def __lt__(self, other: Endpoint|object) -> bool:
         """ self < other """
         if isinstance(other, Endpoint):
             if self.value == other.value:
@@ -134,7 +143,7 @@ class Endpoint:
 
         return self.value < other
 
-    def __le__(self, other):
+    def __le__(self, other: Endpoint|object) -> bool:
         """ self <= other """
         if isinstance(other, Endpoint):
             if self.value == other.value:
@@ -146,8 +155,10 @@ class Endpoint:
 
         return self.value < other
 
-    def _cmp(self, other):
+    def _cmp(self, other: Endpoint) -> int:
         """Compare two Endpoints with equal values."""
+        assert self.value == other.value
+
         if self.left:
             if other.left:
                 if not self.open and not other.open:
@@ -178,7 +189,7 @@ class Endpoint:
 
         return 0
 
-    def __invert__(self):
+    def __invert__(self) -> Endpoint:
         """
         Return Endpoint with same value but opposite "open" and "left" attributes.
         >>> ~Endpoint('[1')
@@ -187,13 +198,13 @@ class Endpoint:
         bound = OPEN_LEFT_TO_BOUNDS_MAPPING[not self.open, not self.left]
         return Endpoint(self.value, bound)
 
-    def copy(self):
+    def copy(self) -> Endpoint:
         """Return a shallow copy of the Endpoint"""
         bound = OPEN_LEFT_TO_BOUNDS_MAPPING[self.open, self.left]
         return Endpoint(self.value, bound)
 
 
-def are_bounding(e1, e2):
+def are_bounding(e1: Endpoint, e2: Endpoint) -> bool:
     """
     Return boolean indicating that 2 endpoints have no gap between them.
     >>> are_bounding(Endpoint('1]'), Endpoint('(1'))
@@ -203,5 +214,7 @@ def are_bounding(e1, e2):
     >>> are_bounding(Endpoint('1)'), Endpoint('(1'))
     False
     """
-    assert e1.left is not e2.left
+    if e1.left is e2.left:
+        raise ValueError(f'It is expected that e1.left != e2.left but the endpoints are both left={e1.left}')
+
     return e1.value == e2.value and (not e1.open or not e2.open)

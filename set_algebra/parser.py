@@ -1,7 +1,7 @@
-from set_algebra.infinity import inf, neg_inf
+from set_algebra.infinity import Infinity, NegativeInfinity, inf, neg_inf
 
 
-def parse_value(value_str):
+def parse_value(value_str: str) -> int | float | Infinity | NegativeInfinity:
     """
     Parse numeric string, return either:
     int
@@ -9,10 +9,12 @@ def parse_value(value_str):
     Infinity, NegativeInfinity
     """
     if not isinstance(value_str, str):
-        raise TypeError('value_str must be a string, not %s' % type(value_str).__name__)
+        classname = type(value_str).__name__
+        raise TypeError(f'value_str must be a string, not {classname}')
 
     value_str = value_str.strip()
-    if value_str.isdigit() or (value_str[0] == '-' and value_str[1:].isdigit()):
+
+    if value_str.isdigit() or (value_str.startswith('-') and value_str[1:].isdigit()):
         value = int(value_str)
     elif value_str in ('-inf', 'neg_inf'):
         value = neg_inf
@@ -34,20 +36,21 @@ BOUNDS_TO_OPEN_LEFT_MAPPING = {
 OPEN_LEFT_TO_BOUNDS_MAPPING = {v: k for k, v in BOUNDS_TO_OPEN_LEFT_MAPPING.items()}
 
 
-def parse_bound(bound):
+def parse_bound(bound: str) -> tuple[bool, bool]:
     """
     Given 1 length string, return a tuple of two booleans: (open, left)
     """
     if not isinstance(bound, str):
-        raise TypeError('bound must be a string, not %s' % type(bound).__name__)
+        classname = type(bound).__name__
+        raise TypeError(f'bound must be a string, not {classname}')
 
     try:
         return BOUNDS_TO_OPEN_LEFT_MAPPING[bound]
     except KeyError:
-        raise ValueError('bound must be one of [](), not %s' % bound)
+        raise ValueError(f'bound must be one of [](), not {bound}') from None
 
 
-def parse_endpoint_notation(notation):
+def parse_endpoint_notation(notation: str) -> tuple[int|float|Infinity|NegativeInfinity, bool, bool]:
     """
     Parse string representing Endpoint (endpoint notation).
 
@@ -65,16 +68,20 @@ def parse_endpoint_notation(notation):
     (inf, True, False)
     """
     if not isinstance(notation, str):
-        raise TypeError('notation must be a string, not %s' % type(notation).__name__)
+        classname = type(notation).__name__
+        raise TypeError(f'notation must be a string, not {classname}')
 
     notation = notation.strip()
 
     if len(notation) < 2:
         raise ValueError('Invalid Notation')
+
     if notation[0] in '[(':
         bound, value_str = notation[0], notation[1:]
+
     elif notation[-1] in '])':
         value_str, bound = notation[:-1], notation[-1]
+
     else:
         raise ValueError('Invalid notation')
 

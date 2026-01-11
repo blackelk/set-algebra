@@ -1,8 +1,10 @@
+from __future__ import annotations
 import math
 from numbers import Real
+from types import NotImplementedType
 
 
-def _is_orderable(x) -> bool:
+def _is_orderable(x: object) -> bool:
     """
     Return True if x supports ordering operations by design.
     Note: NaN is considered orderable here and must be handled separately.
@@ -16,7 +18,7 @@ def _is_orderable(x) -> bool:
     return True
 
 
-def _isnan(x):
+def _isnan(x: object) -> bool:
     return isinstance(x, Real) and math.isnan(x)
 
 
@@ -26,18 +28,18 @@ class Infinity:
     Supports comparsion operations.
     Is greater than everything except infinity / nan.
     """
-    def __eq__(self, other):
+    def __eq__(self, other: object) -> bool:
         """
         self == other
         Equality here is not purely type-based - it delegates to foreign `==`
         """
         return isinstance(other, Infinity) or other == float('inf')
 
-    def __ne__(self, other):
+    def __ne__(self, other: object) -> bool:
         """ self != other """
         return not self == other
 
-    def __gt__(self, other):
+    def __gt__(self, other: object) -> bool|NotImplementedType:
         """ self > other """
         if isinstance(other, Infinity) or other == float('inf') or _isnan(other):
             return False
@@ -47,7 +49,7 @@ class Infinity:
 
         return NotImplemented
 
-    def __lt__(self, other):
+    def __lt__(self, other: object) -> bool|NotImplementedType:
         """ self < other """
         if isinstance(other, (Infinity, NegativeInfinity)):
             return False
@@ -57,7 +59,7 @@ class Infinity:
 
         return NotImplemented
 
-    def __ge__(self, other):
+    def __ge__(self, other: object) -> bool|NotImplementedType:
         """ self >= other """
         if _isnan(other):
             return False
@@ -69,7 +71,7 @@ class Infinity:
 
         return not lt
 
-    def __le__(self, other):
+    def __le__(self, other: object) -> bool|NotImplementedType:
         """ self <= other """
         if _isnan(other):
             return False
@@ -81,11 +83,11 @@ class Infinity:
 
         return not gt
 
-    def __neg__(self):
+    def __neg__(self) -> NegativeInfinity:
         """ -self """
         return neg_inf
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         return 'inf'
 
 
@@ -95,18 +97,18 @@ class NegativeInfinity:
     Supports comparsion operations.
     Is less than everything except negative infinity / nan.
     """
-    def __eq__(self, other):
+    def __eq__(self, other: object) -> bool:
         """
         self == other
         Equality here is not purely type-based - it delegates to foreign `==`
         """
         return isinstance(other, NegativeInfinity) or other == float('-inf')
 
-    def __ne__(self, other):
+    def __ne__(self, other: object) -> bool:
         """ self != other """
         return not self == other
 
-    def __gt__(self, other):
+    def __gt__(self, other: object) -> bool|NotImplementedType:
         """ self > other """
         if isinstance(other, (Infinity, NegativeInfinity)):
             return False
@@ -116,7 +118,17 @@ class NegativeInfinity:
 
         return NotImplemented
 
-    def __ge__(self, other):
+    def __lt__(self, other: object) -> bool|NotImplementedType:
+        """ self < other """
+        if isinstance(other, NegativeInfinity) or other == float('-inf') or _isnan(other):
+            return False
+
+        if _is_orderable(other):
+            return True
+
+        return NotImplemented
+
+    def __ge__(self, other: object) -> bool|NotImplementedType:
         """ self >= other """
         if _isnan(other):
             return False
@@ -128,7 +140,7 @@ class NegativeInfinity:
 
         return not lt
 
-    def __le__(self, other):
+    def __le__(self, other: object) -> bool|NotImplementedType:
         """ self <= other """
         if _isnan(other):
             return False
@@ -140,30 +152,20 @@ class NegativeInfinity:
 
         return not gt
 
-    def __lt__(self, other):
-        """ self < other """
-        if isinstance(other, NegativeInfinity) or other == float('-inf') or _isnan(other):
-            return False
-
-        if _is_orderable(other):
-            return True
-
-        return NotImplemented
-
-    def __neg__(self):
+    def __neg__(self) -> Infinity:
         """ -self """
         return inf
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         return 'neg_inf'
 
 
-def is_finite(value) -> bool:
-    if _isnan(value):
+def is_finite(x: object) -> bool:
+    if _isnan(x):
         return False
 
-    return neg_inf != value != inf
+    return neg_inf != x != inf
 
 
-inf = Infinity()
-neg_inf = NegativeInfinity()
+inf: Infinity = Infinity()
+neg_inf: NegativeInfinity = NegativeInfinity()

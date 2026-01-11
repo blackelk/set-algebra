@@ -4,22 +4,24 @@ from set_algebra import Endpoint, are_bounding
 
 
 def test_endpoint_init_from_notation():
-
     e1 = Endpoint('[1')
     assert e1.left
     assert not e1.right
     assert not e1.open
     assert e1.value == 1
+
     e2 = Endpoint('(1')
     assert e2.left
     assert not e2.right
     assert e2.open
     assert e2.value == 1
+
     e3 = Endpoint('1]')
     assert not e3.left
     assert e3.right
     assert not e3.open
     assert e3.value == 1
+
     e4 = Endpoint('1)')
     assert not e4.left
     assert e4.right
@@ -28,7 +30,6 @@ def test_endpoint_init_from_notation():
 
 
 def test_endpoint_init_from_value_and_bound():
-
     assert Endpoint(1, '[').notation == '[1'
     assert Endpoint(1, '(').notation == '(1'
     assert Endpoint(1, ']').notation == '1]'
@@ -54,23 +55,29 @@ def test_endpoint_init_raises():
     with pytest.raises(ValueError): Endpoint('inf]')
 
 
-def test_endopint_init_from_notation():
+def test_endpoint_init_from_notation():
+    v1 = Endpoint('[1').value
+    assert type(v1) is int
+    assert v1 == 1
 
-    assert Endpoint('[1').value is 1
-    v1 = Endpoint('[1.').value
-    assert type(v1) is float and v1 == 1.0
-    v2 = Endpoint('[1.0').value
-    assert type(v2) is float and v2 == 1.0
+    v2 = Endpoint('[1.').value
+    assert type(v2) is float
+    assert v2 == 1.0
+
+    v3 = Endpoint('[1.0').value
+    assert type(v3) is float
+    assert v3 == 1.0
+
     assert Endpoint('[10').value == 10
     assert Endpoint('[4.5e-6').value == 4.5e-6
     assert Endpoint('[4.5e6').value == 4.5e6
+
     assert Endpoint('(-inf').value == float('-inf')
     assert Endpoint('(neg_inf').value == float('-inf')
     assert Endpoint('inf)').value == float('inf')
 
 
 def test_endpoint_repr():
-
     e1 = Endpoint('[5')
     e2 = Endpoint('(-inf')
     e3 = Endpoint('inf)')
@@ -91,7 +98,6 @@ def test_endpoint_repr():
 
 
 def test_endpoint_invert():
-
     assert ~Endpoint('[1') == Endpoint('1)')
     assert ~Endpoint('(1') == Endpoint('1]')
     assert ~Endpoint('1]') == Endpoint('(1')
@@ -100,7 +106,6 @@ def test_endpoint_invert():
 
 
 def test_endpoint_notation():
-
     assert Endpoint('[1').notation == '[1'
     assert Endpoint('(1').notation == '(1'
     assert Endpoint('1]').notation == '1]'
@@ -108,7 +113,6 @@ def test_endpoint_notation():
 
 
 def test_endpoint_eq_scalar():
-
     assert Endpoint('[1') == 1
     assert Endpoint('1]') == 1
     assert not Endpoint('(1') == 1
@@ -117,7 +121,6 @@ def test_endpoint_eq_scalar():
 
 
 def test_endpoint_ne_scalar():
-
     assert not Endpoint('[1') != 1
     assert not Endpoint('1]') != 1
     assert Endpoint('(1') != 1
@@ -126,7 +129,6 @@ def test_endpoint_ne_scalar():
 
 
 def test_endpoint_gt_scalar():
-
     assert not Endpoint('[1') > 1
     assert Endpoint('(1') > 1
     assert not Endpoint('1]') > 1
@@ -142,7 +144,6 @@ def test_endpoint_gt_scalar():
 
 
 def test_endpoint_ge_scalar():
-
     assert Endpoint('[1') >= 1
     assert Endpoint('(1') >= 1
     assert Endpoint('1]') >= 1
@@ -158,7 +159,6 @@ def test_endpoint_ge_scalar():
 
 
 def test_endpoint_lt_scalar():
-
     assert not Endpoint('[1') < 1
     assert not Endpoint('(1') < 1
     assert not Endpoint('1]') < 1
@@ -174,7 +174,6 @@ def test_endpoint_lt_scalar():
 
 
 def test_endpoint_le_scalar():
-
     assert Endpoint('[1') <= 1
     assert not Endpoint('(1') <= 1
     assert Endpoint('1]') <= 1
@@ -190,7 +189,6 @@ def test_endpoint_le_scalar():
 
 
 def test_endpoint_eq_enpoint():
-
     assert Endpoint('[1') == Endpoint('[1')
     assert Endpoint('(1') == Endpoint('(1')
     assert Endpoint('1]') == Endpoint('1]')
@@ -201,7 +199,6 @@ def test_endpoint_eq_enpoint():
 
 
 def test_endpoint_gt_endpoint():
-
     assert Endpoint('[1') > Endpoint('[0')
     assert Endpoint('[1') > Endpoint('(0')
     assert not Endpoint('[1') > Endpoint('[1')
@@ -252,9 +249,10 @@ def test_endpoint_gt_endpoint():
     assert not Endpoint('1)') > Endpoint('2]')
     assert not Endpoint('1)') > Endpoint('2)')
 
+    assert Endpoint('inf)') > Endpoint('[1000')
+
 
 def test_endpoint_ge_endpoint():
-
     assert Endpoint('[1') >= Endpoint('[0')
     assert Endpoint('[1') >= Endpoint('(0')
     assert Endpoint('[1') >= Endpoint('[1')
@@ -307,7 +305,6 @@ def test_endpoint_ge_endpoint():
 
 
 def test_endpoint_lt_endpoint():
-
     assert not Endpoint('[1') < Endpoint('[0')
     assert not Endpoint('[1') < Endpoint('(0')
     assert not Endpoint('[1') < Endpoint('[1')
@@ -358,9 +355,10 @@ def test_endpoint_lt_endpoint():
     assert Endpoint('1)') < Endpoint('2]')
     assert Endpoint('1)') < Endpoint('2)')
 
+    assert Endpoint('(-inf') < Endpoint('[-1000')
+
 
 def test_endpoint_le_endpoint():
-
     assert not Endpoint('[1') <= Endpoint('[0')
     assert not Endpoint('[1') <= Endpoint('(0')
     assert Endpoint('[1') <= Endpoint('[1')
@@ -413,7 +411,6 @@ def test_endpoint_le_endpoint():
 
 
 def test_endpoint_copy():
-
     e1 = Endpoint('1]')
     e2 = e1.copy()
     assert e1 == e2
@@ -421,10 +418,8 @@ def test_endpoint_copy():
 
 
 def test_are_bounding():
-
     assert not are_bounding(Endpoint('(1'), Endpoint('1)'))
     assert are_bounding(Endpoint('(1'), Endpoint('1]'))
     assert are_bounding(Endpoint('[1'), Endpoint('1)'))
     assert are_bounding(Endpoint('[1'), Endpoint('1]'))
     assert not are_bounding(Endpoint('[1'), Endpoint('2]'))
-

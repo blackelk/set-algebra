@@ -1,6 +1,10 @@
+from __future__ import annotations
+
 from set_algebra.endpoint import Endpoint
 from set_algebra.parser import OPEN_LEFT_TO_BOUNDS_MAPPING
 
+
+Scalar = object # For type annotations
 
 class Interval:
     """
@@ -68,7 +72,9 @@ class Interval:
     """
     __slots__ = ('a', 'b')
 
-    def __init__(self, notation_or_a, b=None, bounds=None):
+    def __init__(self, notation_or_a: str|Endpoint|Scalar,
+                       b: Endpoint|Scalar|None = None,
+                       bounds: str|None = None) -> None:
         if b is None:
             # Init from notation.
             if bounds is not None:
@@ -127,10 +133,10 @@ class Interval:
         self.b = b
 
     @property
-    def notation(self):
+    def notation(self) -> str:
         return '%s, %s' % (self.a.notation, self.b.notation)
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         classname = type(self).__name__
         if isinstance(self.a.value, Endpoint.PARSABLE_TYPES):
             return "%s('%s')" % (classname, self.notation)
@@ -144,17 +150,17 @@ class Interval:
 
         return "%s(%s, %s, '%s')" % (classname, repr(a.value), repr(b.value), bounds)
 
-    def __eq__(self, other):
+    def __eq__(self, other: Interval|object) -> bool:
         return isinstance(other, Interval) \
            and self.a == other.a and self.b == other.b
 
-    def __contains__(self, other):
+    def __contains__(self, other: Interval|Scalar) -> bool:
         if isinstance(other, Interval):
             return self.a <= other.a and other.b <= self.b
 
         return self.a <= other <= self.b
 
-    def copy(self):
+    def copy(self) -> Interval:
         """
         Return a shallow copy of the Interval.
         Endpoints are recreated.
@@ -163,17 +169,17 @@ class Interval:
         return Interval(self.a.copy(), self.b.copy())
 
     @property
-    def is_degenerate(self):
+    def is_degenerate(self) -> bool:
         return self.a.value == self.b.value
 
 
-def is_interval(obj):
+def is_interval(obj: object) -> bool:
     return isinstance(obj, Interval)
 
 
-def is_scalar(obj):
+def is_scalar(obj: object) -> bool:
     return not isinstance(obj, Interval)
 
 
 # unbounded represents interval from -inf to inf
-unbounded = Interval('(-inf, inf)')
+unbounded: Interval = Interval('(-inf, inf)')
