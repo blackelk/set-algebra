@@ -94,12 +94,6 @@ def test_interval_init_invalid_notation_raises():
     with pytest.raises(ValueError):
         Interval('[6,')
     with pytest.raises(ValueError):
-        Interval('[6, 6)')
-    with pytest.raises(ValueError):
-        Interval('(6, 6]')
-    with pytest.raises(ValueError):
-        Interval('(6, 6)')
-    with pytest.raises(ValueError):
         Interval('[6, 5)')
 
 
@@ -127,29 +121,34 @@ if sys.version_info[0] == 3:
             Interval(Endpoint('[1'), Endpoint('a', ')'))
 
 
-def test_interval_init_not_ascending_endpoints_raises():
+def test_interval_init_descending_endpoints_raises():
 
     with pytest.raises(ValueError):
-        Interval(Endpoint('[1'), Endpoint('1)'))
-    with pytest.raises(ValueError):
-        Interval(Endpoint('(1'), Endpoint('1]'))
-    with pytest.raises(ValueError):
-        Interval(Endpoint('(1'), Endpoint('1)'))
-    with pytest.raises(ValueError):
-        Interval(Endpoint('[1'), Endpoint('-1]'))
-
-
-def test_interval_init_not_ascending_values_raises():
+        Interval(Endpoint('[0.1'), Endpoint('-0.1]'))
 
     with pytest.raises(ValueError):
-        Interval(1, 1, '[)')
-    with pytest.raises(ValueError):
-        Interval(1, 1, '(]')
-    with pytest.raises(ValueError):
-        Interval(1, 1, '()')
-    with pytest.raises(ValueError):
-        Interval(1, -11, '[]')
+        Interval(Endpoint('[0.1'), Endpoint('-0.1)'))
 
+    with pytest.raises(ValueError):
+        Interval(Endpoint('(0.1'), Endpoint('-0.1]'))
+
+    with pytest.raises(ValueError):
+        Interval(Endpoint('(0.1'), Endpoint('-0.1)'))
+
+
+def test_interval_init_descending_values_raises():
+
+    with pytest.raises(ValueError):
+        Interval(0.1, -0.1, '[]')
+
+    with pytest.raises(ValueError):
+        Interval(0.1, -0.1, '[)')
+
+    with pytest.raises(ValueError):
+        Interval(0.1, -0.1, '(]')
+
+    with pytest.raises(ValueError):
+        Interval(0.1, -0.1, '()')
 
 def test_interval_init_not_left_right_raises():
 
@@ -263,11 +262,20 @@ def test_interval_copy():
 
 
 def test_interval_is_degenerate_True():
-    i = Interval('[1, 1)')
-    assert i.is_degenerate
+    i1 = Interval('[1, 1]')
+    assert i1.is_degenerate
+
+    i2 = Interval('[1, 1)')
+    assert i2.is_degenerate
+
+    i3 = Interval('(1, 1]')
+    assert i3.is_degenerate
+
+    i4 = Interval('(1, 1)')
+    assert i4.is_degenerate
 
 
-def test_interval_is_degenerate_True():
+def test_interval_is_degenerate_False():
     i = Interval('[1, 1.01)')
     assert not i.is_degenerate
 

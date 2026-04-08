@@ -8,7 +8,7 @@ Provides:
     Set
 """
 
-__version__ = '0.3.7.dev1'
+__version__ = '0.4.0.dev1'
 __author__ = 'Constantine Parkhimovich'
 __license__ = 'MIT'
 __copyright__ = 'Copyright 2014-present Constantine Parkhimovich'

@@ -124,10 +124,10 @@ class Interval:
         if b.left:
             raise ValueError('Second endpoint ("b") must be right')
 
-        if a > b:
+        if a.value > b.value:
             raise ValueError('First endpoint ("a") must be less than the second one')
 
-        # a == b Allowed for degenerate interval.
+        # a.value == b.value Allowed for degenerate interval.
 
         self.a = a
         self.b = b

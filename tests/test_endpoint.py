@@ -1,13 +1,14 @@
 import pytest
 
-from set_algebra import Endpoint, are_bounding
+from set_algebra import Endpoint, are_bounding, inf, neg_inf
 
 
-def test_endpoint_init_from_notation():
+def test_endpoint_init_from_notation_int():
     e1 = Endpoint('[1')
     assert e1.left
     assert not e1.right
     assert not e1.open
+    assert type(e1.value) is int
     assert e1.value == 1
 
     e2 = Endpoint('(1')
@@ -27,6 +28,27 @@ def test_endpoint_init_from_notation():
     assert e4.right
     assert e4.open
     assert e4.value == 1
+
+    assert Endpoint('[10').value == 10
+
+
+def test_endpoint_init_from_notation_float():
+    v1 = Endpoint('[1.').value
+    assert type(v1) is float
+    assert v1 == 1.0
+
+    v2 = Endpoint('[1.0').value
+    assert type(v2) is float
+    assert v2 == 1.0
+
+    assert Endpoint('[4.5e-6').value == 4.5e-6
+    assert Endpoint('[4.5e6').value == 4.5e6
+
+
+def test_endpoint_init_from_notation_infinity():
+    assert Endpoint('(-inf').value is neg_inf
+    assert Endpoint('(neg_inf').value is neg_inf
+    assert Endpoint('inf)').value is inf
 
 
 def test_endpoint_init_from_value_and_bound():
@@ -53,28 +75,6 @@ def test_endpoint_init_raises():
 
     with pytest.raises(ValueError): Endpoint('[-inf')
     with pytest.raises(ValueError): Endpoint('inf]')
-
-
-def test_endpoint_init_from_notation():
-    v1 = Endpoint('[1').value
-    assert type(v1) is int
-    assert v1 == 1
-
-    v2 = Endpoint('[1.').value
-    assert type(v2) is float
-    assert v2 == 1.0
-
-    v3 = Endpoint('[1.0').value
-    assert type(v3) is float
-    assert v3 == 1.0
-
-    assert Endpoint('[10').value == 10
-    assert Endpoint('[4.5e-6').value == 4.5e-6
-    assert Endpoint('[4.5e6').value == 4.5e6
-
-    assert Endpoint('(-inf').value == float('-inf')
-    assert Endpoint('(neg_inf').value == float('-inf')
-    assert Endpoint('inf)').value == float('inf')
 
 
 def test_endpoint_repr():
