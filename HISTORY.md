@@ -1,4 +1,4 @@
-## 0.4.0.dev1
+## 0.4.0.dev2
 #### 2026 April 9
 - Infinity ordering semantics refined:
     - comparisons apply only to orderable values
@@ -7,7 +7,7 @@
     - is\_finite() no longer considers NaN finite.
 - Interval.is\_degenerate property
 - Collapse degenerate intervals into scalars when adding/removing them to/from Set
-- Tested on python3.12 - 3.13
+- Tested on python3.12 - 3.14
 - Discontinued python <3.10 support
 - Added type annotations
 - Set comparisons now return NotImplemented (instead of raising TypeError) when the other operand is not a Set
