@@ -1,12 +1,6 @@
 *.pyc
 *.pyo
 __pycache__
-*.egg*
 .cache
 .pytest_cache
-
 *.swp
-
-venv*
-trash
-

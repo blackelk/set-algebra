@@ -1,0 +1,74 @@
+[build-system]
+requires = ["setuptools>=61", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "set-algebra"
+description = "Algebra of Sets"
+
+authors = [
+  { name="Constantine Parkhimovich", email="cparkhimovich@gmail.com" },
+]
+
+maintainers = [
+  { name="Constantine Parkhimovich", email="cparkhimovich@gmail.com" },
+]
+
+version = "0.4.0.dev1"
+
+dependencies = []
+
+requires-python = ">=3.10"
+
+readme = "README.md"
+
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Intended Audience :: Developers",
+    "Natural Language :: English",
+    "Operating System :: OS Independent",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Programming Language :: Python :: 3.13",
+    "Topic :: Software Development :: Libraries :: Python Modules",
+    "Topic :: Scientific/Engineering :: Mathematics",
+]
+
+keywords = [
+    "intervals",
+    "interval-algebra",
+    "interval-arithmetic",
+    "interval-set",
+    "interval-union",
+    "set-operations",
+    "set-theory",
+    "real-line",
+    "ranges",
+    "continuous-sets",
+]
+
+license = "MIT"
+license-files = ["LICENSE"]
+
+[project.urls]
+Homepage = "https://github.com/blackelk/set-algebra"
+Repository = "https://github.com/blackelk/set-algebra"
+Issues = "https://github.com/blackelk/set-algebra/issues"
+Changelog = "https://github.com/blackelk/set-algebra/blob/main/HISTORY.md"
+
+[project.optional-dependencies]
+dev = [
+    "build",
+    "pylint",
+    "pytest",
+    "twine",
+]
+
+[tool.setuptools]
+package-dir = {"" = "src"}
+
+[tool.setuptools.packages]
+find = {where = ["src"]}
