@@ -1,6 +1,0 @@
-
-[dev]
-build
-pylint
-pytest
-twine
