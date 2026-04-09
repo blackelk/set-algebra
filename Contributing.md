@@ -9,8 +9,8 @@ source ~/venvs/set-algebra/bin/activate
 pip install -e .[dev]
 
 pylint src/set_algebra
-pylint --errors-only tests/test_*
-pytest
+pylint --errors-only tests/*.py
+pytest tests
 ```
 
 
@@ -20,11 +20,12 @@ rm -rf build dist *.egg-info src/*.egg-info
 
 python -m build
 python -m venv /tmp/venv-test-set-algebra
+source /tmp/venv-test-set-algebra/bin/activate
 
-/tmp/venv-test-set-algebra/bin/pip install dist/*.whl
-/tmp/venv-test-set-algebra/bin/python -c "import set_algebra"
-/tmp/venv-test-set-algebra/bin/pip install pytest
-/tmp/venv-test-set-algebra/bin/pytest
+pip install dist/*.whl
+python -c "import set_algebra"
+pip install pytest
+pytest tests
 ```
 
 
@@ -70,6 +71,9 @@ pip install \
 
 python -c "from set_algebra import Set, Interval"
 python -c "import set_algebra; print(set_algebra.__version__)"
+
+pip install pytest
+pytest tests
 ```
 
 
