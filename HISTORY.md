@@ -12,6 +12,7 @@
 - Discontinued python <3.10 support
 - Added type annotations
 - Set comparisons now return `NotImplemented` (instead of raising TypeError) when the other operand is not a `Set`
+- Expanded `README.md` with detailed API documentation and usage examples
 
 
 ## 0.3.6
@@ -66,7 +67,7 @@
 ##### 2014 June 16
 - `Set.__xor__()`
 - `Set.__ixor__()`
-- `Set.symmetric\_difference()`
+- `Set.symmetric_difference()`
 - `Set.symmetric_difference_update()`
 - `Set.__sub__()`
 - `Set.__isub__()`
