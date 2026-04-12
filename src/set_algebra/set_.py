@@ -427,12 +427,16 @@ class Set:
         return new
 
     @_assert_pieces_are_ascending
-    def update(self, *others: Set) -> None:
+    def update(self, *others: Set | Iterable[Interval|Scalar] ) -> None:
         """Update the Set, adding pieces from all the others."""
         for other in others:
-            lo = 0
-            for x in other.pieces:
-                lo = self._add(x, lo)
+            if isinstance(other, Set):
+                lo = 0
+                for x in other.pieces:
+                    lo = self._add(x, lo)
+            else:
+                for x in other:
+                    self._add(x)
 
     @staticmethod
     def __and(A: Set, B: Set) -> Set:

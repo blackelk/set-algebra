@@ -1,11 +1,12 @@
 ## 0.4.0.dev2
-#### 2026 April 9
+#### 2026 April 12
 - Infinity ordering semantics refined:
     - comparisons apply only to orderable values
     - propagate comparisons via reflected operators
-    - treat NaN as unordered.
-    - is\_finite() no longer considers NaN finite.
-- Interval.is\_degenerate property
+    - treat `NaN` as unordered.
+    - `is_finite()` no longer considers `NaN` finite.
+- `Interval.is_degenerate` property
+- Fixed `Set.update()` to accept iterables in addition to Set instances
 - Collapse degenerate intervals into scalars when adding/removing them to/from Set
 - Tested on python3.12 - 3.14
 - Discontinued python <3.10 support
