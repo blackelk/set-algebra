@@ -13,6 +13,8 @@ The library is designed for cases where you need interval-aware set logic rather
 
 It can also be useful for schedule calculations, such as [finding overlapping meeting times](#scheduling-and-availability) between multiple people.
 
+**All code examples in this README are automatically extracted and tested to ensure they stay correct.**
+
 
 ## What the library does
 

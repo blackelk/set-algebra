@@ -13,6 +13,7 @@
 - Added type annotations
 - Set comparisons now return `NotImplemented` (instead of raising TypeError) when the other operand is not a `Set`
 - Expanded `README.md` with detailed API documentation and usage examples
+- Added automated tests for README examples
 
 
 ## 0.3.6

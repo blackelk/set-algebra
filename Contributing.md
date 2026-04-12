@@ -9,6 +9,7 @@ source ~/venvs/set-algebra/bin/activate
 pip install -e .[dev]
 
 pylint src/set_algebra
+pylint tests/test_README.py
 pylint --errors-only tests/*.py
 pytest tests
 ```
