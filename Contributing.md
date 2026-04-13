@@ -100,8 +100,8 @@ Check release date in `HISTORY.md`
 
 ```
 git commit -m "Release X.Y.Z"
+git push origin main
 git tag -a X.Y.Z -m "Release X.Y.Z"
-git push
 git push origin X.Y.Z
 
 deactivate
@@ -113,6 +113,7 @@ rm -rf /tmp/venv-pypi-wheel-set-algebra
 python -m venv /tmp/venv-pypi-wheel-set-algebra
 source /tmp/venv-pypi-wheel-set-algebra/bin/activate
 
+pip install --upgrade twine
 pip install --force-reinstall dist/set_algebra-*.whl
 python -c "import set_algebra"
 
