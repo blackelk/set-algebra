@@ -18,14 +18,15 @@ pytest tests
 ## For release testing
 ```
 rm -rf build dist *.egg-info src/*.egg-info
-
 python -m build
+
+rm -rf /tmp/venv-test-set-algebra
 python -m venv /tmp/venv-test-set-algebra
 source /tmp/venv-test-set-algebra/bin/activate
 
-pip install dist/*.whl
+pip install --force-reinstall dist/*.whl
 python -c "import set_algebra"
-pip install pytest
+pip install --upgrade pytest
 pytest tests
 ```
 
@@ -42,11 +43,13 @@ Make sure versions match in:
 ```
 rm -rf build dist *.egg-info src/*.egg-info
 python -m build
+
+rm -rf /tmp/venv-try-set-algebra-wheel
 python -m venv /tmp/venv-try-set-algebra-wheel
 source /tmp/venv-try-set-algebra-wheel/bin/activate
 
-pip install twine
-pip install dist/set_algebra-*.whl
+pip install --upgrade twine
+pip install --force-reinstall dist/set_algebra-*.whl
 python -c "import set_algebra"
 
 python -m twine upload \
@@ -57,13 +60,15 @@ python -m twine upload \
 ```
 ^ Enter the TestPyPI API token when prompted for password.
 
-Review [Set Algebra at testPyPI](https://test.pypi.org/project/set-algebra/)
+Review [Set Algebra at testPyPI](https://test.pypi.org/project/set-algebra/ )
 
 
 ## Verify package from TestPyPI
+
 ```
-python -m venv /tmp/venv-testpypi-set-algebra
-source /tmp/venv-testpypi-set-algebra/bin/activate
+rm -rf /tmp/venv-testpypi-wheel-set-algebra
+python -m venv /tmp/venv-testpypi-wheel-set-algebra
+source /tmp/venv-testpypi-wheel-set-algebra/bin/activate
 
 pip install \
     --index-url https://test.pypi.org/simple/ \
@@ -73,12 +78,13 @@ pip install \
 python -c "from set_algebra import Set, Interval"
 python -c "import set_algebra; print(set_algebra.__version__)"
 
-pip install pytest
+pip install --upgrade pytest
 pytest tests
 ```
 
 
 ## Packaging (live)
+
 Remove `.devN` from `version` in:
 - `pyproject.toml`
 - `src/set_algebra/__init__.py`
@@ -87,10 +93,12 @@ Remove `.devN` from `version` in:
 ```
 rm -rf build dist *.egg-info src/*.egg-info
 python -m build
-python -m venv /tmp/venv-try-set-algebra-wheel
-source /tmp/venv-try-set-algebra-wheel/bin/activate
 
-pip install dist/set_algebra-*.whl
+rm -rf /tmp/venv-pypi-wheel-set-algebra
+python -m venv /tmp/venv-pypi-wheel-set-algebra
+source /tmp/venv-pypi-wheel-set-algebra/bin/activate
+
+pip install --force-reinstall dist/set_algebra-*.whl
 python -c "import set_algebra"
 
 python -m twine upload \
@@ -98,4 +106,6 @@ python -m twine upload \
     -u __token__ \
     dist/*
 ```
-Review [Set Algebra at PyPI](https://pypi.org/project/set-algebra/)
+^ Enter the PyPI API token when prompted for password.
+
+Review [Set Algebra at PyPI](https://pypi.org/project/set-algebra/ )
