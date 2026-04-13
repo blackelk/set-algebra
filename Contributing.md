@@ -96,7 +96,14 @@ Remove `.devN` from `version` in:
 - `src/set_algebra/__init__.py`
 - `HISTORY.md`
 
+Check release date in `HISTORY.md`
+
 ```
+git commit -m "Release X.Y.Z"
+git tag -a X.Y.Z -m "Release X.Y.Z"
+git push
+git push origin X.Y.Z
+
 deactivate
 
 rm -rf build dist *.egg-info src/*.egg-info

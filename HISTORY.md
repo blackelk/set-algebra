@@ -1,4 +1,4 @@
-## 0.4.0.dev4
+## 0.4.0
 #### 2026 April 13
 - Infinity ordering semantics refined:
     - comparisons apply only to orderable values
