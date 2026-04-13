@@ -17,6 +17,8 @@ pytest tests
 
 ## For release testing
 ```
+deactivate
+
 rm -rf build dist *.egg-info src/*.egg-info
 python -m build
 
@@ -41,6 +43,8 @@ Make sure versions match in:
 - `HISTORY.md`
 
 ```
+deactivate
+
 rm -rf build dist *.egg-info src/*.egg-info
 python -m build
 
@@ -66,6 +70,8 @@ Review [Set Algebra at testPyPI](https://test.pypi.org/project/set-algebra/ )
 ## Verify package from TestPyPI
 
 ```
+deactivate
+
 rm -rf /tmp/venv-testpypi-wheel-set-algebra
 python -m venv /tmp/venv-testpypi-wheel-set-algebra
 source /tmp/venv-testpypi-wheel-set-algebra/bin/activate
@@ -91,6 +97,8 @@ Remove `.devN` from `version` in:
 - `HISTORY.md`
 
 ```
+deactivate
+
 rm -rf build dist *.egg-info src/*.egg-info
 python -m build
 

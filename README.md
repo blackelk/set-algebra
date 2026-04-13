@@ -9,7 +9,8 @@ It provides four core concepts:
 - `Interval`
 - `Set`
 
-The library is designed for cases where you need interval-aware set logic rather than plain Python hash sets. It supports open and closed bounds, unbounded intervals, singleton points, membership checks, complements, unions, intersections, differences, and symmetric differences.
+The library is designed for cases where you need interval-aware set logic rather than plain Python hash sets.<br>
+It supports open and closed bounds, unbounded intervals, singleton points, membership checks, complements, unions, intersections, differences, and symmetric differences.
 
 It can also be useful for schedule calculations, such as [finding overlapping meeting times](#scheduling-and-availability) between multiple people.
 
@@ -175,9 +176,9 @@ Use `are_bounding(e1, e2)` to check whether two opposite-side endpoints touch wi
 ```python
 >>> from set_algebra import are_bounding, Endpoint
 
->>> are_bounding( Endpoint('7)'), Endpoint('[7'))
+>>> are_bounding( Endpoint('7)'), Endpoint('[7') )
 True
->>> are_bounding( Endpoint('7)'), Endpoint('(7'))
+>>> are_bounding( Endpoint('7)'), Endpoint('(7') )
 False
 ```
 
@@ -200,7 +201,7 @@ Interval('[1, 2)')
 Interval('(-1, 1]')
 ```
 
-Membership supports:
+#### Interval Membership
 
 - scalar in interval
 - endpoint in interval
@@ -224,7 +225,7 @@ False
 True
 ```
 
-Useful attributes and methods:
+#### Useful attributes and methods
 
 - `a`, `b`: left and right endpoints
 - `notation`: normalized interval notation
@@ -246,7 +247,7 @@ Represents a set as an ordered sequence of non-overlapping pieces, where each pi
 - an `Interval`
 - a singleton scalar value
 
-Construction styles:
+#### Construction styles
 
 ```python
 >>> from set_algebra import Set, Interval
@@ -282,7 +283,7 @@ Set('[1, 2], {2}')
 Set('[1, 2], (2, 3)')
 ```
 
-#### Membership
+#### Set Membership
 
 ```python
 >>> from set_algebra import Set, Interval
@@ -330,7 +331,7 @@ Set([Interval('[1, 4)')])
 >>> a ^ b  # symmetric difference
 Set([Interval('[1, 4)'), Interval('(5, 10]')])
 
-~a  # complement relative to (-inf, inf)
+>>> ~a  # complement relative to (-inf, inf)
 Set([Interval('(-inf, 1)'), Interval('(5, inf)')])
 ```
 
@@ -390,7 +391,7 @@ Set([Interval('[1, 2)'), Interval('(2, 3)'), Interval('(3, 5]')])
 - `difference_update(*others)`
 - `symmetric_difference_update(*others)`
 
-##### add(x)
+###### `add(x)`
 
 ```python
 >>> from set_algebra import Set, Interval
@@ -405,7 +406,7 @@ Set([Interval('[1, 2)'), Interval('(2, 3)'), Interval('(3, 5]')])
 '[0, 5], [7, 9], {10}'
 ```
 
-##### `remove(x)`
+###### `remove(x)`
 
 ```python
 >>> from set_algebra import Set
@@ -429,7 +430,7 @@ Unlike Python built-in `set.remove(x)`, `Set.remove(x)` does not raise an except
 Because removal is already tolerant of missing values, there is no separate discard() method.
 
 
-##### `clear()`
+###### `clear()`
 
 ```python
 >>> from set_algebra import Set
@@ -447,7 +448,8 @@ False
 ''
 ```
 
-##### `update(*others)`
+###### `update(*others)`
+
 ```python
 >>> from set_algebra import Set, Interval
 
@@ -460,7 +462,7 @@ False
 '[0, 5], [10, 20], {30}, [40, 50]'
 ```
 
-##### `intersection_update(*others)`
+###### `intersection_update(*others)`
 
 ```python
 >>> from set_algebra import Set, Interval
@@ -483,7 +485,7 @@ False
 - `a < b`
 - `a <= b`
 
-##### Equality and inequality
+###### Equality and inequality
 
 ```python
 >>> from set_algebra import Set
@@ -498,7 +500,7 @@ True
 False
 ```
 
-##### Superset and proper superset
+###### Superset and proper superset
 
 ```python
 >>> from set_algebra import Set
@@ -516,7 +518,7 @@ True
 False
 ```
 
-##### Subset and proper subset
+###### Subset and proper subset
 
 ```python
 >>> from set_algebra import Set
@@ -560,7 +562,7 @@ False
 - `isdisjoint(other)`
 - `copy()`
 
-##### `search(x)`
+###### `search(x)`
 
 ```python
 >>> from set_algebra import Set, Interval
@@ -579,7 +581,7 @@ False
 (2, Interval('[20, 30]'))
 ```
 
-##### `issubset(other)`
+###### `issubset(other)`
 
 ```python
 >>> from set_algebra import Set, Interval
@@ -594,7 +596,7 @@ False
 True
 ```
 
-##### `issuperset(other)`
+###### `issuperset(other)`
 
 ```python
 >>> from set_algebra import Set, Interval
@@ -609,7 +611,7 @@ False
 True
 ```
 
-##### `isdisjoint(other)`
+###### `isdisjoint(other)`
 
 ```python
 >>> from set_algebra import Set
@@ -624,7 +626,7 @@ False
 True
 ```
 
-##### `copy()`
+###### `copy()`
 
 ```python
 >>> from set_algebra import Set
@@ -645,7 +647,6 @@ False
 >>> s2.notation
 '[0, 5], {10}'
 ```
-
 
 ### Parser helpers
 
@@ -679,17 +680,15 @@ If you need intervals over non-numeric comparable values, construct `Endpoint` a
 >>> letters = Interval(left, right)
 >>> 'r' in letters
 True
->>> 'sA' in letters # becasuse 'p' <= 'sA' <= 'z'
+>>> 'sA' in letters # because 'p' <= 'sA' <= 'z'
 True
 ```
-
 
 ### Degenerate intervals
 
 An interval whose endpoint values are equal is considered degenerate.
 
 For `Set`, only the closed form `[a, a]` contributes a point. Other degenerate bound combinations are treated as empty when added or removed from a set.
-
 
 ### `Set` stores normalized pieces
 
@@ -717,11 +716,12 @@ The complement operator `~` means complement within `(-inf, inf)`, not relative 
 ### Interval containment
 
 ```python
-from set_algebra import Interval
+>>> from set_algebra import Interval
 
-outer = Interval('[0, 100]')
-inner = Interval('[20, 30]')
-inner in outer          # True
+>>> outer = Interval('[0, 100]')
+>>> inner = Interval('[20, 30]')
+>>> inner in outer
+True
 ```
 
 ### Mixed set construction
@@ -760,6 +760,10 @@ print((~s).notation)
 ```
 
 ### Scheduling and Availability
+
+Alice can meet on 2026-04-12 from 10:00 to 14:00, and on 2026-04-14 from 13:00 to 15:00.<br>
+Bob can meet on 2026-04-12 from 12:00 to 16:00.<br>
+Find the time when they are both available.
 
 ```python
 >>> from datetime import date, datetime, time

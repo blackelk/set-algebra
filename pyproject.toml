@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "set-algebra"
-description = "Algebra of Sets"
+description = "Set algebra over intervals and singleton values"
 
 authors = [
   { name="Constantine Parkhimovich", email="cparkhimovich@gmail.com" },
@@ -14,7 +14,7 @@ maintainers = [
   { name="Constantine Parkhimovich", email="cparkhimovich@gmail.com" },
 ]
 
-version = "0.4.0.dev2"
+version = "0.4.0.dev4"
 
 dependencies = []
 

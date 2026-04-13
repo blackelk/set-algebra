@@ -1,5 +1,5 @@
-## 0.4.0.dev2
-#### 2026 April 12
+## 0.4.0.dev4
+#### 2026 April 13
 - Infinity ordering semantics refined:
     - comparisons apply only to orderable values
     - propagate comparisons via reflected operators
